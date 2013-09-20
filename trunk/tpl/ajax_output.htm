@@ -1,0 +1,28 @@
+[search]
+	<ul id="resultList">
+	  <li class="head">
+	    {query}
+	  </li>
+		{body}
+		<li class="foot">
+		  {count} / {total}
+		</li>
+	</ul>
+[search_line]
+	<li>
+		<div class="point_img">
+			<a href="/{lang}/goods/view/{g_id}">
+				<img src="{p_img}" onload="if($(this).width())$(this).next().remove();">
+				<img src="/img/def_point.jpg">
+			</a>
+		</div>
+	  <p>
+			<a href="/point/{p_id}">
+			  <span class="name">{p_name}</span>
+				<span class="addr">{p_addr}</span>
+				{p_themes}
+			</a>
+		</p>
+	</li>
+[search_noresults]
+	<p class="nores">Ничего не найдено</p>

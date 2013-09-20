@@ -1,0 +1,48 @@
+Крутая плитка
+http://masonry.desandro.com/appendix.html
+
+Geo/Spatial Search with MySQL
+расстояния между координатами в Mysql
+http://ru.scribd.com/doc/2569355/Geo-Distance-Search-with-MySQL
+
+
+//Обращение к foursqareAPI
+Client id ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS
+Client secret CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J
+client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+
+//Поиск по портер в киеве (радиус 10 км)
+https://api.foursquare.com/v2/venues/search?ll=50.467995,30.567856&radius=10000&intent=browse&query=%D0%BF%D0%BE%D1%80%D1%82%D0%B5%D1%80&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+https://api.foursquare.com/v2/venues/search?near=kiev&intent=browse&query=%D0%BF%D0%BE%D1%80%D1%82%D0%B5%D1%80&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+
+
+4d4b7105d754a06374d81259
+https://api.foursquare.com/v2/venues/search?ll=50.467995,30.567856&radius=5000&intent=browse&categoryId=4d4b7105d754a06374d81259&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+
+
+//	№поретр ПАБ 4cc30146b2beb1f78091134c
+https://api.foursquare.com/v2/venues/4cc30146b2beb1f78091134c?client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+
+//		ROUTE66
+https://api.foursquare.com/v2/venues/513262d5e4b0e80cdba8eb71?client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+
+//Категории
+https://api.foursquare.com/v2/venues/categories?client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+
+//поиск Три мушкетера
+https://api.foursquare.com/v2/venues/search?ll=50.467995,30.567856&radius=20000&intent=browse&query=Три+мушкетера&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+
+https://api.foursquare.com/v2/venues/search?near=kiev&intent=global&query=Три+мушкетера&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+https://api.foursquare.com/v2/venues/search?near=kievskaya+oblast&intent=match&query=Три+мушкетера&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+
+//Хитрый запрос для определения только геокодинга.
+https://api.foursquare.com/v2/venues/search?near=kievskaya+oblast&intent=match&query=onlugeocoding&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+
+//Поиск макдональдзов только в киеве
+https://api.foursquare.com/v2/venues/search?near=kiev&intent=browse&query=макдональдз&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+//Поиск макдональдзов вообще
+https://api.foursquare.com/v2/venues/search?intent=global&query=макдональдз&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+
+
+//Блиндаж
+https://api.foursquare.com/v2/venues/4d5565ece7f1a1cd18fbf9a4?client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901

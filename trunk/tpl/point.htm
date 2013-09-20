@@ -1,0 +1,96 @@
+[body]
+	<div id="point">
+		<div id="map_box"></div>
+		<div id="point_wrapper">
+			<div id="point_main">
+			  <div id="point_gallery">
+			    {gallery}
+				</div>
+				<div id="point_name">{p_name}</div>
+				<div id="point_tags">{p_themes}</div>
+				<ul id="point_info">
+				  <li>адрес <span>{p_addr}</span></li>
+				  {p_timeframes}
+				  {p_phone}
+				  {p_site}
+				</ul>
+				<div id="point_control">
+				</div>
+				<div class="clear"></div>
+			</div>
+	    {auth}
+			{comms}
+		</div>
+	</div>
+[auth]
+[not_auth]
+		<div id="point_social">
+			  <div class="head">
+					Кто-кто из твоих друзей уже пользуется сервисом Vidguk.Pro, присоединяйся!
+				</div>
+			  <div class="content">
+					<div style="margin:10px; background:#99f; text-align:center; padding:20px;">
+			    Тут плагин социалочек
+			    </div>
+				</div>
+			  <div class="foot">
+					<a href="http://loginza.ru/api/widget?token_url=http%3A%2F%2F{function:server_name}%2Floginza&provider=facebook" class="loginza button">
+					  Вход через openID
+					</a>
+
+				  или
+
+					<a href="/?reg=true">Зарегистрироваться через e-mail</a>
+
+				</div>
+			</div>
+[p_timeframes]
+	<li>режим <span>{p_timeframes}</span></li>
+[p_site]
+	<li>сайт <span>{p_site}</span></li>
+[p_phone]
+	<li>телефон <span>{p_phone}</span></li>
+[empty]
+	<h1>уупс...</h1>
+	<p>Временные проблемы с отображением этой страницы</p>
+[gallery_item]
+	<img src="{photo}" title="{title}" alt="{title}">
+[comm_body]
+	<div id="point_comm">
+	  <h3>Что говорят люди про {comm_p_fscat_prim} {comm_p_name}</h3>
+		{body}
+	</div>
+[comm_line]
+  <div class="comment" >
+    <div class="bullet">
+    	<img src="{u_img}">
+    </div>
+		<div class="user">
+			<span class="name">{u_name}</span>
+			<span class="recommend">рекомендует</span>
+		  <span class="duration">на сайте <span class="from">{u_createdate}</span>.</span>
+			<!--<a href="">Подписаться на отзывы участника</a>-->
+		</div>
+		<span class="date">{com_date}</span>
+		<div class="text">
+		  {com_text}
+		</div>
+		<div class="bullet wide">
+		  <span class="likes"><i></i>{com_cachelikes}</span>
+		</div>
+  </div>
+[comm_line_fs]
+  <div class="comment foursquare">
+    <div class="bullet">
+    	<img src="{user_photo}">
+    	<img src="/img/fs_logo_tiny.jpg" title="из foursquare">
+    </div>
+		<div class="user">
+			<span class="name">{user_name}</span>
+			<!--<a href="">Подписаться на отзывы участника</a>-->
+		</div>
+		<span class="date">{create}</span>
+		<div class="text">
+		  {text}
+		</div>
+  </div>

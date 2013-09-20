@@ -1,0 +1,57 @@
+[body]
+	<div class="list_title">
+	  Поиск заведений
+	</div>
+	<div class="point_list">
+	  {body}
+	</div>
+[line]
+	{p_id}
+[p_id]
+	<div class="item">
+	  <div class="point">
+		  <div class="ill">
+		  	<img src="{p_img}">
+		  	{p_comms}
+		  </div>
+		  <label>{p_name}</label>
+		  <small>{p_addr}</small>
+		  <a href="/point/{p_url}"></a>
+	  </div>
+	  <div class="vote">
+	  </div>
+	  {com_id}
+	</div>
+[not_p_id]
+	<div class="item fs">
+	  <div class="point">
+		  <div class="ill">
+		  	<img src="{img}">
+		  </div>
+		  <label>{name}</label>
+		  <small>{address}</small>
+			<div>{categories}</div>
+		  <a href="/point/add/{id}"></a>
+	  </div>
+	  <div class="comm">
+	    <p>
+	      {spec}
+	    </p>
+	  </div>
+	</div>
+[com_id]
+		<div class="comm">
+	    <a href="/users/{u_url}">
+	      <img src="{u_img}">
+	      <strong>{u_name}</strong>
+	      <small class="duration">на сайте <span class="from">{u_createdate}</span></small>
+	    </a>
+	    <p>
+	      {com_short}
+	    </p>
+	  </div>
+[p_comms]
+  <span class="comms"><i></i>{p_comms}</span>
+[empty]
+	Ничего не найдено... <br>
+	Проверте - правильно ли вы указали название заведения?

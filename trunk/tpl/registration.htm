@@ -1,0 +1,142 @@
+[body]
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	    "http://www.w3.org/TR/html4/loose.dtd">
+	<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link href="/css/share.css" rel="stylesheet" type="text/css">
+		<link href="/css/registration.css" rel="stylesheet" type="text/css">
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="head">
+			  <div id="logo"></div>
+
+				<div class="wide" style="padding-top:15px;">
+					<div class="arrow" style="width:30%">
+					  <span class="arr"></span>
+					  <div><span>Добро пожаловать</span></div>
+					  <span class="arr r"></span>
+					</div>
+					<div class="arrow gray" style="width:39%;">
+					  <span class="arr"></span>
+					  <div><span>Выберите интересующие вас темы</span></div>
+					  <span class="arr r"></span>
+					</div>
+					<div class="arrow gray" style="width:30%">
+					  <span class="arr"></span>
+					  <div><span>Готово!</span></div>
+					  <span class="arr r"></span>
+					</div>
+				</div>
+			</div>
+
+			<div class="content">
+			  {error:error}
+				<center>Вы можете воспользоваться одним из существующих профилей</center>
+				<div>
+					<script src="http://loginza.ru/js/widget.js" type="text/javascript"></script>
+					<a href="http://loginza.ru/api/widget?token_url=http%3A%2F%2F{function:server_name}%2Floginza&provider=facebook" class="loginza button" id="reg_type_soc">
+					  Вход через openID
+					</a>
+				</div>
+
+				<center>или создатьт новый аккаунт</center>
+				<form name="registration">
+				  <input type="hidden" name="hidden" >
+				  <input type="text" name="name" placeholder="Имя" required><br>
+				  <input type="text" name="email" placeholder="e-mail" required style="email"><br>
+				  <button>Создать новый аккаунт</button>
+				</form>
+				
+				<br>
+				<a href="/?reg_skip=watch">Пропустить регистрацию, хочу просто посмотреть</a>
+			</div>
+		</div>
+	</body>
+	</html>
+[categories]
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	    "http://www.w3.org/TR/html4/loose.dtd">
+	<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="/css/share.css" rel="stylesheet" type="text/css">
+		<link href="/css/registration.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="/js/jquery.js"></script>
+		<script type="text/javascript" src="/js/forms.js"></script>
+		<script type="text/javascript" src="/js/registration.js"></script>
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="head">
+			  <div id="logo"></div>
+
+				<div class="wide" style="padding-top:15px;">
+					<div class="arrow" style="width:30%">
+					  <span class="arr"></span>
+					  <div><a href="{replacer: pg="{the_url}"}/name">Добро пожаловать</a></div>
+					  <span class="arr r"></span>
+					</div>
+					<div class="arrow" style="width:39%;">
+					  <span class="arr"></span>
+					  <div><span>Выберите интересующие вас темы</span></div>
+					  <span class="arr r"></span>
+					</div>
+					<div class="arrow gray" style="width:30%">
+					  <span class="arr"></span>
+					  <div><span>Готово!</span></div>
+					  <span class="arr r"></span>
+					</div>
+				</div>
+			</div>
+
+			<div class="content">
+				<form id="cats"  name="registration">
+					{body}
+					<div class="clear"></div>
+					<input type="submit" value="Готово!">
+				</form>
+
+			</div>
+		</div>
+	</body>
+	</html>
+[categories_line]
+	<div class="check_block" title="{t_name}">
+	  <input type="checkbox" name="themes[{t_id}]" value="{t_id}" >
+	  <img src="{t_img}" alt="{t_name}">
+	</div>
+[categories_sep]
+[categories_empty]
+	Нет категорий
+[mail_msg]
+	<html>
+	  <body>
+	    <table width="500" height="100%">
+	      <tr>
+	        <td height="60">
+	          <img src="http://{server}/img/logo.jpg">
+					</td>
+	      </tr>
+	      <tr>
+	        <td background="http://{server}/img/shadow_bg.jpg" height="10"></td>
+	      </tr>
+	      <tr>
+	        <td valign="top">
+	          <h1>Спасибо за интерес к сервису Vidguk.pro</h1>
+	          <p>Для завершения регистрации необходимо подтвердить Ваш адрес электронной почты, перейдя по ссылке:</p>
+	          <p><a href="http://{server}/unlock/{u_unlock}">http://{server}/unlock/{u_unlock}</a></p>
+	          <p><small><i>Если ссылка не открывает браузер со страницей подтверждения, скопируйте ее в адресную строку браузера.</i></small></p>
+	          <br><br>
+	          <p>Удачного дня!</p>
+					</td>
+	      </tr>
+	      <tr>
+	        <td background="#e4e4e4" height="60">
+	          Vidguk.pro - Делитесь впечатлениями!
+					</td>
+	      </tr>
+	    </table>
+	  </body>
+	</html>

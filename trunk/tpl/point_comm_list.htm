@@ -1,0 +1,31 @@
+[body]
+	<div class="list_title">
+	  Заголовок
+	</div>
+	<div class="point_list">
+	  {body}
+	</div>
+[line]
+	<div class="item">
+	  <div class="point">
+		  <div class="ill">
+		  	<img src="{p_img}">
+		  	<span class="comms"><i></i>{p_comms}</span>
+		  </div>
+		  <label>{p_name}</label>
+		  <small>{p_addr}</small>
+		  <a href="/point/{p_url}"></a>
+	  </div>
+	  <div class="vote">
+	  </div>
+	  <div class="comm">
+	    <a href="/users/{u_url}">
+	      <img src="{u_img}">
+	      <strong>{u_name}</strong>
+	      <small class="duration">на сайте <span class="from">{u_createdate}</span></small>
+	    </a>
+	    <p>
+	      {com_short}
+	    </p>
+	  </div>
+	</div>

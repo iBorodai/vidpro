@@ -1,0 +1,85 @@
+#wrapper{
+	width:100%;
+}
+#head,#point_wrapper{
+	margin: 0 auto;
+	width: 990px;
+}
+#point_wrapper{
+	margin-top:-180px;
+}
+#map_box{
+	width:100%;
+	height:400px;
+	background:red;
+}
+
+#point_main{
+	background:#fff;
+	box-shadow:0 3px 3px #ccc;
+	margin-bottom:20px;
+}
+
+#point_gallery{
+	height:180px;
+}
+
+#point_name,
+#point_tags,
+#point_info{
+  margin-left:20px;
+}
+
+#point_name{
+	font-size:20px;
+	margin-bottom:10px;
+}
+#point_info{
+  margin-top:10px;
+  margin-bottom:10px;
+	list-style:none;
+	padding:0;
+	width:300px;
+	float:left;
+}
+
+#point_info li span{
+	font-weight:bold;
+	float:right;
+	width:200px;
+}
+
+#point_social{
+	width:100%;
+	border:1px solid #e4e4e4;
+}
+#point_social .head,
+#point_social .foot{
+	background:#e4e4e4;
+	font-size:20px;
+	padding:20px;
+}
+
+.comment{
+	padding-left:85px;
+	position:relative;
+	min-height:80px;
+}
+.comment .bullet{
+	position:absolute;
+	left:0; top:0;
+	width:80px;
+}
+
+#point_comm{
+	margin-top:20px;
+}
+
+#point_comm h3{
+	color:#434343;
+	margin:0 0 20px 0;
+	font-size:30px;
+}
+
+.comment .name{font-weight:bold;}
+.comment .duration{display:block; font-size:11px; color:#687184;}
