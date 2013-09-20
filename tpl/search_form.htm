@@ -1,0 +1,12 @@
+<form id="search_form" name="search" action="/search">
+  <input type="text" name="query" placeholder="Что ищем?" id="search_query">
+  <select name="region" id="search_reg">
+    <options source="sql:region#r_name name, 	r_url id$auto_query=no">
+	</select>
+	<input type="text" name="region_other" id="search_reg_other" placeholder="Название" onblur="if(this.value=='') { $(this).hide(); $('#search_reg').show(); }">
+	<a href="#" id="search_apply"Э>Найти</a>
+</form>
+<script>
+	$(document).ready(function(){
+	});
+</script>

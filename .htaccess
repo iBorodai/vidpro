@@ -1,0 +1,13 @@
+# Выключить обработку модулем mod_charset
+#CharsetDisable On
+# Выставить кодировку по умолчанию стандартными средствами apache
+AddDefaultCharset UTF-8
+#
+#
+RewriteEngine On
+Options FollowSymLinks ExecCGI
+RewriteCond %{QUERY_STRING} !Jlib_target=
+RewriteCond %{REQUEST_URI} !^/tiny_mce
+RewriteRule ^[^.]+/img/(.*) /img/$1?Jlib_target=img [L]
+RewriteCond %{QUERY_STRING} !Jlib_target=
+RewriteRule ^([^.]*)/?$ /?Jlib_target=$1&%{QUERY_STRING} [L]

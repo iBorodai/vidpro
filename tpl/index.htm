@@ -1,0 +1,42 @@
+[body]
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	    "http://www.w3.org/TR/html4/loose.dtd">
+	<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		{meta:meta}
+	</head>
+	<body>
+	<div id="wrapper" class="{replacer: pg="{the_real_page}"}">
+		<div id="head">
+		  {function:logo_link}
+			<span class="head_arr"></span>
+
+			<div class="right">{user_info: }</div>
+		  <div class="center">
+		    {get_form:search_form tpl=search_form.htm}
+			</div>
+		</div>
+
+		<div class="content">
+			{panel:block1}
+			{panel:block2}
+			{panel:block3}
+			{panel:block4}
+			{panel:block5}
+		</div>
+
+		<div id="push"></div>
+	</div>
+	<div id="footer">
+		footer
+	</div>
+	<div style="display:none" id="sys_block">
+
+	</div>
+	</body>
+	</html>
+[logo_link]
+  <a href="/" id="logo"></a>
+[not_logo_link]
+	<div id="logo"></div>

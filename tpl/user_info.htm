@@ -1,0 +1,40 @@
+[body]
+	<div id="user_info">
+		<a href="#" id="user_profile">
+		  {u_img}
+		</a>
+		<a href="#" id="write_review"><i></i>написать отзыв</a>
+		<div id="user_subnav">
+		  <span class="arr"><span></span></span>
+		  <span class="title">{u_name}</span>
+		  <a href="/profile" >Мой профиль</a>
+		  <a href="/profile/subscribe" >Мои подписки</a>
+		  <a href="/profile/settings" >Мои настройки</a>
+			<a href="/?logout=yes" id="user_logout">Выйти из аккаунта</a>
+			<div class="clear"></div>
+		</div>
+	</div>
+[u_img]
+  <img src="{u_img}" title="{u_name}">
+[not_u_img]
+  <img src="/img/usr_def.jpg" title="{u_name}">
+[form]
+	<div id="login_block">
+		<form name="login" id="login_form">
+		  <span class="arr"><span></span></span>
+		  <span class="title">Вам необходимо авторизироваться.</span>
+		  <input type="hidden" name="hidden">
+		  {error: type=user}
+		  <input type="text" name="usr" placeholder="e-mail" style="email"><br>
+		  <!--err:usr-->
+		  <input type="password" name="pwd" placeholder="пароль"><br>
+		  <input type="submit" value="вход" >
+			<div class="foot">
+		  	<a href="/?reg=true">cоздать новый аккаунт</a> или<br>
+		  	<a href="http://loginza.ru/api/widget?token_url={function:loginza_token_url}&provider=facebook" class="loginza button" id="reg_type_soc">
+					  вход через openID
+				</a>
+		  </div>
+		</form>
+		<a href="#" id="write_review"><i></i>написать отзыв</a>
+	</div>
