@@ -1,4 +1,5 @@
 var ilist=[],itimer=false;
+
 $(document).ready(function(){
 		var req = new JsHttpRequest("utf-8");
 		req.onreadystatechange = function(){
