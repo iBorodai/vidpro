@@ -330,7 +330,7 @@ class lite_reg extends form {
 		$_SESSION['Jlib_auth']=$data;
 		$_SESSION['Jlib_auth']['user_auth']=true;
 		$_SESSION['Jlib_auth']['site_auth']=true;
-		$_SESSION['Jlib_auth']['u_id']=$this->wizard_data['uid'];
+		if(empty($_SESSION['Jlib_auth']['u_id']))$_SESSION['Jlib_auth']['u_id']=$this->wizard_data['uid'];
 	}
 	
 	function loginza_reg(){

@@ -1,28 +1,40 @@
-[search]
-	<ul id="resultList">
+[search_body]
+	<ul class="resultList">
 	  <li class="head">
-	    {query}
+	    {val}
 	  </li>
 		{body}
 		<li class="foot">
 		  {count} / {total}
+		  <a href="#" onClick="$('#search_form').submit(); return false">найти больше</a>
 		</li>
 	</ul>
 [search_line]
-	<li>
+	<li id="{p_id}">
 		<div class="point_img">
-			<a href="/{lang}/goods/view/{g_id}">
+			<a href="/point/{p_url}">
 				<img src="{p_img}" onload="if($(this).width())$(this).next().remove();">
 				<img src="/img/def_point.jpg">
 			</a>
 		</div>
 	  <p>
-			<a href="/point/{p_id}">
+			<a href="/point/{p_url}">
 			  <span class="name">{p_name}</span>
 				<span class="addr">{p_addr}</span>
-				{p_themes}
+				<br><small>{p_themes}</small>
 			</a>
 		</p>
+		<div class="clear"></div>
 	</li>
 [search_noresults]
-	<p class="nores">������ �� �������</p>
+  <ul class="resultList">
+		<li class="head">
+	    Пока никто не оставлял отзывов на это заведение
+	  </li>
+	  <li>
+			<a href="#" onClick="$('#search_form').submit(); return false">найти его?</a>
+		</li>
+	</ul>
+[send_review_success]
+	<h2>Отзыв успешно добавлен</h2>
+	<p>Спасибо, за интерес к проекту</p>

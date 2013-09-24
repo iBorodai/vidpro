@@ -65,12 +65,12 @@ class foursquare{
 	    $this->errors[]=array('err','в запросе не передана строка поиска');
 			return false;
 		}
-//echo '<pre class="debug">'.print_r ( $req ,true).'</pre>';
+
 		if( preg_match('~[а-яА-Я]~', $req['query']) )		{$req['query']=urlencode($req['query']);}
 		if( preg_match('~[а-яА-Я]~', $req['location']) ){$req['query']=urlencode($req['location']);}
 	  //make requert
 	  $fs_query='/v2/venues/search/?near='.$req['location'].'&intent=browse&query='. $req['query'] .'&limit=50&categoryId='.$this->api_top_cats.'&'.$this->api_key;
-//echo $fs_query;
+//echo '<br />'.$fs_query;
 	  $dt=$this->request($fs_query, 86400); //Передаю кешировать на сутки в секундах
 		//Validate response
 	  if( empty($dt->response->venues) ){

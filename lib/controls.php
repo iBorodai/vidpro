@@ -601,7 +601,7 @@ function reg_build_cats($obj){
 	    'ctrl'=>'t_id',
 	    'vars'=>'t_id',
 	    'url'=>'t_id',
-	    'ucl'=>'sql:theme?t_fs_id=\'\' AND t_pid=0 ',
+	    'ucl'=>'sql:theme',
 	    'quantity'=>false,
 	));
 	$t->tpl=array(
