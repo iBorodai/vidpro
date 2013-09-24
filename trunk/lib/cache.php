@@ -21,7 +21,7 @@ class cache {
 	  if( $id=='clear' ){	$this->temp=false; return true; }
 	  //Если не передано что готовить
 	  if( !$data)return false;
-	  
+
 	  $t=mktime();
 	  if(!$period_sec) $period_sec=86400; //+20дней=86400
 
@@ -35,6 +35,7 @@ class cache {
 	  
 	  $this->temp="REPLACE INTO z_fs_queries SET fq_id='$id', fq_content='$serr', fq_create=". $t .", fq_dead=".($t+$period_sec);
 	  $this->last_id=$id;
+	  return true;
 	}
 	
 	function set($id=false,$data=false,$period_sec=false){
@@ -44,7 +45,7 @@ class cache {
 	  $this->db=init_db();
 	  //Если передано что сохранять
 		if($id && $data)	$this->prepare($id,$data,$period_sec);
-		
+
 	  $this->db->query($this->temp);
 	  if(mysql_errno())return false;
 	  $this->last_id=$id;

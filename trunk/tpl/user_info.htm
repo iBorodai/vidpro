@@ -3,7 +3,7 @@
 		<a href="#" id="user_profile">
 		  {u_img}
 		</a>
-		<a href="#" id="write_review"><i></i>написать отзыв</a>
+		<a href="#review" id="write_review"><i></i>написать отзыв</a>
 		<div id="user_subnav">
 		  <span class="arr"><span></span></span>
 		  <span class="title">{u_name}</span>
@@ -12,6 +12,41 @@
 		  <a href="/profile/settings" >Мои настройки</a>
 			<a href="/?logout=yes" id="user_logout">Выйти из аккаунта</a>
 			<div class="clear"></div>
+		</div>
+	</div>
+	<div style="display:none;">
+	  <div id="review_form_tpl">
+	    <form class="review_form">
+	      <div class="recomend_block"></div>
+	      <input type="text" name="recomend" value="" class="recomend_fld">
+	      <hr size="1">
+	      
+	      <textarea name="reveiw"></textarea>
+	      <input type="submit" onclick="send_review( this.form ); return false;">
+	    </form>
+		</div>
+		<div id="recommend_plus_tpl">
+		  <span rel="Подставить ID заведения">
+				Большинство рекомендует
+				<a href="#" onClick="send_recommend(1); return false;">Я тоже рекомендую</a>
+				<a href="#" onClick="send_recommend(-1); return false;">Я не рекомендую</a>
+			</span>
+		</div>
+		<div id="recommend_minus_tpl">
+		  <span rel="Подставить ID заведения">
+				Большинство не рекомендует
+				<a href="#" onClick="send_recommend(-1); return false;">Я тоже не рекомендую</a>
+				<a href="#" onClick="send_recommend(1); return false;">Я все-таки рекомендую</a>
+			</span>
+		</div>
+		<div id="recommend_def_tpl">
+		  <span rel="Подставить ID заведения">
+				<a href="#" onClick="send_recommend(1); return false;">Я рекомендую</a>
+				<a href="#" onClick="send_recommend(-1); return false;">Я не рекомендую</a>
+			</span>
+		</div>
+	  <div id="review_search_tpl">
+	    <img src="/img/big_red_arr_top.jpg" align="bottom"> Укажите заведение для добавления отзыва.
 		</div>
 	</div>
 [u_img]

@@ -213,6 +213,9 @@
 			'class' => 'proj_list_viewer',
 			'page_selector_tpl' => 'pages.htm',
 		),
+		'nav_cats'=>array(
+		  'class' => 'nav_cats',
+		),
 	),
 	'forms' => array (
 		'regexes' => array (
@@ -448,7 +451,7 @@
 							 COUNT( com_id ) p_comms
 							?com_key_obj=p_id AND com_type=\'pnt\' AND com_key_u=u_id AND p_key_reg=r_id AND
 							 p2t_key_p=p_id {themes_place} {city_place}
-							$group=p_id ',
+							$group=p_id debug=yes',
 			'ucl_themes'=>' AND p2t_key_t IN({themes})',
 			'ucl_city'=>' AND r_url IN( {city} )',
 	    //'ucl_cats'
@@ -745,6 +748,7 @@
 			'class' => 'reg_handler',
 			'content' => array(
 			  'block1'=>'icontrol: tpl=index_layout.htm',
+			  'logo_nav'=>'nav_cats: tpl="nav_cats.htm"',
 			),
 		),
 		'static_content' => array (

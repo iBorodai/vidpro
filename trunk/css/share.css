@@ -27,6 +27,7 @@ body {
 
 #head{
 	height:60px;
+	position:relative;
 }
 
 #head #logo{
@@ -206,8 +207,12 @@ body {
 #search_form select{
 	border:none;
 }
-#search_query{
+#search_query,
+#search_form .liveSearch{
 	width:70%;
+}
+#search_form .liveSearch{
+	float:left;
 }
 #search_reg{
   width:29%;
@@ -298,4 +303,60 @@ body {
 	display:block;
 	padding-top:5px;
 	margin-top:5px;
+}
+
+#dialog_block{
+	position:absolute;
+	top:60px;
+	left:0;
+	z-index:20;
+	width:100%;
+	background:#fff;
+	display:none;
+}
+
+.relative{
+	position:relative;
+}
+.resDiv{
+	background:#fff;
+	position:absolute;
+	z-index:30;
+}
+
+.resultList{
+	list-style:none;
+	padding:0; margin:0;
+}
+.resultList li{
+  padding:5px; margin:0;
+  clear:both;
+  border-bottom:1px solid #e4e4e4;
+  
+}
+.resultList .head{
+	color:#000;
+	font-size:14px;
+	font-weight:bold;
+	padding-bottom:10px;
+	margin-bottom:10px;
+	border-bottom:1px solid #e4e4e4;
+}
+
+.resultList li .point_img{
+	width:50px; height:50px; float:left; margin-right:5px;
+}
+.resultList li .point_img img{width:100%;}
+.resultList li p{
+	font-size:10px;
+}
+
+.resultList li p a{
+	text-decoration:none;
+	color:#000;
+}
+.resultList li p small{
+	color:#555;
+	font-size:10px;
+	
 }

@@ -66,9 +66,16 @@
 	min-height:80px;
 }
 .comment .bullet{
-	position:absolute;
-	left:0; top:0;
-	width:80px;
+  height: 80px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 80px;
+}
+
+.comment .bullet img{
+	max-width:50px;
+	max-height:50px;
 }
 
 #point_comm{
@@ -83,3 +90,15 @@
 
 .comment .name{font-weight:bold;}
 .comment .duration{display:block; font-size:11px; color:#687184;}
+
+.comment .likes{
+		background:#fff;
+    top: 40px;
+    display: block;
+    height: 15px;
+    left: 40px;
+    position: absolute;
+    text-align: center;
+    width: 15px;
+}
+.comment .likes.likes_0{display:none;}

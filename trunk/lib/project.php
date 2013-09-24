@@ -4,7 +4,9 @@
  ************************************/
 class point extends item_viewer{
 	function get_data(){
-	  $this->data=$GLOBALS[CM]->run("sql:point?p_url='".$this->ctrl['p_url']."'\$auto_query=no shrink=yes limit=0,1");
+	  $this->data=$GLOBALS[CM]->run("sql:point LEFT JOIN likes ON(l_key_obj=p_id AND l_type='pnt')
+	                                #*,SUM(l_weight) p_weight
+																	?p_url='".$this->ctrl['p_url']."'\$auto_query=no group=p_id shrink=yes limit=0,1 ");
 	  if(empty($this->data['p_fsid'])){
 	    return false;
 		}
@@ -24,7 +26,7 @@ class point extends item_viewer{
                            u_id,u_grp,u_url,u_email,u_name,u_img,u_gender,u_createdate,u_lastlogin,u_lock,u_openid,u_openidprov,
 													DATE_FORMAT( com_date ,\'%Y%m%d%H%i%s\') did,
 													DATE_FORMAT( com_date ,\'%d.%m.%Y %H:%i\') com_date
-													?com_type=\'pnt\' AND com_key_obj='.$this->data['p_id'].'$id=did ');
+													?com_type=\'pnt\' AND com_key_obj='.$this->data['p_id'].' AND com_key_u=u_id$id=did ');
 
 		$this->data['tips']=array_merge($this->data['tips'], $t);
 		krsort($this->data['tips']);
@@ -60,6 +62,7 @@ class point extends item_viewer{
 		 *****************/
 			$vals=array();
 			if(!empty($this->data['tips'])){
+
 				foreach($this->data['tips'] as $k=>$v){
 					if(!empty($v['com_id']))$tpl=$this->tpl['comm_line'];
 					else  $tpl=$this->tpl['comm_line_fs'];
@@ -94,7 +97,7 @@ class point_add extends icontrol{
 	    exit();
 		}
 		$item=parse_venue_item($dt);
-
+//echo '<pre class="debug">'.print_r ( $item ,true).'</pre>'; exit();
 		//УРЛ
 		$item['p_url']=strtolower(translit( $item['p_name'] ));
 		$t=$GLOBALS[CM]->run('sql:point?p_url=\''.$item['p_url'].'\'');
@@ -140,15 +143,11 @@ class point_add extends icontrol{
 			$item['p_name'] ,
 			array( '"'=>' ', "'"=>' ', '`'=>'', '/'=>'', '_'=>' ', '-'=>' ', '  '=>'')
 		);
-//echo 'name:'.$item['p_name'];
 		$m=explode(' ', $item['p_name']);
-//echo '<pre class="debug">'.print_r ( $m ,true).'</pre>';
-    //preg_match_all('~(\S+)~', $item['p_name'], $m);
     $sql="REPLACE INTO search_words_index VALUES ";
     $vals=array();
     foreach( $m as $v ){
       if(empty($v)) continue;
-//echo '<br />'.$v;
       if( strlen($v)>1 )
         $vals[]=" ('$v', $p_id, 'pnt') ";
 		}
@@ -157,8 +156,11 @@ class point_add extends icontrol{
 		  $vals[]=" ('".trim($v)."', $p_id, 'pnt') ";
 		}
 		$sql.=implode(',',$vals);
-		
 		$db=init_db();
+		$db->query($sql);
+		
+		//Добавить привязку к категориям
+		$sql="REPLACE INTO point2theme (SELECT $p_id , t2c_key_t FROM theme2fs_cat WHERE  t2c_key_c IN( '". implode("','", array_keys( $item['p_fs_cats'] ) ) ."' ) )";
 		$db->query($sql);
 		
 		redirect('/point/'.$item['p_url']);
@@ -276,6 +278,7 @@ function parse_venue_item($dt){
 		  $tags[ $d->categories[$i]->id ] = $d->categories[$i]->name;
 		}
 		$res_data['p_themes']= implode(',', $tags);
+		$res_data['p_fs_cats']= $tags;
 
 		if(!empty($d->url)) $res_data['p_site']= $d->url;
 		else $res_data['p_site']='';
@@ -350,6 +353,17 @@ class proj_get_meta extends get_meta{
 	      $GLOBALS['Jlib_meta'][ $v['mt_typ'] ][]=$v['mt_cnt'];
 			}
 		}
+	}
+}
+
+class nav_cats extends list_viewer{
+	function init(){
+	  //echo '<pre class="debug">'.print_r ( $this->params ,true).'</pre>';
+	  if(empty($_SESSION['Jlib_auth']))
+			$this->params['ucl']='sql:theme';
+		else
+		  $this->params['ucl']='sql:theme,user2theme?u2t_key_t=t_id AND u2t_key_u='.$_SESSION['Jlib_auth']['u_id'];
+		parent::init();
 	}
 }
 ?>

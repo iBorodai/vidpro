@@ -1,5 +1,5 @@
 [body]
-	<div id="point">
+	<div id="point" rel="{p_id}" data-weight="{p_weight}">
 		<div id="map_box"></div>
 		<div id="point_wrapper">
 			<div id="point_main">
@@ -57,7 +57,7 @@
 	<img src="{photo}" title="{title}" alt="{title}">
 [comm_body]
 	<div id="point_comm">
-	  <h3>Что говорят люди про {comm_p_fscat_prim} {comm_p_name}</h3>
+	  <h3 class="label">Что говорят люди про {comm_p_fscat_prim} {comm_p_name}</h3>
 		{body}
 	</div>
 [comm_line]
@@ -76,14 +76,14 @@
 		  {com_text}
 		</div>
 		<div class="bullet wide">
-		  <span class="likes"><i></i>{com_cachelikes}</span>
+		  <span class="likes likes_{com_cachelikes}"><i></i>{com_cachelikes}</span>
 		</div>
   </div>
 [comm_line_fs]
   <div class="comment foursquare">
     <div class="bullet">
     	<img src="{user_photo}">
-    	<img src="/img/fs_logo_tiny.jpg" title="из foursquare">
+    	<img src="/img/fs_logo_tiny.jpg" title="из foursquare" class="fs_label">
     </div>
 		<div class="user">
 			<span class="name">{user_name}</span>
