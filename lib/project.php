@@ -372,7 +372,10 @@ class nav_cats extends list_viewer{
 
 function point_stat($prm){
 	$prm['parent']->pg='';
-	echo '<pre class="debug">'.print_r ( $GLOBALS['Jlib_frame']->obj['block1']->data ,true).'</pre>';
+	//echo '<pre class="debug">'.print_r ( $GLOBALS['Jlib_frame']->obj['block1']->data ,true).'</pre>';
+	[p_weight] => -1
+  [p_votes] => 1
+  [p_plus_cnt] => 0
 	return $prm['parent']->tpl['statistic'];
 }
 ?>
