@@ -258,24 +258,45 @@ class lite_reg extends form {
 
 	function do_save(){
 	  if(AJAX) return true;
-	  
-	  //return true;
-	  //Создать аккаунт
-	  $data=array(
-		  'u_email'=>$this->wizard_data['email'],
-		  'u_name'=>$this->wizard_data['name'],
-		  'u_url'=>translit($this->wizard_data['name']).'_'.uniqid(''),
-		  'u_grp'=>'usr',
-		  'u_img'=>$this->wizard_data['u_img'],
-		  'u_createdate'=>date('Y-m-d H:i:s'),
-		  'u_lastlogin'=>date('Y-m-d H:i:s'),
-		  'u_pwd'=>$pwd,
-		  'u_lock'=>0,
-		  'u_openid'=>!empty($this->wizard_data['u_openid'])?$this->wizard_data['u_openid']:'',
-		  'u_openidprov'=>!empty($this->wizard_data['u_openidprov'])?$this->wizard_data['u_openidprov']:'',
-		);
-		$uid=$GLOBALS[CM]->run('sql:user','insert',$data);
-		
+	  //echo '<pre class="debug">'.print_r ( $_SESSION['Jlib_auth'] ,true).'</pre>';
+	  if(!empty($_SESSION['Jlib_auth']))
+	    $uid=$_SESSION['Jlib_auth']['u_id'];
+	  else{
+		  //Создать аккаунт
+		  $data=array(
+			  'u_email'=>$this->wizard_data['email'],
+			  'u_name'=>$this->wizard_data['name'],
+			  'u_url'=>translit($this->wizard_data['name']).'_'.uniqid(''),
+			  'u_grp'=>'usr',
+			  'u_img'=>$this->wizard_data['u_img'],
+			  'u_createdate'=>date('Y-m-d H:i:s'),
+			  'u_lastlogin'=>date('Y-m-d H:i:s'),
+			  'u_pwd'=>$pwd,
+			  'u_lock'=>0,
+			  'u_openid'=>!empty($this->wizard_data['u_openid'])?$this->wizard_data['u_openid']:'',
+			  'u_openidprov'=>!empty($this->wizard_data['u_openidprov'])?$this->wizard_data['u_openidprov']:'',
+			);
+			$uid=$GLOBALS[CM]->run('sql:user','insert',$data);
+			
+		  //Отправляю мыло
+		  require_once 'lib/class.phpmailer.php';
+		  $data['proj_email_name']=$GLOBALS['Jlib_proj_name'];
+		  $data['server']=$_SERVER['SERVER_NAME'];
+		  $msg=strjtr($this->tpl['mail_msg'], $data);
+
+			$mail = new PHPMailer();
+			$mail->From = $GLOBALS['Jlib_defaults']['proj_email'];
+			$mail->FromName = $GLOBALS['Jlib_defaults']['proj_email_name'];
+			$mail->IsHTML(true);
+			$mail->AddAddress($form->data['u_email']);
+			$mail->Subject = 'Доступ к Вашему акаунту на '.$GLOBALS['Jlib_proj_name'];
+			$mail->Body = $msg;
+			$mail->Send();
+
+		  //Авторизирую
+		  $data['u_id']=$uid;
+		  $this->wizard_data=array_merge($this->wizard_data, $data);
+		}
 	  //Привязать темы
 	  $sql="INSERT INTO user2theme VALUES ";
 	  $vals=array(); foreach( $this->data['themes'] as $v )
@@ -284,27 +305,8 @@ class lite_reg extends form {
 	  $db=init_db();
 	  $db->query($sql);
 	  $this->wizard_data['u_themes']=$this->data['themes'];
-	  
-	  //Отправляю мыло
-	  require_once 'lib/class.phpmailer.php';
-	  $data['proj_email_name']=$GLOBALS['Jlib_proj_name'];
-	  $data['server']=$_SERVER['SERVER_NAME'];
-	  $msg=strjtr($this->tpl['mail_msg'], $data);
-	  
-		$mail = new PHPMailer();
-		$mail->From = $GLOBALS['Jlib_defaults']['proj_email'];
-		$mail->FromName = $GLOBALS['Jlib_defaults']['proj_email_name'];
-		$mail->IsHTML(true);
-		$mail->AddAddress($form->data['u_email']);
-		$mail->Subject = 'Доступ к Вашему акаунту на '.$GLOBALS['Jlib_proj_name'];
-		$mail->Body = $msg;
-		$mail->Send();
-	  
-	  //Авторизирую
-	  $data['u_id']=$uid;
-	  $this->wizard_data=array_merge($this->wizard_data, $data);
-	  $this->auth_user();
-	  
+
+		$this->auth_user();
 	  redirect('/');
 	}
 	

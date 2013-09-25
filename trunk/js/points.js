@@ -1,14 +1,24 @@
 var ilist=[],itimer=false;
 $(document).ready(function(){
-		load_page();
-		
+		//Жду секунду, чтобы посмотрели на заставку и загружаю данные
+		setTimeout(function(){
+		  load_page();
+		},1000);
+
 		$(window).scroll(function(){
 		  if( ($(document).height()-$(window).scrollTop()-$(window).height())<100 ) load_more();
-		  //console.log( $(document).height()+' '+$(window).height()+' '+$(window).scrollTop() );
+		});
+
+		$('#nav_cats_lnk').click(function(){
+		  $('#nav_cats_block').toggle();
+		  return false;
 		});
 });
 
+var show_list=[];
+var loading_more=false;
 function load_page(page_num,callback){
+    loading_page=true;
 		var req = new JsHttpRequest("utf-8");
 		req.onreadystatechange = function(){
 			if (req.readyState == 4){
@@ -26,53 +36,79 @@ function load_page(page_num,callback){
 							var adding=false;
 						}
 					  
-					  $('#point_container').append( req.responseJS.content );
-						var $container = $('.point_list');
-						
 						if(!adding){
+							//$('#point_container').append( $(req.responseJS.content).find('.point_list').html() );
+							$('#point_container').html( req.responseJS.content );
+							var $container = $('.point_list');
 							$container.masonry({
 							  itemSelector: '.item',
 							});
 							var ilist=$('.point_list .item').get();
+							show_list=ilist;
 						}else{
-						  var ilist=$('#point_container .item').not('.displayed').get();
-						  console.log(ilist);
-              $container.masonry( 'appended', ilist );
+						  var $container = $('.point_list');
+						  
+							var t=$(req.responseJS.content);
+							$('.point_pages').html( t.find('.point_pages').html() );
+						  var ilist=t.find('.item').get();
+						  
+						  for ( var i = 0; i < ilist.length; i++ ) {
+						    $container.append( ilist[i] );
+						    show_list.push(ilist[i]);
+						  }
+              //$container.masonry( 'appended', ilist );
+              $container.masonry( 'addItems', ilist);
+              $container.masonry( 'layout' );
+              $(window).resize();
 						}
 						
 						duration();
-						for(var j, x, i = ilist.length; i; j = Math.floor(Math.random() * i), x = ilist[--i], ilist[i] = ilist[j], ilist[j] = x);
+						
+						for(var j, x, i = show_list.length; i; j = Math.floor(Math.random() * i), x = show_list[--i], show_list[i] = show_list[j], show_list[j] = x);
 
+						if(itimer) clearInterval(itimer);
 						itimer=setInterval(function(){
-						  $(ilist[0]).animate({opacity:1},300,function(){
+						  $(show_list[0]).animate({opacity:1},200,function(){
 						    $(this).addClass('displayed');
 							});
-						  ilist.shift();
-						  if( ilist.length<1 ) clearInterval(itimer);
-						},100);
+						  show_list.shift();
+						  if( show_list.length<1 ) clearInterval(itimer);
+						},50);
 					}
 				}
-				//if(req.responseText!='') alert(req.responseText);
+				loading_page=false;
+				if( $(document).height()-$(window).height() <100 ) load_more();
 			}
 		}
-
-		$('#point_container');
+		
+		//Объект-парамерты запроса
 		if(typeof(page_num)=='undefined') page_num=1;
+		var params_obj={'mode':'points_comm_last',fields:['block'],page:page_num};
+		
+		//GET параметры страницы
+		var t=(document.location.search+'').substr(1).split('&');
+		for(var i=0; i<t.length; i++){
+		  var tt=t[i].split('=');
+		  if( typeof(tt[1])=='undefined' ) continue;
+		  params_obj[tt[0]]=tt[1];
+		}
+		console.log(params_obj);
+		//$('#point_container');
   	req.open(null,'/ajax', true);
-		req.send({'mode':'points_comm_last',fields:['block'],page:page_num});
+		req.send( params_obj );
 }
 
-var loading_more=false;
+var loaded_count=0;
 function load_more(){
-	if(loading_more) return;
-	loading_more=true;
+	if(loading_page) return;
 	var page_cur=parseInt($('.point_pages').last().find('.current').html());
 	var page_count=parseInt($('.point_pages').last().find('.on_page').html());
 	var page_ttl=parseInt($('.point_pages').last().find('.total').html());
-	if(page_cur*page_count<page_ttl){
+	loaded_count+=page_cur*page_count;
+	if( loaded_count<page_ttl){
+	  console.log( page_cur*page_count+'<'+page_ttl );
 	  $('#point_container').append( $('#js_tpl_points .loading_tpl').html() );
 	  load_page(page_cur+1 ,function(req){
-	    $('#point_container').find('.list_title').last().remove();
 	    $('#point_container').find('.loading').remove();
 		});
 	}
