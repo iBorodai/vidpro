@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Sep 24, 2013 at 08:22 PM
+-- Generation Time: Sep 25, 2013 at 08:18 PM
 -- Server version: 5.1.40
 -- PHP Version: 5.2.12
 
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `comment` (
   PRIMARY KEY (`com_id`),
   KEY `com_key_u` (`com_key_u`),
   KEY `com_type` (`com_type`,`com_key_obj`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=86 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=87 ;
 
 --
 -- Dumping data for table `comment`
@@ -121,7 +121,8 @@ INSERT INTO `comment` (`com_id`, `com_type`, `com_key_obj`, `com_key_u`, `com_da
 (82, 'pnt', 68, 2, '2013-09-24 17:09:20', 'Комментарий', 'Комментарий', 0, 0),
 (83, 'pnt', 69, 2, '2013-09-24 17:09:20', 'Комментарий', 'Комментарий', 0, 0),
 (84, 'pnt', 70, 2, '2013-09-24 17:09:20', 'Комментарий', 'Комментарий', 0, 0),
-(85, 'pnt', 71, 2, '2013-09-24 17:09:20', 'Комментарий', 'Комментарий', 0, 0);
+(85, 'pnt', 71, 2, '2013-09-24 17:09:20', 'Комментарий', 'Комментарий', 0, 0),
+(86, 'pnt', 72, 1, '2013-09-25 19:38:03', 'Очень хорошее заведение!!! ЛАйкид!', 'Очень хорошее заведение!!! ЛАйкид!', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -922,10 +923,10 @@ CREATE TABLE IF NOT EXISTS `user2theme` (
 --
 
 INSERT INTO `user2theme` (`u2t_key_u`, `u2t_key_t`) VALUES
-(0, 88),
-(0, 89),
-(0, 90),
-(0, 91);
+(1, 88),
+(1, 89),
+(1, 90),
+(1, 91);
 
 -- --------------------------------------------------------
 

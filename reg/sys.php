@@ -443,19 +443,23 @@
 	    'ctrl'=>'p_id',
 	    'vars'=>'p_id',
 	    'url'=>'p_id',
-	    'ucl'=>'sql:point,comment,user,region,point2theme
+	    'ucl'=>'sql:point,comment,user,region,point2theme,theme
 	            #p_id,p_url,p_fsid,p_name,p_img,p_dscr,p_key_reg,p_addr,p_lat,p_lng,p_createdate,
 	             com_id,com_type,com_date,com_short,com_cachelikes,com_cahecomms,
 							 u_id,u_grp,u_url,u_name,u_img,u_gender,u_createdate,u_lastlogin,
 							 r_id,r_name,r_url,r_lat,r_lng,
 							 COUNT( com_id ) p_comms
 							?com_key_obj=p_id AND com_type=\'pnt\' AND com_key_u=u_id AND p_key_reg=r_id AND
-							 p2t_key_p=p_id {themes_place} {city_place}
-							$group=p_id debug=yes',
+							 p2t_key_p=p_id AND t_id=p2t_key_t {themes_place} {city_place}
+							$group=p_id',
 			'ucl_themes'=>' AND p2t_key_t IN({themes})',
 			'ucl_city'=>' AND r_url IN( {city} )',
 	    //'ucl_cats'
 	    'tpl'=>'point_comm_list.htm',
+	    'filter'=>array(
+	      'theme'		=> array(' = ','t_url',false,true)
+	      //'search'	=> array(' LIKE ','u_login','as_start',true)
+			),
 		),
 		'point'=>array(
 		  'ctrl'=>'p_url',
@@ -748,7 +752,7 @@
 			'class' => 'reg_handler',
 			'content' => array(
 			  'block1'=>'icontrol: tpl=index_layout.htm',
-			  'logo_nav'=>'nav_cats: tpl="nav_cats.htm"',
+			  'logo_nav'=>'nav_cats: tpl="nav_cats.htm" vars=theme ',
 			),
 		),
 		'static_content' => array (
@@ -788,6 +792,7 @@
 		'default_point' => array (
 			'frame' => 'default',
 			'content' => array(
+			  'search_form'=>'function: name=point_stat tpl=point.htm',
 				'block1' => 'point: dir_name=point',
 			),
 		),

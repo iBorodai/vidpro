@@ -116,3 +116,23 @@
   font-size:10px;
 }
 
+#nav_cats_lnk{
+  display:block;
+	position:absolute; left:219px; top:24px;
+	background:#e4e4e4;
+}
+
+#nav_cats_block{
+  background: none repeat scroll 0 0 #FFFFFF;
+  border: 1px solid #E4E4E4;
+  left: 205px;
+  max-width: 200px;
+  padding: 10px;
+  position: absolute;
+  top: 43px;
+  z-index: 30;
+}
+#nav_cats_block a{
+	display:block;
+	padding:5px 0;
+}

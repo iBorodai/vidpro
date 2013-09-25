@@ -18,7 +18,6 @@ class ajax extends icontrol{
 					    'city_place'=>'',
 					  );
 					}
-			    
 					if( !empty($_SESSION['Jlib_auth']['u_themes']) ){
 					  $repl['themes_place']=$t->params['ucl_themes'];
 					  $repl['themes']=$_SESSION['Jlib_auth']['u_themes'];
@@ -28,7 +27,12 @@ class ajax extends icontrol{
 			    $t->params['vars'].='&t_pg='. intval($_REQUEST['page']);
 			    $t->init();
 			    $t->get_maked();
-			    $this->pg=$t->pg;
+			    
+			    if(empty($t->ctrl['theme']))
+        		$title=$t->tpl['title_def'];
+			    else
+			      $title=$GLOBALS[CM]->run('sql:theme#t_name?t_url=\''. mysql_real_escape_string($t->ctrl['theme']) .'\'$shrink=yes');
+			    $this->pg= str_replace('{title}',$title,$t->pg) ;
 			    unset($t);
 
 			    break;

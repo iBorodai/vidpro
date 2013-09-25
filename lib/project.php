@@ -5,8 +5,8 @@
 class point extends item_viewer{
 	function get_data(){
 	  $this->data=$GLOBALS[CM]->run("sql:point LEFT JOIN likes ON(l_key_obj=p_id AND l_type='pnt')
-	                                #*,SUM(l_weight) p_weight
-																	?p_url='".$this->ctrl['p_url']."'\$auto_query=no group=p_id shrink=yes limit=0,1 ");
+	                                #*,SUM(l_weight) p_weight, COUNT(l_weight) p_votes, (SELECT COUNT(l1.l_key_obj) FROM likes l1 WHERE l1.l_key_obj=p_id AND l1.l_type='pnt' AND l_weight>0) p_plus_cnt
+																	?p_url='".$this->ctrl['p_url']."'\$auto_query=no group=p_id shrink=yes limit=0,1 debug=yes");
 	  if(empty($this->data['p_fsid'])){
 	    return false;
 		}
@@ -358,12 +358,21 @@ class proj_get_meta extends get_meta{
 
 class nav_cats extends list_viewer{
 	function init(){
-	  //echo '<pre class="debug">'.print_r ( $this->params ,true).'</pre>';
 	  if(empty($_SESSION['Jlib_auth']))
 			$this->params['ucl']='sql:theme';
 		else
 		  $this->params['ucl']='sql:theme,user2theme?u2t_key_t=t_id AND u2t_key_u='.$_SESSION['Jlib_auth']['u_id'];
+
+		if(!empty($this->ctrl['theme'])){
+		  $this->pg=str_replace('{body}', $this->tpl['link_all'].'{body}', $this->pg);
+		}
 		parent::init();
 	}
+}
+
+function point_stat($prm){
+	$prm['parent']->pg='';
+	echo '<pre class="debug">'.print_r ( $GLOBALS['Jlib_frame']->obj['block1']->data ,true).'</pre>';
+	return $prm['parent']->tpl['statistic'];
 }
 ?>
