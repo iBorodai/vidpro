@@ -1,0 +1,91 @@
+@font-face {
+    font-family: 'helvetica_l';
+    src: url('/fonts/helveticaneuecyr-ultralight-webfont.eot');
+    src: url('/fonts/helveticaneuecyr-ultralight-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/helveticaneuecyr-ultralight-webfont.woff') format('woff'),
+         url('/fonts/helveticaneuecyr-ultralight-webfont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body{
+	background:#acc3cb;
+	min-width:1000px;
+}
+#footer{background:none;}
+.bg_body{
+	width:100%; height:100%;
+	position:absolute;
+	left:0; bottom:0;
+	z-index:-2;
+}
+
+.bg_img{
+	    left: 50%;
+    margin: -36% 0 0 -50%;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    z-index: -1;
+}
+
+#wrapper{
+	margin:0 auto;
+	min-width:990px;
+	max-width:1600px;
+	width:auto;
+	margin:0 auto;
+	min-height: 100%;
+	position:relative;
+	font-family:helvetica_l;
+}
+
+#text_block{
+  width: 990px;
+  margin:-154px 0 0 -495px;
+  position:absolute;
+  top:50%;
+  left:50%;
+}
+
+#ask{
+	text-align:right;
+	font-size:60px;
+	color:#434343;
+	margin-bottom:185px;
+}
+#text{
+	font-size:30px;
+	padding:0 380px 0 100px;
+	color: #434343;
+}
+#text .q_l{
+	margin-left:-17px;
+}
+#text .q_r{
+	position:absolute;
+}
+
+#ill{
+  left: 630px;
+  position: absolute;
+  top: 190px;
+  z-index:10;
+}
+#sign{
+	text-align:right;
+	font-size:18px;
+	padding:20px 90px 0 0;
+}
+
+#quote_reload{
+    display: block;
+    left: 443px;
+    padding: 20px 0 1px 5px;
+    position: absolute;
+    top: 210px;
+    outline:none;
+    color:#000;
+    text-decoration:none;
+    border-bottom:1px dashed #555;
+}

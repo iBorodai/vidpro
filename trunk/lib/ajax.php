@@ -50,27 +50,31 @@ class ajax extends icontrol{
 						$short=substr($text, 0, $tst).'...';
 					}else
 					  $short=$text;
-					
+
+					if(!empty($_REQUEST['recomend'])) {
+					  //l_id 	l_weight 	l_type 	l_key_obj 	l_key_u 	l_date
+					  $like=( ($_REQUEST['recomend']>0)?1:-1 );
+						$l_id=$GLOBALS[CM]->run('sql:likes','replace',array(
+						  'l_type'=>'pnt',
+							'l_key_obj'=> intval($_REQUEST['point']),
+							'l_key_u'=>$_SESSION['Jlib_auth']['u_id'],
+							'l_date'=>date('Y-m-d H:i:s'),
+							'l_weight'=>$like
+						));
+					}else{
+					  $like=0;
+					}
+
 					$com_id=$GLOBALS[CM]->run('sql:comment$','insert',array(
 					  'com_type'=>'pnt',
 						'com_key_obj'=> intval($_REQUEST['point']),
 						'com_key_u'=>$_SESSION['Jlib_auth']['u_id'],
 						'com_date'=>date('Y-m-d H:i:s'),
+						'com_weight'=>$like,
 						'com_text'=>$text,
 						'com_short'=>$short
 					));
-					
-					if(!empty($_REQUEST['recomend'])){
-					  //l_id 	l_weight 	l_type 	l_key_obj 	l_key_u 	l_date
-						$l_id=$GLOBALS[CM]->run('sql:likes$debug=yes','replace',array(
-						  'l_type'=>'pnt',
-							'l_key_obj'=> intval($_REQUEST['point']),
-							'l_key_u'=>$_SESSION['Jlib_auth']['u_id'],
-							'l_date'=>date('Y-m-d H:i:s'),
-							'l_weight'=>( ($_REQUEST['recomend']>0)?1:-1 )
-						));
-					}
-					
+
 					if(!empty($com_id)){
 					  $this->pg=$this->tpl['send_review_success'];
 					}else{
@@ -99,9 +103,12 @@ class ajax extends icontrol{
 					$inp=array();
 					foreach($query as $v){
 						if(!empty($v) && empty($inp[$v])) {
-							$inp[$v]="sw_word LIKE '%".$v."%'";
+							//$inp[$v]="sw_word LIKE '%".$v."%'";
+							$inp[$v]="sw_word = '".$v."'";
 						}
 					}
+					//array_unshift($inp, "sw_word LIKE '%".implode(' ', $query)."%'");
+					//echo '<pre class="debug">'.print_r ( $inp ,true).'</pre>';
 					
 					if(empty($inp)){
 						$GLOBALS['result']['error']='Слова не разобраны';
@@ -116,7 +123,7 @@ class ajax extends icontrol{
 								 count( p_id ) words,
 								 (select GROUP_CONCAT(t_name) FROM point2theme,theme WHERE p2t_key_p=p_id AND t_id=p2t_key_t GROUP BY p_id) p_themes
 								?p_key_reg=r_id AND p_id=sw_key_obj AND sw_obj_type=\'pnt\' AND '.$inp.' AND r_url=\''. $_REQUEST['query']['reg'] .'\'
-								$order=words,p_name direction=asc group=p_id auto_query=no ';
+								$order=words,p_name direction=desc,asc group=p_id auto_query=no ';
 					if(!$total=$GLOBALS[CM]->run($ucl,'count'))$total=0;
 					$GLOBALS['result']['count']=($total>$lim)?$total-$lim:$total;
 

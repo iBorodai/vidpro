@@ -18,14 +18,14 @@
 
 .list_title{
 	height:45px;
-	font-size:18px;
+	font-size:30px;
 	color:#b1b1b1;
-	padding:35px 0 0 22px;
+	padding:35px 0 10px 22px;
 }
 
 .point_list .item{
   width: 200px;
-  margin: 5px;
+  margin: 6px;
   border:1px solid #e4e4e4;
   box-shadow:0 2px 1px #eee;
 
@@ -45,7 +45,7 @@
 }
 
 .point_list .item .point{
-  margin:10px 10px 0 10px;
+  margin:15px 15px 0 15px;
   position:relative;
 }
 .point_list .item .point>a{
@@ -97,14 +97,33 @@
   vertical-align:top;
 }
 
-.point_list .item > label,
-.point_list .item > small,
-.point_list .item > .comm{
-	padding:0 10px;
+.point_list .item .point label,
+.point_list .item .point small,
+.point_list .item .comm{
 	display:block;
+	color:#4d4d4d;
 }
-.point_list .item > .comm{
-	margin-bottom:10px;
+.point_list .item .point small{
+	font-size:11px;
+}
+.point_list .item .point label{
+	font-size:18px;
+	color:#000;
+}
+.point_list .item .comm{
+	padding: 10px 15px 15px;
+}
+.point_list .item .comm a{
+	text-decoration:none;
+	color:#4d4d4d;
+	display:block;
+	padding:0 0 10px 40px;
+}
+
+.point_list .item .comm img{
+	width:28px;
+	position:absolute;
+	left:15px;
 }
 
 .point_list .item > label{
@@ -118,21 +137,36 @@
 
 #nav_cats_lnk{
   display:block;
-	position:absolute; left:219px; top:24px;
-	background:#e4e4e4;
+	position:absolute;
+	left:219px;
+	top:24px;
+	width:18px;
+	height:15px;
 }
+#nav_cats_lnk i{
+	display:block;
+	height:3px;
+	background:#ababa9;
+	margin-bottom:2px;
+}
+
 
 #nav_cats_block{
   background: none repeat scroll 0 0 #FFFFFF;
   border: 1px solid #E4E4E4;
-  left: 205px;
   max-width: 200px;
   padding: 10px;
   position: absolute;
-  top: 43px;
+  top:56px;
+	left:207px;
   z-index: 30;
 }
 #nav_cats_block a{
 	display:block;
 	padding:5px 0;
 }
+#nav_cats_block .arr {
+	left:10px;
+}
+
+#footer{display:none;}

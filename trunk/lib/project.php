@@ -4,20 +4,29 @@
  ************************************/
 class point extends item_viewer{
 	function get_data(){
+	  if(!empty($_SESSION['Jlib_auth']['u_id']))
+	  	$you_sql_add=" ,(SELECT l2.l_weight FROM likes l2 WHERE l2.l_key_obj=p_id AND l2.l_type='pnt' AND l_key_u=".$_SESSION['Jlib_auth']['u_id'].") p_you ";
+	  else
+	    $you_sql_add=" ,'' p_you ";
+	
 	  $this->data=$GLOBALS[CM]->run("sql:point LEFT JOIN likes ON(l_key_obj=p_id AND l_type='pnt')
-	                                #*,SUM(l_weight) p_weight, COUNT(l_weight) p_votes, (SELECT COUNT(l1.l_key_obj) FROM likes l1 WHERE l1.l_key_obj=p_id AND l1.l_type='pnt' AND l_weight>0) p_plus_cnt
-																	?p_url='".$this->ctrl['p_url']."'\$auto_query=no group=p_id shrink=yes limit=0,1 debug=yes");
+	                                #*,
+																		SUM(l_weight) p_weight,
+																		COUNT(l_weight) p_votes,
+																	 (SELECT COUNT(l1.l_key_obj) FROM likes l1 WHERE l1.l_key_obj=p_id AND l1.l_type='pnt' AND l_weight>0) p_plus_cnt
+																	 ".$you_sql_add."
+																	?p_url='".$this->ctrl['p_url']."'\$auto_query=no group=p_id shrink=yes limit=0,1 ");
+		//Если нет foursquare идентификатора - ничего не выйдет
 	  if(empty($this->data['p_fsid'])){
 	    return false;
 		}
-		//Обращение к foursquare
+		//Обращение к foursquare (там есть кэш)
 		$GLOBALS['FS']=init_fs();
 		if(!$dt=$GLOBALS['FS']->venue( $this->data['p_fsid'] )){
 		  $this->data=array(); return true;
 		}
 		
 		//Запихиваю данные из fourscquare в $this->data
-	  //echo 'D:<pre class="debug">'.print_r ( $d ,true).'</pre>';
 		$this->data=array_merge($this->data, parse_venue_item($dt));
 
 		//Выбрать каменты из БД
@@ -35,7 +44,6 @@ class point extends item_viewer{
 	
 	function before_parse(){
 	  parent::before_parse();
-	  //echo '<pre class="debug">'.print_r ( $this->data ,true).'</pre>';
 	  $repl=array(
 	    'gallery'=>'',
 	    'auth'=>'',
@@ -77,6 +85,10 @@ class point extends item_viewer{
 			
 			//.... подстановка
 			$this->pg=strjtr($this->pg,$repl);
+		/*****************
+		 *  Голосовалка / рекоммендовалка
+		 *****************/
+		 
 	}
 }
 /*************************************
@@ -291,6 +303,7 @@ function parse_venue_item($dt){
 			  for($j=0; $j<count($d->photos->groups[$i]->items); $j++){
 			    $res_data['photos'][]=array(
 			      'photo'=>$d->photos->groups[$i]->items[$j]->prefix.'150x150'.$d->photos->groups[$i]->items[$j]->suffix,
+			      'photo_big'=>$d->photos->groups[$i]->items[$j]->prefix.'original'.$d->photos->groups[$i]->items[$j]->suffix,
 			      'title'=>$d->photos->groups[$i]->name.' '.$d->name
 					);
 			  }
@@ -373,9 +386,59 @@ class nav_cats extends list_viewer{
 function point_stat($prm){
 	$prm['parent']->pg='';
 	//echo '<pre class="debug">'.print_r ( $GLOBALS['Jlib_frame']->obj['block1']->data ,true).'</pre>';
-	[p_weight] => -1
-  [p_votes] => 1
-  [p_plus_cnt] => 0
-	return $prm['parent']->tpl['statistic'];
+	/*
+	//[p_weight] => -1
+  //[p_votes] => 1
+  //[p_plus_cnt] => 0
+		  p_votes 		- 100%
+		  p_plus_cnt	- ?%
+  */
+  $pdt=&$GLOBALS['Jlib_frame']->obj['block1']->data;
+
+  $repl=$GLOBALS['Jlib_frame']->obj['block1']->data;
+
+	if(!empty($_SESSION['Jlib_auth']['u_id'])){
+	  if(
+			!empty($pdt['p_you']) &&
+			($pdt['p_you']/abs($pdt['p_you'])) == ($pdt['p_weight']/abs($pdt['p_weight']))
+		) $repl['youtoo']=$prm['parent']->tpl['stat_youtoo'];
+		$repl['stat_act']=$prm['parent']->tpl['stat_act'];
+	}else{
+	  $repl['stat_act']=$prm['parent']->tpl['stat_act_auth'];
+	  $repl['loginza_token']=loginza_token_url();
+	}
+
+  //statistic_empty
+  if(empty($pdt['p_votes'])){
+    return strjtr($prm['parent']->tpl['statistic_empty'], $repl );
+	}
+
+  //Плюсовой процент
+  $repl['pct']=$pdt['p_plus_cnt']*100/ $pdt['p_votes'];
+  
+  if( $pdt['p_weight']<0 ){//Минусовой процент
+		$repl['pct']=100-$repl['pct'];
+		$repl['recommend']=$prm['parent']->tpl['stat_not_recommend'];
+	}elseif($pdt['p_weight']==0){  //Поровну
+		//Чтобы нуля не было.
+		$repl['p_weight']=$pdt['p_weight']=1;
+		$repl['recommend']=$prm['parent']->tpl['stat_recommend'];
+	}else{  //Большинство ЗА!
+	  $repl['p_weight']=$pdt['p_weight']=1;
+	  $repl['recommend']=$prm['parent']->tpl['stat_recommend'];
+	}
+	//Большинство или все
+	if( $repl['pct']<100 ) $repl['many']=$prm['parent']->tpl['many'];
+	else  $repl['many']=$prm['parent']->tpl['many_all'];
+
+  //Мнение пользователя
+  $repl['youtoo']='';
+
+
+	return strjtr($prm['parent']->tpl['statistic'], $repl );
+}
+
+function display_search_query($prm){
+	return mysql_real_escape_string($_GET['query']);
 }
 ?>

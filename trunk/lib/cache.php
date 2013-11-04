@@ -28,24 +28,26 @@ class cache {
 	  if( !is_string($data) ) $serr=serialize($data);
 	  else $serr=$data;
 	  $serr=mysql_real_escape_string($serr);
-	  if( unserialize($serr) != $data ){
+	  /*
+	  if(1==3 && unserialize($serr) != $data ){
 			$this->temp=false;
 			return false;
 		}
-	  
+		*/
+		
 	  $this->temp="REPLACE INTO z_fs_queries SET fq_id='$id', fq_content='$serr', fq_create=". $t .", fq_dead=".($t+$period_sec);
 	  $this->last_id=$id;
 	  return true;
 	}
 	
 	function set($id=false,$data=false,$period_sec=false){
+//echo "CACHE SET ".$this->temp;
 	  //Если что сохранять не передано и сохранение не подготовлено заранее - ошибка
 	  if(!$id && !$data && !$this->temp) return false;
 		
 	  $this->db=init_db();
 	  //Если передано что сохранять
 		if($id && $data)	$this->prepare($id,$data,$period_sec);
-
 	  $this->db->query($this->temp);
 	  if(mysql_errno())return false;
 	  $this->last_id=$id;

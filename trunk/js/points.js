@@ -10,7 +10,9 @@ $(document).ready(function(){
 		});
 
 		$('#nav_cats_lnk').click(function(){
-		  $('#nav_cats_block').toggle();
+	    //$('.pop').hide();
+		  //$('#nav_cats_block').toggle();
+		  toggle_pop('#nav_cats_block');
 		  return false;
 		});
 });
