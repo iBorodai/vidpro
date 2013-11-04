@@ -723,14 +723,14 @@
 		'default' => array (
 			'class' => 'icontrol',
 			'tpl' => 'index.htm',
-			//'security' => 'undercon',
+			'security' => 'undercon',
 			'content' => array (
 			),
 		),
 		'inside' => array (
 			'class' => 'icontrol',
 			'tpl' => 'inside.htm',
-			//'security' => 'undercon',
+			'security' => 'undercon',
 			'content' => array (
 			),
 		),

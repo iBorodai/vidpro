@@ -1,35 +1,4 @@
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-	    "http://www.w3.org/TR/html4/loose.dtd">
-	<html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link href="/css/share.css" rel="stylesheet" type="text/css">
-		<link href="/css/stub.css" rel="stylesheet" type="text/css">
-		<script type="text/javascript" src="/js/jquery.js"></script>
-	</head>
-	<body>
-		<img src="/img/stub/bg.jpg" class="bg_body">
-		<div id="wrapper">
-		  <img src="/img/stub/stars.png" class="bg_img">
-		  <div id="text_block">
-				<div id="ask">є що сказати?</div>
-				<div id="quote" style="visibility:hidden;">
-				  <div id="text">
-				    <span class="q_l">«</span>
-				    <span id="quote_text">
-							Даже если ты один против всех — <br>
-							это не значит, что ты не прав!
-						</span>
-						<span class="q_r">»</span>
-						<div id="sign">Хью Лори</div>
-					</div>
-				  <img id="ill" src="/img/stub/q1.png">
-				</div>
-				<a href="#" id="quote_reload">Другая цитата</a>
-			</div>
-		</div>
-		<script>
-		  var quotes=[
+var quotes=[
 		    {
 					text:'Даже если ты один против всех &ndash;<br>это не значит, что ты не прав!',
 					ill:'/img/stub/q1.png',
@@ -54,10 +23,10 @@
 			];
 			function switch_quote(){
 			  var tst=( Math.round( (quotes.length-1) *Math.random()) );
-			  
+
 			  if(quotes.length>1) while(tst==last_quote) tst=( Math.round( (quotes.length-1) *Math.random()) );
 			  last_quote=tst;
-			  
+
 			  var tb=$('#quote');
 				tb.stop( true, true ).animate({opacity:0},300,function(){
 				  $('#quote_text',tb).html( quotes[tst].text );
@@ -79,12 +48,11 @@
 				});
 				$('#form_open').click(function(){
 				  $('#login_form').show();
+				  return false;
 				});
 				$('#form_close').click(function(){
-				  alert('HERE');
 				  $('#login_form').hide();
+				  return false;
 				});
+
 			});
-		</script>
-	</body>
-	</html>

@@ -89,3 +89,28 @@ body{
     text-decoration:none;
     border-bottom:1px dashed #555;
 }
+
+#login_form{
+	width:400px;
+	height:400px;
+	position:absolute;
+	left:50%;
+	top:50%;
+	z-index:30;
+	margin:-210px 0 0 -210px;
+	background:#fff;
+	padding:20px;
+	box-shadow: 0 1px 5px #000;
+}
+#login_form label{
+	font-family:helvetica_l;
+	font-size:30px;
+	display:block;
+	margin-bottom:20px;
+}
+
+#form_close{
+	position:absolute;
+	right:5px;
+	top:5px;
+}
