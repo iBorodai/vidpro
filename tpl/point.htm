@@ -1,6 +1,5 @@
 [body]
 	<div id="point" rel="{p_id}" data-weight="{p_weight}">
-		<div id="map_box"></div>
 		<div id="point_wrapper">
 			<div id="point_main">
 			  <div id="point_gallery">
@@ -54,10 +53,16 @@
 	<h1>уупс...</h1>
 	<p>Временные проблемы с отображением этой страницы</p>
 [gallery_item]
-	<img src="{photo}" title="{title}" alt="{title}">
+	<a href="{photo_big}" class="fb">
+		<img src="{photo}" title="{title}" alt="{title}">
+	</a>
 [comm_body]
 	<div id="point_comm">
-	  <h3 class="label">Что говорят люди про {comm_p_fscat_prim} {comm_p_name}</h3>
+	  <h3 class="label">
+			Что говорят люди про
+			<span class="js_point_type">{comm_p_fscat_prim}</span>
+			<span class="js_point_quotes">«</span><span class="js_point_name">{comm_p_name}</span><span class="js_point_quotes">»</span>
+		</h3>
 		{body}
 	</div>
 [comm_line]
@@ -95,7 +100,95 @@
 		</div>
   </div>
 [statistic]
-	<div>
-		{p_fscat_prim} {p_name}
-		
+	<div class="stat_block">
+		<div class="arrow stat_arr">
+			<span class="arr"></span>
+			<div>
+				<span>
+					<span class="js_point_type">{p_fscat_prim}</span>
+					<span class="js_point_quotes">«</span><span class="js_point_name">{p_name}</span><span class="js_point_quotes">»</span>
+					<span class="weight w{p_weight}">{pct}%</span>
+				</span>
+			</div>
+			<span class="arr r"></span>
+		</div>
+		<div class="stat_info">
+		  Место
+				<span class="pop_form">
+					<span class="pop_res" rel="посещал,посещали,посещало,еще не посещали">посещало</span>
+					<span class="pop_num">{p_votes}</span>
+					<span class="pop_res" rel="участник,участника,усастников,">участников</span>
+				</span>
+				Vidguk.pro<br>
+		  	{many}{youtoo} {recommend}
+		  <div class="stat_act">
+      {stat_act}
+		  </div>
+		</div>
 	</div>
+[many]
+Большинство
+[many_all]
+Все
+[stat_youtoo]
+, в том числе и вы,
+[stat_recommend]
+	его рекоммендуют
+[stat_not_recommend]
+  его не рекоммендуют
+[statistic_empty]
+	<div class="stat_block">
+		<div class="arrow stat_arr">
+			<span class="arr"></span>
+			<div>
+				<span>
+					<span class="js_point_type">{p_fscat_prim}</span>
+					<span class="js_point_quotes">«</span><span class="js_point_name">{p_name}</span><span class="js_point_quotes">»</span>
+				</span>
+			</div>
+			<span class="arr r"></span>
+		</div>
+		<div class="stat_info">
+		  Место еще не посещали участники Vidguk.pro<br>
+		  Станьте первым, кто поделился своим мнением!
+		  <div class="stat_act">
+      {stat_act}
+		  </div>
+		</div>
+	</div>
+[stat_act]
+      <a href="#" class="plus">Я рекомендую</a>
+		    <a href="#" class="minus">Я не рекомендую</a>
+[stat_act_auth]
+				<a class="minus" href="/?reg=true">cоздать новый аккаунт</a>
+		  	<a href="http://loginza.ru/api/widget?token_url={loginza_token}&provider=facebook" class="loginza button" id="reg_type_soc">
+					  вход через openID
+				</a>
+[mapbox]
+	<script src='//api.tiles.mapbox.com/mapbox.js//mapbox.js'></script>
+  <link href='//api.tiles.mapbox.com/mapbox.js//mapbox.css' rel='stylesheet' />
+<div id="map_box_block"><div id="map"></div></div>
+<script>
+var map = L.mapbox.map('map', 'examples.map-20v6611k')
+    .setView([37.9, -77], 6);
+
+L.mapbox.markerLayer({
+    // this feature is in the GeoJSON format: see geojson.org
+    // for the full specification
+    type: 'Feature',
+    geometry: {
+        type: 'Point',
+        // coordinates here are in longitude, latitude order because
+        // x, y is the standard for GeoJSON and many formats
+        coordinates: [-77, 37.9]
+    },
+    properties: {
+        title: 'A Single Marker',
+        description: 'Just one of me',
+        // one can customize markers by adding simplestyle properties
+        // http://mapbox.com/developers/simplestyle/
+        'marker-size': 'large',
+        'marker-color': '#f0a'
+    }
+}).addTo(map);
+</script>

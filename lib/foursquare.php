@@ -42,7 +42,7 @@ class foursquare{
     //make request
 	  $fs_query='/v2/venues/'.$fsid.'?'.$this->api_key;
 		$dt=$this->request($fs_query);
-		
+
 		//validation response
 	  if( empty($dt->response->venue) ){
 	    $this->errors[]=array('err','в ответе не обнаружено заведение');
@@ -50,7 +50,8 @@ class foursquare{
 	    $GLOBALS[CACHE]->remove($fsid);
 	    return false;
 		}
-		//CGCHE
+
+		//CACHE
 		$GLOBALS[CACHE]->set();
 		return $dt;
 	}
@@ -80,7 +81,6 @@ class foursquare{
 		}
 		$GLOBALS[CACHE]->set();
 	  return $dt;
-
 	}
 }
 

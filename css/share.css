@@ -12,7 +12,8 @@ body {
 	height: auto !important;
 	height: 100%;
 	margin: 0 auto -100px; /* нижний margin является отрицательной величиной высоты footer */
-	width:990px;
+	min-width:990px;
+	max-width:1600px;
 }
 
 #footer, #push {
@@ -28,6 +29,7 @@ body {
 #head{
 	height:60px;
 	position:relative;
+	
 }
 
 #head #logo{
@@ -97,7 +99,11 @@ body {
 	display:block;
 	height:25px;
 	padding-top:5px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
+
 .arrow > div >a{
 	text-decoration:none;
 	color:#fff;
@@ -120,6 +126,7 @@ body {
 	width:25px; height:25px;
 	overflow:hidden;
 	text-align:center;
+	background:#efefef;
 }
 #user_profile img{max-width:25px; max-height:25px; vertical-align:middle;}
 #write_review{
@@ -142,7 +149,8 @@ body {
   width: 18px;
 }
 
-#user_subnav{
+#user_subnav,
+.nav_drop{
 	display:none;
 	background: none repeat scroll 0 0 #FFFFFF;
   border: 1px solid #DFDFDF;
@@ -156,7 +164,9 @@ body {
 }
 
 #user_subnav .arr,
-#user_subnav .arr span{
+#user_subnav .arr span,
+.nav_drop .arr,
+.nav_drop .arr span{
 	position:absolute;
 	left:1px;
 	top:-20px;
@@ -169,20 +179,23 @@ body {
 	width: 0;
 	z-index:1;
 }
-#user_subnav .arr span{
+#user_subnav .arr span,
+.nav_drop .arr span{
 	left: -10px;
   top: -9px;
 	border-color: transparent transparent #fff transparent;
 }
 
-#user_subnav .title{
+#user_subnav .title,
+.nav_drop .title{
 	display:block;
 	font-weight:bold;
 	color:#000;
 	height:30px;
 	border-bottom:1px solid #dedede;
 }
-#user_subnav a{
+#user_subnav a,
+.nav_drop a{
 	display:block;
 	font-size:14px;
 	color:#575757;

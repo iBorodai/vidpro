@@ -451,7 +451,7 @@
 							 COUNT( com_id ) p_comms
 							?com_key_obj=p_id AND com_type=\'pnt\' AND com_key_u=u_id AND p_key_reg=r_id AND
 							 p2t_key_p=p_id AND t_id=p2t_key_t {themes_place} {city_place}
-							$group=p_id',
+							$group=p_id order=com_date direcrtion=desc',
 			'ucl_themes'=>' AND p2t_key_t IN({themes})',
 			'ucl_city'=>' AND r_url IN( {city} )',
 	    //'ucl_cats'
@@ -794,6 +794,7 @@
 			'content' => array(
 			  'search_form'=>'function: name=point_stat tpl=point.htm',
 				'block1' => 'point: dir_name=point',
+				'under_wrapper'=>'replacer: tpl=point.htm section=mapbox',
 			),
 		),
 		'point_add'=>array(

@@ -1,17 +1,24 @@
 #wrapper{
 	width:100%;
 }
-#head,#point_wrapper{
+#point_wrapper{
 	margin: 0 auto;
 	width: 990px;
 }
 #point_wrapper{
-	margin-top:-180px;
+	margin-top:236px;
 }
-#map_box{
+#map_box_block{
+	position:absolute;
+	top:60px;
+	width:100%;
+	z-index:-1;
+}
+#map{
 	width:100%;
 	height:400px;
 	background:red;
+	overflow: hidden;
 }
 
 #point_main{
@@ -22,6 +29,15 @@
 
 #point_gallery{
 	height:180px;
+	text-align:center;
+	font-size:0;
+}
+
+#point_gallery a{
+	text-decoration:none;
+}
+#point_gallery img{
+	padding: 15px 6px;
 }
 
 #point_name,
@@ -102,3 +118,44 @@
     width: 15px;
 }
 .comment .likes.likes_0{display:none;}
+
+.stat_block .stat_info{
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	*display: inline;
+	position:relative;
+}
+.stat_block .stat_info .stat_act{
+	display:none;
+}
+.stat_block .stat_info.hover .stat_act{
+	position:absolute;
+	top:0;left:-35px;
+	width:120%;
+	display:block;
+}
+.stat_block .stat_info.hover .stat_act a{
+	display:block;
+	float:left;
+	width:49.9%;
+	background:#00C6FF;
+	color:#fff;
+	height: 20px;
+	padding: 5px 0;
+	text-align: center;
+	text-decoration: none;
+}
+.stat_block .stat_info.hover .stat_act a.minus{
+	background:#000;
+}
+
+.stat_arr{
+	font-weight:bold;
+	width:50%;
+}
+
+.stat_arr .weight{
+	float:right;
+}

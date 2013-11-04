@@ -1,13 +1,37 @@
-#cats .check_block{
+#cats{
+	width:990px;
+	padding-top:45px;
+	text-align:center;
+}
+
+#cats .submit{
+	width:200px;
+	margin:20px auto 0 auto;
 	display:block;
-	float:left;
+}
+#cats .check_block{
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	*display: inline;
+
+	position:relative;
 	margin:5px;
 	background:#aaa;
 	text-align:center;
-	width:88px;
-	height:88px;
+	width:160px;
+	height:160px;
 	text-decoration: none;
 	color:#fff;
+	font-size:16px;
+}
+#cats .check_block > div{
+	position:absolute;
+	bottom:5px;
+	left:0;
+	text-align:center;
+	width:100%;
 }
 #cats .check_block.active{
   background:#00C6FF;
@@ -47,7 +71,7 @@
 }
 
 #cats .check_block img{
-	vertical-align:middle;
+	margin-top: 30px;
 }
 
 .radio_block,
@@ -67,4 +91,57 @@
 		-moz-opacity: 0;
 		-khtml-opacity: 0;
 		opacity: 0;
+}
+.reg_info{
+	padding:70px 0 60px;
+	color:#999;
+	text-align:center;
+	font-size:18px;
+}
+
+#social_logins{
+	text-align:center;
+}
+
+#social_logins a{
+	text-decoration:none;
+	outline:none;
+}
+.reg_form{
+	width:320px;
+	margin:0 auto;
+}
+.reg_form input{
+	width:100%;
+	padding:10px 0;
+	border-top:1px solid #c5c5c5;
+	border-left:1px solid #c5c5c5;
+	border-right:1px solid #d8d8d8;
+	border-bottom:1px solid #d8d8d8;
+	margin-bottom:10px;
+	text-align:center;
+	font-size:24px;
+}
+.reg_form .submit{
+	color:#fff;
+	background:#00c6ff;
+	border:none;
+	width:100%;
+	text-align:center;
+	font-size:24px;
+	padding:10px 0;
+	margin-bottom:15px;
+}
+
+#head .arrow > div > span,
+#head .arrow > div > a{
+	font-size:20px;
+	height: 28px;
+	padding-top: 2px;
+}
+.reg_skip{
+	padding-bottom:20px;
+	text-align:center;
+	color:#999;
+	display:block;
 }

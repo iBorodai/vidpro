@@ -40,9 +40,11 @@ function display_error(text){
 
 function duration(){
 	$('.duration').each(function(){
+	  if($(this).hasClass('done'))return;
 	  var now=moment()
 		var d1=moment($(this).find('.from').text()) ;
 		$(this).find('.from').text( moment.duration(now-d1).humanize() );
+		$(this).addClass('done');
 	});
 }
 
@@ -125,21 +127,76 @@ function send_recommend(){
 	alert('send_recommend');
 }
 
+//n, form1, form2, form5
+//"письмо", "письма", "писем"
+// nObj=id|false;
+function pluralForm( nObj,nRes,f1,f24,f59,f0 ) {
+	var obj=false, val=false;
+	if(!nObj && typeof(nRes)=='number' ){
+	  val=parseInt(nRes);
+	}else{
+		obj=$('#'+nObj);
+		val=parseInt(obj.html());
+	}
+	if( val==0 && f0){
+		if(obj){
+			obj.hide(); obj.html(f0); return true;
+		}else return f0;
+	}
+
+	var res=f1;
+	var n = Math.abs(val) % 100;
+	var n1 = Math.floor(n / 10)*10;	// десятки
+	n=(n-n1);                  			// в «N» остаются еденицы
+
+	if( n1>=10 && n1<20 ) res=f59; else
+  if( n==1 ) res=f1; else
+	if( n>1&&n<5 ) res=f24; else
+	res=f59;
+
+	if(obj){
+	  var tst=document.getElementById(nRes);
+	  if(tst!=undefined) tst.innerHTML=res;
+	}else{
+	  return res;
+	}
+}
+
+function populars(){
+	$('.pop_form').each(function(){
+	  if( $(this).hasClass('done') ) return;
+	  //pluralForm( nObj,nRes,f1,f24,f59,f0 )
+	  var int_val=parseInt($('.pop_num',this).text());
+	  $('.pop_res',this).each(function(){
+	    var forms=$(this).attr('rel').split(',');
+	    $(this).html( pluralForm( false,int_val,forms[0],forms[1],forms[2],forms[3] ) );
+		});
+	  $(this).addClass('done');
+	});
+}
+
+function toggle_pop(jq_selector){
+	$('.pop').not(jq_selector).hide();
+	$(jq_selector).toggle();
+}
+
 $(document).ready(function(){
 	//Проставить все длительности
 	moment.lang('ru');
 	duration();
-
+  populars();
 
 	//Форма авторизации, если есть
 	if($('#login_block').get().length>0){
 	  $('#write_review').click(function(){
+	    $('.pop').hide();
 	    $('#login_form').toggle();
 	    return false;
 		});
 	}else{
 	//Отображение диалога комментария
 	  $('#write_review').click(function(){
+	    $('.pop').hide();
 	    review_dialog();
 	    return false;
 		});
@@ -148,7 +205,9 @@ $(document).ready(function(){
 	//Пользовательское меню,если есть
   if($('#user_profile').get().length>0){
 	  $('#user_profile').click(function(){
-	    $('#user_subnav').toggle();
+	     //$('#user_subnav').toggle();
+      //$('.pop').hide();
+	    toggle_pop('#user_subnav');
 	    return false;
 		});
 	}
