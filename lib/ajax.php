@@ -82,6 +82,27 @@ class ajax extends icontrol{
 					}
 				  break;
 				}
+				case 'send_vote':{
+					if(empty($_REQUEST['point']) || empty($_REQUEST['recomend'])){
+						$GLOBALS['result']['error']='Data not send';
+						return false;
+					}
+
+				  $like=( ($_REQUEST['recomend']>0)?1:-1 );
+					$l_id=$GLOBALS[CM]->run('sql:likes','replace',array(
+					  'l_type'=>'pnt',
+						'l_key_obj'=> intval($_REQUEST['point']),
+						'l_key_u'=>$_SESSION['Jlib_auth']['u_id'],
+						'l_date'=>date('Y-m-d H:i:s'),
+						'l_weight'=>$like
+					));
+					
+					if( mysql_error() ){
+					  $GLOBALS['result']['error']='Отзыв не добавлен';
+					}else
+					  $this->pg=$this->tpl['send_vote_success'];
+				  break;
+				}
 				case 'search_points':{
 				  //echo '<pre class="debug">'.print_r ( $_REQUEST ,true).'</pre>';
 					if(empty($_REQUEST['val'])){
@@ -93,18 +114,17 @@ class ajax extends icontrol{
 						return false;
 					}
 					
+					$GLOBALS['result']['val']=$_REQUEST['val']['query'];
+					$GLOBALS['result']['reg']=$_REQUEST['val']['reg'];
 
-					$GLOBALS['result']['val']=$_REQUEST['val'];
-					$GLOBALS['result']['reg']=$_REQUEST['query']['reg'];
-
-					$query=preg_replace('/[\-+\/\\_&^%$#*!`\'"]/',' ',$_REQUEST['val']);
+					$query=preg_replace('/[\-+\/\\_&^%$#*!`\'"]/',' ',$_REQUEST['val']['query']);
 					$query=explode(' ',$query);
 
 					$inp=array();
 					foreach($query as $v){
 						if(!empty($v) && empty($inp[$v])) {
-							//$inp[$v]="sw_word LIKE '%".$v."%'";
-							$inp[$v]="sw_word = '".$v."'";
+							$inp[$v]="sw_word LIKE '".$v."%'";
+							//$inp[$v]="sw_word = '".$v."'";
 						}
 					}
 					//array_unshift($inp, "sw_word LIKE '%".implode(' ', $query)."%'");
@@ -114,6 +134,7 @@ class ajax extends icontrol{
 						$GLOBALS['result']['error']='Слова не разобраны';
 						return false;
 					}
+
 					$inp='('.implode(' OR ',$inp).')';
 
 					$lim=(empty($_REQUEST['limit']) || !is_numeric($_REQUEST['limit']))?5:$_REQUEST['limit'];
@@ -122,7 +143,7 @@ class ajax extends icontrol{
 								#p_id,p_url,p_fsid,p_name,p_img,p_dscr,p_key_reg,p_addr,p_lat,p_lng,p_createdate,
 								 count( p_id ) words,
 								 (select GROUP_CONCAT(t_name) FROM point2theme,theme WHERE p2t_key_p=p_id AND t_id=p2t_key_t GROUP BY p_id) p_themes
-								?p_key_reg=r_id AND p_id=sw_key_obj AND sw_obj_type=\'pnt\' AND '.$inp.' AND r_url=\''. $_REQUEST['query']['reg'] .'\'
+								?p_key_reg=r_id AND p_id=sw_key_obj AND sw_obj_type=\'pnt\' AND '.$inp.' AND r_url=\''. $_REQUEST['val']['reg'] .'\'
 								$order=words,p_name direction=desc,asc group=p_id auto_query=no ';
 					if(!$total=$GLOBALS[CM]->run($ucl,'count'))$total=0;
 					$GLOBALS['result']['count']=($total>$lim)?$total-$lim:$total;
@@ -131,7 +152,8 @@ class ajax extends icontrol{
 					  'count'=>$GLOBALS['result']['count'],
 					  'total'=>$total,
 					  'limit'=>$lim,
-					  'val'=>$GLOBALS['result']['val']
+					  'val'=>$GLOBALS['result']['val'],
+					  'reg'=>$GLOBALS['result']['reg'],
 					);
 					
 					if($GLOBALS['result']['count']>0){
@@ -155,7 +177,6 @@ class ajax extends icontrol{
 	}
 	function after_make(){
 		if(!empty($_REQUEST['swf'])) exit($this->pg);
-		
 		if(empty($GLOBALS['result']['content'])) $GLOBALS['result']['content']=$this->pg;
 		$this->pg='';
 		return true;

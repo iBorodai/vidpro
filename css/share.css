@@ -1,3 +1,8 @@
+.trace,.debug{
+	position:relative;
+	z-index:200;
+	background:#fff;
+}
 * { margin: 0; }
 html, body { height: 100%; }
 body {
@@ -33,26 +38,32 @@ body {
 }
 
 #head #logo{
-	width:260px;
+	width:200px;
 	float:left;
-	background:url(/img/logo.jpg) left center no-repeat;
+	background:url(/img/logo.jpg) 0 center no-repeat;
 	height:60px;
+	left:20px;
+	top:0;
+	position:absolute;
+	z-index:9;
 }
 #head .wide{
   padding:0 0 0 260px;
 }
 #head .right{
-  width:260px;
-  float:right;
-  height:100%;
+	height: 30px;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 200px;
 }
 #head .center{
-  padding:0 260px 0 260px;
+  padding: 0 230px 0 255px;
   height:100%;
 }
 #head .right,
 #head .center{
-	padding-top:20px;
+	padding-top:14px;
 }
 
 .clear{clear:both;}
@@ -102,6 +113,7 @@ body {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	position:relative;
 }
 
 .arrow > div >a{
@@ -119,24 +131,31 @@ body {
   border-color: transparent transparent transparent #e4e4e4;
 }
 
-#user_info{position:relative; width:200px;}
+#user_info{
+	position:relative;
+	max-width:220px;
+	min-width:190px;
+}
 #user_profile{
 	display:block;
 	float:left;
-	width:25px; height:25px;
+	width:30px; height:30px;
 	overflow:hidden;
 	text-align:center;
 	background:#efefef;
 }
-#user_profile img{max-width:25px; max-height:25px; vertical-align:middle;}
+#user_profile img{max-width:30px; max-height:30px; vertical-align:middle;}
 #write_review{
 	display:block;
 	float:right;
-	width:155px;
-	height: 22px;
-  padding-top: 3px;
+	width:145px;
+	margin-right:20px;
+	height: 24px;
+  padding-top: 6px;
 	background:#00c6ff;
 	color:#fff;
+	font-size: 14px;
+	text-decoration:none;
 }
 #write_review i{
   background: url("/img/sprite.png") no-repeat scroll -19px 0 transparent;
@@ -146,7 +165,7 @@ body {
   height: 18px;
   margin: 0 5px;
   padding-right: 3px;
-  width: 18px;
+  width: 16px;
 }
 
 #user_subnav,
@@ -154,7 +173,13 @@ body {
 	display:none;
 	background: none repeat scroll 0 0 #FFFFFF;
   border: 1px solid #DFDFDF;
-  box-shadow: 0 1px 2px #777777;
+  
+	-moz-box-shadow: 0 1px 2px #777777;
+	-webkit-box-shadow:  0 1px 2px #777777;
+	box-shadow: 0 1px 2px #777777;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=180, Color='#CCCCCC')";
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=180, Color='#CCCCCC');
+
   left: 0;
   padding: 10px;
   position: absolute;
@@ -209,11 +234,10 @@ body {
 }
 
 #search_form{
-	margin-right:50px;
 	display:block;
 	border:1px solid #dfdfdf;
-	height:21px;
-	padding:2px 25px 0 10px;
+	height:22px;
+	padding:5px 25px 0 10px;
 	position:relative;
 }
 #search_form input,
@@ -243,24 +267,48 @@ body {
 	text-indent:-9999px;
 	display:block;
 	position:absolute;
-	right:3px; top:3px;
+	top:6px;
+	right:6px;
 }
 
 #login_block{
 	position:relative;
-	width:200px;
+	padding-left: 40px;
 }
 #login_block #login_form{
 	display:none;
 	background:#fff;
   border: 1px solid #DFDFDF;
   box-shadow: 0 1px 2px #777777;
-  left: 0;
-  padding: 10px;
+  left: 28px;
+  padding: 13px;
   position: absolute;
   top: 38px;
-  width: 178px;
+  width: 154px;
   z-index: 90;
+}
+#login_block #login_form input{
+	border-color: #C5C5C5 #D8D8D8 #D8D8D8 #C5C5C5;
+  border-style: solid;
+  border-width: 1px;
+  margin-bottom:5px;
+  padding: 3px 0 3px 8px;
+  width: 145px;
+  font-size:16px;
+}
+#login_block #login_form input.submit{
+	background: none repeat scroll 0 0 #00C6FF;
+  border: 1px solid #00C6FF;
+  color: #FFFFFF;
+	font-weight:bold;
+  text-align: center;
+  width:153px;
+  margin-bottom:0;
+}
+#login_block .foot{color:#687184;}
+#login_block .foot #uLogin{
+	padding-left:6px;
+	height:16px;
 }
 
 #login_block .arr,
@@ -269,7 +317,7 @@ body {
     border-style: solid;
     border-width: 10px;
     height: 0;
-    left: 8px;
+    left: 15px;
     margin: 0;
     padding: 0;
     position: absolute;
@@ -322,10 +370,11 @@ body {
 	position:absolute;
 	top:60px;
 	left:0;
-	z-index:20;
+	z-index:25;
 	width:100%;
 	background:#fff;
 	display:none;
+	box-shadow:0 5px 5px #777;
 }
 
 .relative{
@@ -372,4 +421,124 @@ body {
 	color:#555;
 	font-size:10px;
 	
+}
+
+.review_form{
+	width:960px;
+	margin:0 auto;
+}
+
+.review_form .recomend_block{
+ 	text-align:center;
+ 	padding:25px 0 15px 0;
+}
+
+.review_form .recomend_block a{
+	padding:5px;
+	margin-top:-5px;
+	background:#00C6FF;
+	color:#fff;
+	text-decoration:none;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	*display: inline;
+
+}
+
+.review_form .recomend_block a.minus{
+	background:#000;
+}
+
+.review_form textarea{
+	width:80%;
+	margin:o auto;
+}
+
+.profile_dialog{
+	width:60%;
+	margin:0 auto;
+	position: relative;
+}
+.profile_dialog .close{
+	position:absolute;
+	right:0;
+	top:0;
+}
+
+.profile_dialog .fline{
+	padding-bottom:35px;
+}
+.profile_dialog .pro_avatar,
+.profile_dialog .pro_info{
+	float:left;
+}
+.profile_dialog .pro_avatar{
+	width:20%;
+	height:112px;
+	overflow:hidden;
+	position:relative;
+}
+
+.profile_dialog .pro_avatar input{
+	position:absolute;
+	font-size:120px;
+	left:0;
+	top:0;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+  -moz-opacity: 0;
+  -khtml-opacity: 0;
+  opacity: 0;
+}
+
+.profile_dialog .field{
+	margin-bottom:12px;
+}
+
+.profile_dialog .field label{
+	width:19%;
+	color:#434343;
+	font-size:17px;
+
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	*display: inline;
+}
+.profile_dialog .field label.sh{
+	width:auto;
+	padding:0 10px 0 5px;
+}
+.profile_dialog .field input{
+	width:79%;
+	font-size:20px;
+	margin-top:-3px;
+}
+.profile_dialog .field input.sh{
+	width:auto;
+	margin-top:6px;
+}
+
+.profile_dialog .pro_name{
+	color:#434343;
+	font-size:30px;
+	display:block;
+}
+.profile_dialog .pro_geo{
+	background:url(/img/globe.jpg) 0 2px no-repeat;
+	padding-left:30px;
+	color:#434343;
+	font-size:17px;
+}
+.profile_dialog .submit{
+	background:#00c6ff;
+	color:#fff;
+	font-size:19px;
+	font-weight:bold;
+	border:none;
+	padding:5px;
+	border:1px solid #00c6ff;
 }

@@ -100,39 +100,17 @@ class lite_reg extends form {
 		}
 
 	  parent::init(false);
-		//Инициализация хранилища визарда
-		$this->wizard_init();
-		//$this->data=$this->wizard_data;
-
-	  if( !empty($GLOBALS['Jlib_page_extra'][0]) && $GLOBALS['Jlib_page_extra'][0]=='loginza' ){
-	    $this->loginza_reg();
-		}
-
-	  //Получить информацию о шагах
-		//Определить шаг
-		if((!empty($this->ctrl[ $this->params['ctrl_steps'] ]))){
-		  $this->cur_step=$this->ctrl[ $this->params['ctrl_steps'] ];
-		}else{
-		  $this->cur_step=array_shift(array_keys( $this->params['steps'] ))  ;
-		}
-
-		//Оформить шаг
-		$this->show_step();
-		// Работает форма
-
-
-	  //if( $GLOBALS['Jlib_page']=='registration' && !empty($_SESSION['Jlib_auth']) ) {redirect('/'); exit();}
-		
+	  
 		if(!empty($this->ctrl['unlock'])){
 		  //Выбираю пользователя
 			$rs=$GLOBALS[CM]->run('sql:usr?u_lock=\''.$this->ctrl['unlock'].'\'$shrink=yes auto_query=no');
 			unset($rs['u_pwd']);
-			
+
 			//Выбираю профайл
 			if($rs){
 			  if($rs['u_grp']=='saller') $rs2=$GLOBALS[CM]->run('sql:sallers?s_id='.$rs['u_key_subj'].'$auto_query=no shrink=yes ');
 			}
-			  
+
 			if($rs && $rs2){
 			  $GLOBALS[CM]->run('sql:usr?u_id=\''.$rs['u_id'].'\'$auto_query=no' ,'update', array('u_lock'=>'', 'u_last_login'=>date('Y-m-d H:i:s')));
 				$_SESSION['Jlib_auth']=array_merge($rs, $rs2, array('site_auth'=>1,'admin_auth'=>0));
@@ -146,7 +124,27 @@ class lite_reg extends form {
 			$this->maked=true;
 			return true;
 		}
-		
+	  
+		//Инициализация хранилища визарда
+		$this->wizard_init();
+//echo '<pre class="debug">HERE1:'.print_r ( $GLOBALS['Jlib_page_extra'] ,true).'</pre>';
+	  if( !empty($GLOBALS['Jlib_page_extra'][0]) && $GLOBALS['Jlib_page_extra'][0]=='ulogin' ){
+	    //$this->loginza_reg();
+	    $this->ulogin_reg();
+		}
+
+	  //Получить информацию о шагах
+		//Определить шаг
+		if((!empty($this->ctrl[ $this->params['ctrl_steps'] ]))){
+		  $this->cur_step=$this->ctrl[ $this->params['ctrl_steps'] ];
+		}else{
+		  //echo '<pre class="debug">'.print_r ( $this->wizard_data ,true).'</pre>';
+		  $this->cur_step=array_shift(array_keys( $this->params['steps'] ))  ;
+		}
+
+		//Оформить шаг
+		$this->show_step();
+
 		$this->load_params_reg();
 		
 		// инициализация
@@ -157,13 +155,8 @@ class lite_reg extends form {
 		} else {
 			// режим insert
 			$this->form_params['cs_mode']='insert';
-			//if( file_exists('img/users/tmp_'.session_id().'.jpg') )	$ava='tmp_'.session_id().'.jpg';
 		}
 		
-		//if(empty($ava)) $ava=str_replace('{img_ava}','def.jpg',$this->tpl['not_img_ava']);
-		//else $ava=str_replace('{img_ava}',$ava,$this->tpl['img_ava']);
-		//$this->pg=str_replace('{img_ava}',$ava,$this->pg);
-
 		parent::init(true);
 		$this->inited=true;
 	}
@@ -258,56 +251,133 @@ class lite_reg extends form {
 
 	function do_save(){
 	  if(AJAX) return true;
-	  //echo '<pre class="debug">'.print_r ( $_SESSION['Jlib_auth'] ,true).'</pre>';
-	  if(!empty($_SESSION['Jlib_auth']))
-	    $uid=$_SESSION['Jlib_auth']['u_id'];
-	  else{
+	  //echo '<br />SESSION:<pre class="debug">'.print_r ( $_SESSION['Jlib_auth'] ,true).'</pre>';
+	  //echo '<br />wizard_data:<pre class="debug">'.print_r ( $this->wizard_data ,true).'</pre>';
+	  //exit();
+
+	  //if(!empty($_SESSION['Jlib_auth'])) $uid=$_SESSION['Jlib_auth']['u_id']; else//что это пока не понятно... хм.
+		if(empty($this->wizard_data['u_id'])){
+			//Создание акка пользователя
+	    if(!empty($this->wizard_data['name'])){ $this->wizard_data['u_name']=$this->wizard_data['name']; unset($this->wizard_data['name']); }
+	    if(!empty($this->wizard_data['email'])){ $this->wizard_data['u_email']=$this->wizard_data['email']; unset($this->wizard_data['email']); }
 		  //Создать аккаунт
 		  $data=array(
-			  'u_email'=>$this->wizard_data['email'],
-			  'u_name'=>$this->wizard_data['name'],
-			  'u_url'=>translit($this->wizard_data['name']).'_'.uniqid(''),
+			  'u_email'=>(!empty($this->wizard_data['u_email']))?$this->wizard_data['u_email']:uniqid('') ,
+			  'u_name'=>$this->wizard_data['u_name'],
+			  'u_sname'=>$this->wizard_data['u_sname'],
+			  'u_url'=>translit($this->wizard_data['u_name'].'.'.$this->wizard_data['u_sname']),
 			  'u_grp'=>'usr',
 			  'u_img'=>$this->wizard_data['u_img'],
+			  'u_gender'=>$this->wizard_data['u_gender'],
 			  'u_createdate'=>date('Y-m-d H:i:s'),
 			  'u_lastlogin'=>date('Y-m-d H:i:s'),
-			  'u_pwd'=>$pwd,
+			  'u_pwd'=>( empty($this->wizard_data['oid_openid']) )?uniqid(''):'',
 			  'u_lock'=>0,
-			  'u_openid'=>!empty($this->wizard_data['u_openid'])?$this->wizard_data['u_openid']:'',
-			  'u_openidprov'=>!empty($this->wizard_data['u_openidprov'])?$this->wizard_data['u_openidprov']:'',
 			);
-			$uid=$GLOBALS[CM]->run('sql:user','insert',$data);
+			//Проверить URL на уникальность
+			$tst=$GLOBALS[CM]->run('sql:user?u_url=\''.$data['u_url'].'\'');
+			if( !empty($tst) ) $data['u_url'].='-'.uniqid('');
 			
-		  //Отправляю мыло
-		  require_once 'lib/class.phpmailer.php';
-		  $data['proj_email_name']=$GLOBALS['Jlib_proj_name'];
-		  $data['server']=$_SERVER['SERVER_NAME'];
-		  $msg=strjtr($this->tpl['mail_msg'], $data);
+			$uid=$GLOBALS[CM]->run('sql:user','insert',$data);
+			if(empty($uid)){echo "ОШибка регистрации ".mysql_error(); exit();}
+			
+			if(!empty($this->wizard_data['u_email']) && !empty( $data['u_pwd'] ) ){
+				//Отправляю мыло
+			  require_once 'lib/class.phpmailer.php';
+			  $data['proj_email_name']=$GLOBALS['Jlib_proj_name'];
+			  $data['server']=$_SERVER['SERVER_NAME'];
+			  $msg=strjtr($this->tpl['mail_msg'], $data);
 
-			$mail = new PHPMailer();
-			$mail->From = $GLOBALS['Jlib_defaults']['proj_email'];
-			$mail->FromName = $GLOBALS['Jlib_defaults']['proj_email_name'];
-			$mail->IsHTML(true);
-			$mail->AddAddress($form->data['u_email']);
-			$mail->Subject = 'Доступ к Вашему акаунту на '.$GLOBALS['Jlib_proj_name'];
-			$mail->Body = $msg;
-			$mail->Send();
+				$mail = new PHPMailer();
+				$mail->From = $GLOBALS['Jlib_defaults']['proj_email'];
+				$mail->FromName = $GLOBALS['Jlib_defaults']['proj_email_name'];
+				$mail->IsHTML(true);
+				$mail->AddAddress($this->wizard_data['u_email']);
+				$mail->Subject = 'Доступ к Вашему акаунту на '.$GLOBALS['Jlib_proj_name'];
+				$mail->Body = $msg;
+				$mail->Send();
+			}
 
-		  //Авторизирую
+			//Мерджу измененные данные
 		  $data['u_id']=$uid;
 		  $this->wizard_data=array_merge($this->wizard_data, $data);
+		}else{
+		  //ПРофайл есть - проверяю поля: картинка, фамилия, т.п
+		  //echo 'Ulogin:<pre class="debug">'.print_r ( $_SESSION['ulogin_data'] ,true).'</pre>';
+		  //echo 'Wizard:<pre class="debug">'.print_r ( $this->wizard_data ,true).'</pre>';
+		  if(
+				(
+					$this->wizard_data['u_img']=='/img/def_usr.jpg' ||
+					strpos($this->wizard_data['u_img'], 'ulogin.ru')!==false
+				) &&
+				!empty( $_SESSION['ulogin_data']['u_img'] )
+			)$update['u_img']=$_SESSION['ulogin_data']['u_img'];
+			
+			if(
+				(
+					empty($this->wizard_data['bdate']) ||
+					$this->wizard_data['bdate']=='0000-00-00'
+				)&&
+					!empty( $_SESSION['ulogin_data']['u_bdate'] )
+			){
+				if( substr($_SESSION['ulogin_data']['u_bdate'], 4, 1)=='-' )	$update['u_bdate']= $_SESSION['ulogin_data']['u_bdate'];
+				else	$update['u_bdate']= date_processor('store',$_SESSION['ulogin_data']['u_bdate'],array('store' => 'Y-m-d','display' => 'd.m.Y'));
+			}
+			
+			if(
+				empty($this->wizard_data['u_sname']) &&
+				!empty( $_SESSION['ulogin_data']['u_sname'] )
+			)$update['u_sname']=$_SESSION['ulogin_data']['u_sname'];
+			
+			if(!empty($update)){
+
+			  $t=array(); foreach( $update as $k=>$v ) $t[]=$k."='".$v."' ";
+				$sql="UPDATE user SET ".implode(',',$t)." WHERE u_id=".$this->wizard_data['u_id'];
+				
+				mysql_query($sql);
+				if( mysql_error() ){}
+				$this->wizard_data=array_merge($this->wizard_data,$update);
+			}
+			//echo '<pre class="debug">'.print_r ( $_SESSION['ulogin_data'] ,true).'</pre>';
+			//echo '<pre class="debug">'.print_r ( $update ,true).'</pre>';
 		}
-	  //Привязать темы
-	  $sql="INSERT INTO user2theme VALUES ";
-	  $vals=array(); foreach( $this->data['themes'] as $v )
-	    $vals[]=" ( $uid, $v ) ";
-	  $sql.=implode(',', $vals);
-	  $db=init_db();
-	  $db->query($sql);
-	  $this->wizard_data['u_themes']=$this->data['themes'];
+		//привязываю к акку темы, если нужно
+		if(!empty($this->data['themes'])){
+			//Привязать темы
+		  $sql="INSERT INTO user2theme VALUES ";
+		  $vals=array(); foreach( $this->data['themes'] as $v )
+		    $vals[]=" ( $uid, $v ) ";
+		  $sql.=implode(',', $vals);
+		  $db=init_db();
+		  $db->query($sql);
+		  $this->wizard_data['u_themes']=$this->data['themes'];
+		}
+		
+		//echo '<pre class="debug">'.print_r ( $this->wizard_data ,true).'</pre>';
+		//Создаю запись OpenID ели нужно
+		if( empty($this->wizard_data['oid_id']) && !empty($this->wizard_data['oid_openid'])){
+		  $data=array(
+		    'oid_key_u'=>$this->wizard_data['u_id'],
+		    'oid_openid'=>$this->wizard_data['oid_openid'],
+		    'oid_provider'=>$this->wizard_data['oid_provider'],
+			);
+			$sql="INSERT INTO openid SET oid_key_u=".$this->wizard_data['u_id'].", oid_openid='".$this->wizard_data['oid_openid']."'";
+			mysql_query($sql);
+			$oid=mysql_insert_id();
+			
+			if(!empty($oid)){
+			  $this->wizard_data['oid_id']=$oid;
+			}
+		}
 
 		$this->auth_user();
-	  redirect('/');
+		if(!empty($_SESSION['reg_from'])){
+		  $t=$_SESSION['reg_from'];
+		  unset($_SESSION['reg_from']);
+			redirect($t);
+		}else
+			redirect('/');
+		exit();
 	}
 	
 	function auth_user(){
@@ -318,10 +388,11 @@ class lite_reg extends form {
 	    'u_grp'=>$this->wizard_data['u_grp'],
 	    'u_img'=>$this->wizard_data['u_img'],
 	    'u_gender'=>$this->wizard_data['u_gender'],
+	    'u_bdate'=>$this->wizard_data['u_bdate'],
 	    'u_createdate'=>$this->wizard_data['u_createdate'],
 	    'u_lastlogin'=>$this->wizard_data['u_lastlogin'],
-	    'u_openid'=>$this->wizard_data['u_openid'],
-	    'u_openidprov'=>$this->wizard_data['u_openidprov'],
+	    'oid_openid'=>(!empty($this->wizard_data['oid_openid']))?$this->wizard_data['oid_openid']:'',
+	    'oid_provider'=>(!empty($this->wizard_data['oid_provider']))?$this->wizard_data['oid_provider']:'',
 		);
 		
 		if(!empty( $this->wizard_data['u_themes'] )){
@@ -335,96 +406,58 @@ class lite_reg extends form {
 		if(empty($_SESSION['Jlib_auth']['u_id']))$_SESSION['Jlib_auth']['u_id']=$this->wizard_data['uid'];
 	}
 	
-	function loginza_reg(){
-		if( empty($_POST) ) {redirect('/'); exit(); }
-		$debug=false; $local=true;
-		if(!empty($_GET['ref'])){ $_SESSION['Jlib_auth_ref']=$_GET['ref']; }
-		$host='loginza.ru';
-		if( $local )
-			$loc='/api/authinfo?token='.$_POST['token'];
-		else
-			$loc='/api/authinfo?token='.$_POST['token'].'&id=50555&sig='.md5($_POST['token'].'077f18fec6c9c2748d31d7de8791c7e3');
-
-	  $json_dt=get_page($host, $loc);
-		//include 'lib/JSON.php';
-		//$json = new Services_JSON();
-		//$dt = $json->decode($json_dt);
-		$dt=json_decode($json_dt);
-		if($debug){
-		  echo '<br />Данные от соц. ДО<pre class="debug">'.print_r ( $dt ,true).'</pre>';
+	function ulogin_reg(){
+	  if(empty($_POST['token'])){
+	    echo "auth error";
+	    exit();
 		}
-		if( !empty($dt->error_type) ){
-		  return '<h1>Ошибка :(</h1><p>'.$dt->error_message.'</p><br />';
-		}
-
-		if(!empty($dt->name->first_name))	$first_name	=	($dt->name->first_name);
-		if(!empty($dt->name->last_name))	$last_name	=	($dt->name->last_name);
-		if(!empty($dt->name->full_name))	$full_name	=	($dt->name->full_name);
-		if(!empty($dt->name->nickname))		$nickname		=	($dt->name->nickname);
-		
-		if($debug){
-		  echo '<br />Данные от соц. ПОСЛЕ<pre class="debug">'.print_r ( $dt ,true).'</pre>';
-		}
-
-		//nm gen
-		if(!empty($first_name)) $nm=$first_name;
-		elseif(!empty($nickname)) $nm=$nickname;
-		elseif(!empty($full_name)) $nm=$full_name;
-		else $nm='';
-
+		$s = file_get_contents('http://ulogin.ru/token.php?token=' . $_POST['token'] . '&host=' . $_SERVER['HTTP_HOST']);
+	  $user = json_decode($s, true);
+	  
 		$tmp_data=array(
-		  'u_openid'=>$dt->identity,
-		  'u_openidprov'=>$dt->provider,
-		  'name'=> $nm,
-		  'email'=>( !empty($dt->email) )?$dt->email:'',
-		  'u_gender'=>( empty($dt->gender) )?'hmm': ( ($dt->gender=='M')?'mle':'fme' ),
-		  'u_img'=>( empty($dt->photo) )?'/img/def_usr.jpg':$dt->photo,
+		  'oid_openid'=>$user['identity'],
+		  'oid_provider'=>'',
+		  'u_name'=> $user['first_name'],
+		  'u_sname'=> $user['last_name'],
+		  'u_email'=>( !empty($user['email']) )?$user['email']: '',
+		  'u_bdate'=>( !empty($user['bdate']) )?date_processor('store',$user['bdate'],array('store' => 'Y-m-d','display' => 'd.m.Y')): '',
+		  'u_gender'=>( empty($user['sex']) )?'hmm': ( ($user['sec']=='2')?'m':'f' ),
+		  'u_img'=>( empty($user['photo_big']) )?( (!empty($user['photo']))?$user['photo']:'/img/def_usr.jpg' ):$user['photo_big'],
 		);
+		if( strpos($tmp_data['u_img'], 'ulogin.ru')!==false )
+		  $tmp_data['u_img']=( strpos($user['photo'], 'ulogin.ru')!==false )?'/img/def_usr.jpg':$user['photo'];
+		  
+		//Сохраняю для дальнейшей проверки
+		$_SESSION['ulogin_data']=$tmp_data;
 
 		//Есть ли профайл
-		$by_mail='';
-		if( !empty( $tmp_data['u_email'] ) ) $by_mail=' OR u_email=\''.$tmp_data['u_email'].'\' ';
-		$u_dt=$GLOBALS[CM]->run(
-			'sql:user?u_openid=\''.$tmp_data['u_openid'].'\' '. $by_mail .'
-			$auto_query=no'
-		);
-
-		//Создать пользователя если нету
-		if( empty($u_dt) || count($u_dt)<1 ){
-		  $this->wizard_data=$tmp_data;
-		  //echo '<pre class="debug">'.print_r ( $this->wizard_data ,true).'</pre>'; exit();
-		  
-		  $this->auth_user();
-		  redirect('/'); exit();
+		$DB=init_db();
+		if( !empty( $tmp_data['u_email'] ) ){
+		//Пытаюсь выбрать пользователя по мылу и определить его существующий openID
+		  $sql="SELECT	u_id,u_grp,u_url,u_email,u_pwd,u_name,u_sname,u_img,u_gender,u_createdate,u_lastlogin,u_lock,oid_id
+						FROM		user LEFT JOIN openid ON(oid_key_u=u_id AND oid_openid='".$tmp_data['oid_openid']."')
+						WHERE		u_email='".$tmp_data['u_email']."'	LIMIT 0,1";
 		}else{
-		  //Если аккав несколько - попытаться найти с почтой
-		  if( count($u_dt)>1 ){
-				$first=false; $found=false;
-				foreach( $u_dt as $uk=>$uv ){
-		      if(!$first) $first=$uk;
-		      if( empty($found) && $uv['u_email']!='' ){
-		        $found=$uk;	break;
-					}
-				}
-				if( $found ) $u_dt=$u_dt[$found];
-				else  $u_dt=$u_dt[$first];
-			}else{
-			  $u_dt=$u_dt[0];
-			}
-		  if($debug){
-		  	echo '<br />Пользователь найден <pre class="debug">'.print_r ( $u_dt ,true).'</pre>';
-			}
-		  unset($u_dt['u_pwd'], $u_dt['u_lock']);
-			$uid=$u_dt['u_id'];
-			$t=$GLOBALS[CM]->run('sql:user2theme#GROUP_CONCAT(u2t_key_t)?u2t_key_u='.$uid.'$auto_query=no shrink=yes');
-			if(!empty($t)){
-        $u_dt['u_themes']=$t;
-			}
-
-			$this->wizard_data=$u_dt;
-			$this->auth_user();
-			if(!$debug) redirect('/');
+		//Пытаюсь выбрать пользователя только по openID
+			$sql="SELECT	u_id,u_grp,u_url,u_email,u_pwd,u_name,u_sname,u_img,u_gender,u_createdate,u_lastlogin,u_lock,oid_id
+						FROM		openid,user
+						WHERE		oid_key_u=u_id AND oid_openid='".$tmp_data['oid_openid']."' LIMIT 0,1";
 		}
+		$u_dt=$DB->query($sql);
+		if(mysql_error()) $u_dt=false;
+		else	$u_dt=mysql_fetch_assoc($u_dt);
+    //echo $sql.'<br /><pre class="debug">'.print_r ( $u_dt ,true).'</pre>';
+
+		//Создать пользователя если нету (подставить данные и пустить визарда дальше)
+		if( empty($u_dt['u_id']) ){
+		  $this->wizard_data=$tmp_data;
+		}else{
+			$t=$GLOBALS[CM]->run('sql:user2theme#GROUP_CONCAT(u2t_key_t)?u2t_key_u='.$u_dt['u_id'].'$auto_query=no shrink=yes');
+			if(!empty($t)) $tmp_data['u_themes']=$t;
+			$this->wizard_data=array_merge($tmp_data,$u_dt);
+		}
+
+		redirect('/catigories');
 	}
 }
 

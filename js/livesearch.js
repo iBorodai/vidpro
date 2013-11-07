@@ -139,17 +139,18 @@ var liveSearch={
 		e.liveSearch.currReq=el;
 		req.onreadystatechange = function() {
 			if (req.readyState == 4) {
-			    console.log(req);
-					if(req.responseJS && req.responseJS.val && req.responseJS.val==e.liveSearch.currReq) {
+			    console.log(req,e.liveSearch.currReq);
+					if(req.responseJS && req.responseJS.val && req.responseJS.val==e.liveSearch.currReq.query) {
 						if(req.responseJS.content) {
-							var words=el;
+							var words=el.query;
 							words=words.split(' ');
 							var words_=new Array();
 							var finded={};
 							e.liveSearch.results.html(req.responseJS.content);
 							var text=$('ul:first',e.liveSearch.results).html();
-							if(req.responseJS.count) {
+							if(req.responseJS.count){
 								if(words && text){
+
 									for(i in words) {
 										if(words[i] && words[i]!='' && !liveSearch.in_array(words[i],words_)) {
 											words_.push(words[i]);

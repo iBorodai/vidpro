@@ -1,23 +1,28 @@
 #wrapper{
 	width:100%;
 }
+#head .center {
+	padding: 14px 210px 0 230px;
+}
 #point_wrapper{
 	margin: 0 auto;
 	width: 990px;
 }
 #point_wrapper{
 	margin-top:236px;
+	position: relative;
+	z-index: 20;
 }
 #map_box_block{
 	position:absolute;
 	top:60px;
 	width:100%;
-	z-index:-1;
+	z-index:10;
 }
 #map{
 	width:100%;
 	height:400px;
-	background:red;
+	background:url(/img/vp_pattern.jpg);
 	overflow: hidden;
 }
 
@@ -25,6 +30,7 @@
 	background:#fff;
 	box-shadow:0 3px 3px #ccc;
 	margin-bottom:20px;
+	padding-bottom:16px;
 }
 
 #point_gallery{
@@ -77,16 +83,23 @@
 }
 
 .comment{
-	padding-left:85px;
+	padding:65px 40px 10px 85px;
+	margin-bottom:16px;
 	position:relative;
-	min-height:80px;
+	border:1px solid #e9e8e8;
+	
+	-moz-box-shadow: 0 3px 3px #CCCCCC;
+	-webkit-box-shadow: 0 3px 3px #CCCCCC;
+	box-shadow: 0 3px 3px #CCCCCC;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=3, Direction=180, Color='#CCCCCC')";
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=3, Direction=180, Color='#CCCCCC');
 }
 .comment .bullet{
-  height: 80px;
-  left: 0;
+  min-height: 75px;
+  left: 16px;
   position: absolute;
-  top: 0;
-  width: 80px;
+  top: 10px;
+  width: 75px;
 }
 
 .comment .bullet img{
@@ -104,8 +117,14 @@
 	font-size:30px;
 }
 
-.comment .name{font-weight:bold;}
+.comment .user{position:absolute; top:10px; left: 85px;}
+.comment .date{color:#687184; font-size:9px;}
+.comment .not_recommend,.comment .recommend,.comment .name{color:#4d4d4d; font-size:14px; font-weight:bold;}
+.comment .recommend{color:#00c6ff;}
+.comment .not_recommend{color:#000;}
 .comment .duration{display:block; font-size:11px; color:#687184;}
+
+.comment .text{color:#687184; font-size:13px; line-height:18px; }
 
 .comment .likes{
 		background:#fff;
@@ -126,6 +145,7 @@
 	zoom: 1;
 	*display: inline;
 	position:relative;
+	width:39%;
 }
 .stat_block .stat_info .stat_act{
 	display:none;
@@ -133,7 +153,7 @@
 .stat_block .stat_info.hover .stat_act{
 	position:absolute;
 	top:0;left:-35px;
-	width:120%;
+	width:100%;
 	display:block;
 }
 .stat_block .stat_info.hover .stat_act a{
@@ -143,9 +163,10 @@
 	background:#00C6FF;
 	color:#fff;
 	height: 20px;
-	padding: 5px 0;
+	padding: 7px 0 3px;
 	text-align: center;
 	text-decoration: none;
+	font-size: 12px;
 }
 .stat_block .stat_info.hover .stat_act a.minus{
 	background:#000;
@@ -153,9 +174,37 @@
 
 .stat_arr{
 	font-weight:bold;
-	width:50%;
+	width:60%;
 }
 
 .stat_arr .weight{
-	float:right;
+	position: absolute;
+  right: 6px;
+  top: 6px;
+
+	font-size:16px;
+  padding:0 0 0 24px;
+  display:block;
+  height:18px;
+  width:41px;
+  background:url(/img/vote_hands.png) no-repeat;
+}
+.stat_arr .weight.w-1{
+	background-position:0 -22px;
+	color:#000;
+}
+
+.stat_block .arrow > div > span{
+	font-size:20px;
+	height: 27px;
+	padding-top: 3px;
+	padding-right: 75px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#head{
+    margin: 0 auto;
+    max-width: 1440px;
 }

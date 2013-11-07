@@ -94,6 +94,47 @@ function review_dialog(){
 	});
 }
 
+function profile_dialog(){
+  dialog_show( function(){
+    var t=$('#profile_form_tpl').html();
+    t=t.replace(/jsremove_/g,'');
+		$('#dialog_block .content').html( t );
+		
+		var t=false;
+		t=$('.uinf_name').text(); 	if(t) $('.pro_name').html( t );
+		t=$('.uinf_geo').text(); 		if(t) $('.pro_geo').html( t );
+		
+		t=$('.uinf_name').text(); 	if(t) $('.usr_name input').val( t );
+		t=$('.uinf_sname').text();	if(t) $('.usr_sname input').val( t );
+		t=$('.uinf_bdate').text();	if(t) $('.usr_bdate input').val( t );
+		t=$('.uinf_img').text();		if(t) $('.pro_avatar img').attr('src', t );
+		
+		t=$('.uinf_gender').text();
+		if(t) $('#gender_'+t.substr(0,1)  ).attr('checked','checked');
+			
+		
+		return;
+		    //Определяю какой шаблон подставить
+		    if($('#point').data('weight')>0){
+		      var tpl=$('#recommend_plus_tpl').html();  //recommend_plus_tpl
+				}else if($('#point').data('weight')<0){
+				  var tpl=$('#recommend_minus_tpl').html();	//recommend_minus_tpl
+				}else {
+				  var tpl=$('#recommend_def_tpl').html();	//recommend_def_tpl
+				}
+				tpl=tpl.replace(/onclick/g,'data-onClick');
+
+		    $('#dialog_block .content .recomend_block').html(tpl);
+		    $('#dialog_block .content .recomend_block a').unbind('click').click(function(){
+		    	var r=(($(this).data('onclick')+'').indexOf('(1)') <0 )?-1:1;
+		      $(this).parents('.review_form').find('.recomend_fld').val(  r  );
+		      return false;
+				});
+
+			
+	});
+}
+
 function send_review(form){
 	var req = new JsHttpRequest("utf-8");
 	req.onreadystatechange = function(){
@@ -121,6 +162,28 @@ function send_review(form){
 
 	req.open(null,'/ajax', true);
 	req.send({'mode':'send_review',fields:['block'],text:$(form).find('textarea').val(), point:$('#point').attr('rel'), recomend:$(form).find('.recomend_fld').val() });
+}
+
+function send_vote(point, vote, marker){
+	var req = new JsHttpRequest("utf-8");
+	var elm=marker;
+	elm.html('loading');
+	
+	req.onreadystatechange = function(){
+		if (req.readyState == 4){
+			if(req.responseJS){
+			  if( req.responseJS.error ){
+			    display_error(req.responseJS.error);
+				}else{
+				  elm.html( req.responseJS.content );
+				}
+			}
+			if(req.responseText!='') alert(req.responseText);
+		}
+	}
+
+	req.open(null,'/ajax', true);
+	req.send({ 'mode':'send_vote', fields:['block'], recomend:vote, 'point':point });
 }
 
 function send_recommend(){
@@ -175,9 +238,12 @@ function populars(){
 	});
 }
 
-function toggle_pop(jq_selector){
+function toggle_pop(jq_selector, shower ){
 	$('.pop').not(jq_selector).hide();
-	$(jq_selector).toggle();
+	if(typeof(shower)=='undefined')	$(jq_selector).toggle();
+	else{
+		shower();
+	}
 }
 
 $(document).ready(function(){
@@ -189,18 +255,23 @@ $(document).ready(function(){
 	//Форма авторизации, если есть
 	if($('#login_block').get().length>0){
 	  $('#write_review').click(function(){
-	    $('.pop').hide();
-	    $('#login_form').toggle();
+	    toggle_pop('#login_form');
 	    return false;
 		});
 	}else{
-	//Отображение диалога комментария
+		//Нажатие на комментировать
 	  $('#write_review').click(function(){
-	    $('.pop').hide();
-	    review_dialog();
+	    toggle_pop('#dialog_block',review_dialog);
+	    return false;
+		});
+		//Нажатие на мой профиль
+	  $('#my_profile').click(function(){
+	    toggle_pop('#dialog_block',profile_dialog);
 	    return false;
 		});
 	}
+	
+	
 	
 	//Пользовательское меню,если есть
   if($('#user_profile').get().length>0){
@@ -234,9 +305,11 @@ $(document).ready(function(){
 		liveSearch.init($('#search_query')[0],{
 			attr_set:'placeholder,name,id',
 			mode:'search_points',
-			query:{
-				'query':$('#search_query').val(),
-				'reg':$('#search_reg').val()
+			make_query:function(){
+			  return {
+					'query':$('#search_query').val(),
+					'reg':$('#search_reg').val()
+				}
 			},
 			search_url:'/ajax/',
 			callback:function( respJS,e ){
@@ -248,6 +321,7 @@ $(document).ready(function(){
 				});
 			}
 		});
-		
 	}
+	
+	$('.fb').fancybox();
 });

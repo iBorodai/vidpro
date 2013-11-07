@@ -5,21 +5,27 @@ class foursquare{
 	var $api_top_cats='4d4b7105d754a06374d81259,4d4b7105d754a06376d81259';
 	//Хранилище ошибок выполнения
 	var $errors=array();
+	//
+	var $cur_json=false;
 	
 	/**************************
 	 *	Произвольный запрос к API
 	***************************/
 	function request($fs_query, $cache_time=false){
+//echo md5($fs_query).'<br /><br />';
 		if( $tst=$GLOBALS[CACHE]->get(md5($fs_query)) ){
 	     $dt= unserialize($tst);
-		}else{
+		}
+		if(empty($dt)){
 		  //Запрашиваю
 		  $json=get_page('api.foursquare.com', $fs_query );
 		  if(empty($json)){
 		    $this->errors[]=array('err','пустой ответ');
 		    return false;
 			}
+//echo '<pre class="debug">'.print_r ( $json ,true).'</pre>';
 		  $dt=json_decode($json);
+		  $this->cur_json=$json;
 			//кеширую
 		  if( !$GLOBALS[CACHE]->prepare( md5($fs_query), $dt, $cache_time ) ){
 		    $this->errors[]=array('wrn','ошибка кеширования - не удалось сохранить данные');
