@@ -27,19 +27,25 @@ function addbraces($item){
 
 class user_info extends icontrol {
 	function init() {
+//echo '<pre class="debug">'.print_r ( $_SESSION['Jlib_auth'] ,true).'</pre>';
+
 		if (!empty($this->ctrl['logout'])) {
 			setcookie("jlib_mem_user", "-1", time()-3600,'/' );
 			session_destroy();
 			redirect($this->get_url('logout='));
 		}
+		$_SESSION['Jlib_auth']['u_img_path']=$_SESSION['Jlib_auth']['u_img'];
+		
 		if(!empty($_SESSION['Jlib_auth']['u_nub'])) $this->pg=str_replace('{u_img}',$this->tpl['u_nub'],$this->pg);
 		elseif(!empty($_SESSION['Jlib_auth']['u_img']) && !empty($this->tpl['u_img'])) $this->pg=str_replace('{u_img}',$this->tpl['u_img'],$this->pg);
 		elseif(!empty($this->tpl['not_u_img'])) $this->pg=str_replace('{u_img}',$this->tpl['not_u_img'],$this->pg);
 		else $this->pg=str_replace('{u_img}','',$this->pg);
+		
 		foreach($_SESSION['Jlib_auth'] as $k=>$v){
 			$this->pg=str_replace('{'.$k.'}',$v,$this->pg);
 		}
 		$this->pg=str_replace('{rand}',rand(),$this->pg);
+		$this->pg=preg_replace('~{\w+}~', '', $this->pg);
 	}
 }
 
@@ -549,11 +555,13 @@ if(
 class reg_handler extends handler{
 	function handle(){
 	  if(!empty($_GET['reg_skip'])){  $_SESSION['reg_skip']=true; redirect( '/' );}
-	  if(!empty($_GET['reg'])){
+	  if(
+			!empty($_GET['reg']) || (
+			  !empty($GLOBALS['Jlib_page_extra']) &&
+				$GLOBALS['Jlib_page_extra'][0]=='ulogin'
+			)
+		){
 			unset($_SESSION['reg_skip']);
-			
-			if(!empty($GLOBALS['Jlib_page_extra']) && $GLOBALS['Jlib_page_extra'][0]!='loginza')
-				redirect( '/' );
 		}
 	  
 	  if(empty($_SESSION['reg_skip'])){
@@ -571,7 +579,6 @@ class reg_handler extends handler{
 		    redirect( $r );
 		    exit();
 			}
-
 		}
 	}
 	function add_reg_obj(){
@@ -585,8 +592,12 @@ class reg_handler extends handler{
 }
 
 function reg_check_name($obj){
-  if( empty($obj->data['name']) || empty($obj->data['email'])) return false;
-  $t=$GLOBALS[CM]->run('sql:user?u_email=\''. mysql_real_escape_string($obj->data['email']) .'\'$shrink=yes');
+  //echo '<pre class="debug">'.print_r ( $obj->data ,true).'</pre>';
+  if( empty($obj->data['name']) || empty($obj->data['email'])){
+    if( empty($data['test']) )return false;
+	}
+  
+  $t=$GLOBALS[CM]->run('sql:user?u_email=\''. mysql_real_escape_string($obj->data['u_email']) .'\'$shrink=yes');
   if(!empty($t)) {
 		set_error_ex('Пользователь с таким e-mail уже зарегистрирован');
 		return false;
@@ -597,6 +608,8 @@ function reg_check_name($obj){
 function reg_build_cats($obj){
 	//$t=$GLOBALS[CM]->run('sql:theme');
 	//echo '<pre class="debug">'.print_r ( $t ,true).'</pre>';
+	if(!empty($obj->wizard_data['u_themes'])) $obj->do_save();
+	
 	$t=new list_viewer(array(
 	    'ctrl'=>'t_id',
 	    'vars'=>'t_id',
@@ -697,5 +710,17 @@ function logo_link($prm){
 	else $sec='logo_link';
 
 	return $prm['parent']->parent->tpl[$sec];
+}
+
+function show_domain(){
+	return $_SERVER['SERVER_NAME'];
+}
+function show_back_path(){
+  if($GLOBALS['Jlib_target']!='default') $_SESSION['reg_from']='/'.$GLOBALS['Jlib_target'];
+	return $_SERVER['SERVER_NAME'];
+}
+function ulogin_script(){
+	if(!empty($_SESSION['Jlib_auth']))return '';
+	return '<script src="//ulogin.ru/js/ulogin.js"></script>';
 }
 ?>

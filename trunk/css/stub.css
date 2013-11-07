@@ -100,7 +100,12 @@ body{
 	margin:-210px 0 0 -210px;
 	background:#fff;
 	padding:20px;
+	
+	-moz-box-shadow: 0 1px 5px #000;
+	-webkit-box-shadow: 0 1px 5px #000;
 	box-shadow: 0 1px 5px #000;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=180, Color='#CCCCCC')";
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=180, Color='#CCCCCC');
 }
 #login_form label{
 	font-family:helvetica_l;

@@ -7,37 +7,47 @@
 		<div id="user_subnav" class="pop">
 		  <span class="arr"><span></span></span>
 		  <span class="title">{u_name}</span>
-		  <a href="/profile" >Мой профиль</a>
-		  <a href="/profile/subscribe" >Мои подписки</a>
-		  <a href="/profile/settings" >Мои настройки</a>
+		  <a href="/profile" id="my_profile">Мой профиль</a>
+		  <a href="/profile/subscribe" id="my_subscribes">Мои подписки</a>
+		  <a href="/profile/settings" id="my_settings">Мои настройки</a>
 			<a href="/?logout=yes" id="user_logout">Выйти из аккаунта</a>
 			<div class="clear"></div>
 		</div>
 	</div>
 	<div style="display:none;">
+	  <div id="user_info">
+	    <i class="uinf_id">{u_id}</i>
+	    <i class="uinf_email">{u_email}</i>
+	    <i class="uinf_name">{u_name}</i>
+	    <i class="uinf_sname">{u_sname}</i>
+	    <i class="uinf_gender">{u_gender}</i>
+	    <i class="uinf_bdate">{u_bdate}</i>
+	    <i class="uinf_geo">{u_geo}</i>
+	    <i class="uinf_img">{u_img_path}</i>
+	  </div>
 	  <div id="review_form_tpl">
 	    <form class="review_form">
 	      <div class="recomend_block"></div>
-	      <input type="text" name="recomend" value="" class="recomend_fld">
-	      <hr size="1">
 	      
+	      <input type="hidden" name="recomend" value="" class="recomend_fld">
 	      <textarea name="reveiw"></textarea>
+	      <br>
 	      <input type="submit" onclick="send_review( this.form ); return false;">
 	    </form>
 		</div>
-		<div id="recommend_plus_tpl">
-		  <span rel="Подставить ID заведения">
-				Большинство рекомендует
-				<a href="#" onClick="send_recommend(1); return false;">Я тоже рекомендую</a>
-				<a href="#" onClick="send_recommend(-1); return false;">Я не рекомендую</a>
-			</span>
+		<div id="recommend_plus_tpl" class="recomend_block">
+		  <p>
+				<span>Большинство рекомендует</span>
+				<a href="#" onClick="send_recommend(1); return false;" class="plus">Я тоже рекомендую</a>
+				<a href="#" onClick="send_recommend(-1); return false;" class="minus">Я не рекомендую</a>
+			</p>
 		</div>
-		<div id="recommend_minus_tpl">
-		  <span rel="Подставить ID заведения">
-				Большинство не рекомендует
-				<a href="#" onClick="send_recommend(-1); return false;">Я тоже не рекомендую</a>
-				<a href="#" onClick="send_recommend(1); return false;">Я все-таки рекомендую</a>
-			</span>
+		<div id="recommend_minus_tpl" class="recomend_block">
+		  <p>
+				<span>Большинство не рекомендует</span>
+				<a href="#" onClick="send_recommend(-1); return false;" class="plus">Я тоже не рекомендую</a>
+				<a href="#" onClick="send_recommend(1); return false;" class="minus">Я все-таки рекомендую</a>
+			</p>
 		</div>
 		<div id="recommend_def_tpl">
 		  <span rel="Подставить ID заведения">
@@ -48,6 +58,52 @@
 	  <div id="review_search_tpl">
 	    <img src="/img/big_red_arr_top.jpg" align="bottom"> Укажите заведение для добавления отзыва.
 		</div>
+		
+		<div id="profile_form_tpl">
+		  <div class="profile_dialog">
+				<a href="#" class="close" onClick="profile_dialog(); return false;">Закрыть профиль</a>
+		    <form class="profile_form" enctype="multipart/form-data" method="POST">
+		      <div class="fline">
+			      <div class="pro_avatar">
+							<img src="/img/profile_def.jpg">
+							<input type="file" name="avatar">
+						</div>
+						<div class="pro_info">
+							<span class="pro_name">Имя участника</span>
+							<span class="pro_geo">Месторасположение</span>
+						</div>
+						<div class="clear"></div>
+					</div>
+					<div class="field usr_name">
+					  <label>Имя</label>
+						<input type="text" name="pro_name" >
+	     			<span class="err"></span>
+					</div>
+					<div class="field usr_sname">
+					  <label>Фамилия</label>
+						<input type="text" name="pro_sname" >
+	     			<span class="err"></span>
+					</div>
+					<div class="field usr_gender">
+					  <label>Пол</label>
+						<input type="radio" name="pro_gender" value="m" id="jsremove_gender_m" class="sh"> <label for="jsremove_gender_m" class="sh">мужчина</label>
+						<input type="radio" name="pro_gender" value="f" id="jsremove_gender_f" class="sh"> <label for="jsremove_gender_f" class="sh">женщина</label>
+	     			<span class="err"></span>
+					</div>
+					<div class="field usr_sname">
+					  <label>Дата рождения</label>
+						<input type="text" name="pro_bdate" >
+	     			<span class="err"></span>
+					</div>
+					<div class="field usr_sname">
+					  <label>&nbsp;</label>
+						<input type="submit" class="submit" onclick="save_profile( this.form ); return false;">
+					</div>
+		      
+		    </form>
+			</div>
+		</div>
+    
 	</div>
 [u_img]
   <img src="{u_img}" title="{u_name}">
@@ -55,7 +111,7 @@
   <img src="/img/usr_def.jpg" title="{u_name}">
 [form]
 	<div id="login_block">
-		<form name="login" id="login_form">
+		<form name="login" id="login_form" class="pop">
 		  <span class="arr"><span></span></span>
 		  <span class="title">Вам необходимо авторизироваться.</span>
 		  <input type="hidden" name="hidden">
@@ -63,12 +119,13 @@
 		  <input type="text" name="usr" placeholder="e-mail" style="email"><br>
 		  <!--err:usr-->
 		  <input type="password" name="pwd" placeholder="пароль"><br>
-		  <input type="submit" value="вход" >
+		  <input type="submit" value="вход" class="submit">
 			<div class="foot">
-		  	<a href="/?reg=true">cоздать новый аккаунт</a> или<br>
-		  	<a href="http://loginza.ru/api/widget?token_url={function:loginza_token_url}&provider=facebook" class="loginza button" id="reg_type_soc">
-					  вход через openID
-				</a>
+				<div id="uLogin" data-ulogin="display=small;fields=first_name,last_name;providers=facebook,twitter,google,yandex,foursquare,openid;hidden=mailru,odnoklassniki,livejournal,lastfm,linkedin,liveid,soundcloud,steam,flickr,vimeo,youtube,webmoney,tumblr,googleplus,dudu;redirect_uri=http%3A%2F%2F{function:show_back_path}/ulogin"></div>
+				<center>
+					или	<br>
+		  		<a href="/?reg=true">cоздать новый аккаунт</a>
+		  	</center>
 		  </div>
 		</form>
 		<a href="#" id="write_review"><i></i>написать отзыв</a>

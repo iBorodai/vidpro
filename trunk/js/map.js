@@ -1,64 +1,32 @@
    var map;
 
-    var map_icon_green = new google.maps.MarkerImage(
-        "http://mysite.com/green_pointer.png",
-        new google.maps.Size(12,20),
-        new google.maps.Point(0,0));
-
     var map_icon_blue = new google.maps.MarkerImage(
-        "http://mysite.com/blue_pointer.png",
-        new google.maps.Size(12,20),
-        new google.maps.Point(0,0));
+        "http://ustudio.com.ua/img/point_blue.png",
+        new google.maps.Size(21,26),
+        new google.maps.Point(0,0),
+        new google.maps.Point(0,26)
+		);
 
-    var map_icon_yellow = new google.maps.MarkerImage(
-        "http://mysite.com/yellow_pointer.png",
-        new google.maps.Size(12,20),
-        new google.maps.Point(0,0));
-
-    var map_icon_red = new google.maps.MarkerImage(
-        "http://mysite.com/red_pointer.png",
-        new google.maps.Size(12,20),
-        new google.maps.Point(0,0));
-
-    var map_icon_shadow = new google.maps.MarkerImage(
-        "http://mysite.com/shadow.png",
-        new google.maps.Size(28,20),
-        new google.maps.Point(-6,0));
-
-    var map_crosshair = new google.maps.MarkerImage(
-        "http://mysite.com/cross-hair.gif",
-        new google.maps.Size(17,17),
-        new google.maps.Point(0,0));
-
-
-    function map_loader() {
+    function map_loader(map_container_id,lat,lng,prm_html) {
         var myOptions = {
-            zoom: 5,
+            zoom: 16,
             mapTypeId: google.maps.MapTypeId.ROADMAP,
             scrollwheel:false
         }
 
         map = new google.maps.Map(
-                document.getElementById('map_container'), myOptions);
+        	document.getElementById(map_container_id), myOptions
+				);
 
-        map.setCenter(new google.maps.LatLng(53.0,-1.0));
-
-        // <![CDATA[
-        var point = new google.maps.LatLng(53.0,-4.0755);
-        marker = map_create_marker(point,"some html which is OK",map_icon_red);
-        // ]]>
+        map.setCenter(new google.maps.LatLng(lat,lng));
 
         // <![CDATA[
-        var point = new google.maps.LatLng(-24.0,25.0);
-        marker = map_create_marker(point,"some html which is OK",map_icon_red);
+        var point = new google.maps.LatLng(lat,lng);
+        marker = map_create_marker(point,prm_html,map_icon_blue);
         // ]]>
 
-        // <![CDATA[
-        var point = new google.maps.LatLng(54.0,-2.0);
-        marker = map_create_marker(point,"some html which is OK",map_icon_red);
-        // ]]>
 
-        map.disableDoubleClickZoom = false;
+        //map.disableDoubleClickZoom = false;
     }
 
 
@@ -66,8 +34,7 @@
         var marker =    new google.maps.Marker({
             position: point,
             map: map,
-            icon: icon,
-            shadow: map_icon_shadow
+            icon: icon
         });
 
         if(html!="") {
@@ -81,9 +48,39 @@
         return marker;
     }
     var map_set_center = 0;
-    function map_load_resize() {
+    function map_load_resize(lat,lng) {
         if(map_set_center==0) {
-             map.setCenter(new google.maps.LatLng(53.0,-1.0));
+             map.setCenter(new google.maps.LatLng(lat,lng));
         }
         map_set_center = 1;
     }
+    
+    
+/*
+					gMap = new google.maps.Map(document.getElementById('map_container'));
+					gMap.setZoom(16);      // This will trigger a zoom_changed on the map
+
+					var t=ll.split(',');
+					var lat=t[0],lan=t[1];
+					delete t;
+
+					gMap.setCenter(new google.maps.LatLng(lat, lan));
+					gMap.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+
+					var info_window = new google.maps.InfoWindow({
+	            content: 'loading'
+	        });
+
+					var m = new google.maps.Marker({
+            map:       gMap,
+            animation: google.maps.Animation.DROP,
+            title:     obj_title,
+            position:  new google.maps.LatLng(lat, lan),
+            html:      obj_html
+          });
+
+          google.maps.event.addListener(m, 'click', function() {
+              info_window.setContent(this.html);
+              info_window.open(gMap, this);
+          });
+*/

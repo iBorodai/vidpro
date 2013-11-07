@@ -15,14 +15,19 @@ class point extends item_viewer{
 																		COUNT(l_weight) p_votes,
 																	 (SELECT COUNT(l1.l_key_obj) FROM likes l1 WHERE l1.l_key_obj=p_id AND l1.l_type='pnt' AND l_weight>0) p_plus_cnt
 																	 ".$you_sql_add."
-																	?p_url='".$this->ctrl['p_url']."'\$auto_query=no group=p_id shrink=yes limit=0,1 ");
+																	?p_url='".$this->ctrl['p_url']."'\$auto_query=no group=p_id shrink=yes limit=0,1");
 		//Если нет foursquare идентификатора - ничего не выйдет
 	  if(empty($this->data['p_fsid'])){
+	    $this->data=array();
 	    return false;
 		}
+		
 		//Обращение к foursquare (там есть кэш)
 		$GLOBALS['FS']=init_fs();
-		if(!$dt=$GLOBALS['FS']->venue( $this->data['p_fsid'] )){
+		$dt=$GLOBALS['FS']->venue( $this->data['p_fsid'] );
+		//echo '<pre class="debug">DT:'.print_r ( $dt ,true).'</pre>';
+		if(!$dt){
+		  echo '<pre class="debug">'.$GLOBALS['FS']->cur_json.'</pre>';
 		  $this->data=array(); return true;
 		}
 		
@@ -31,8 +36,8 @@ class point extends item_viewer{
 
 		//Выбрать каменты из БД
 		$t=$GLOBALS[CM]->run('sql:comment,user
-													#com_id,com_type,com_key_obj,com_key_u,com_text,com_short,com_cachelikes,com_cahecomms,
-                           u_id,u_grp,u_url,u_email,u_name,u_img,u_gender,u_createdate,u_lastlogin,u_lock,u_openid,u_openidprov,
+													#com_id,com_type,com_key_obj,com_weight,com_key_u,com_text,com_short,com_cachelikes,com_cahecomms,
+                           u_id,u_grp,u_url,u_email,u_name,u_img,u_gender,u_createdate,u_lastlogin,u_lock,
 													DATE_FORMAT( com_date ,\'%Y%m%d%H%i%s\') did,
 													DATE_FORMAT( com_date ,\'%d.%m.%Y %H:%i\') com_date
 													?com_type=\'pnt\' AND com_key_obj='.$this->data['p_id'].' AND com_key_u=u_id$id=did ');
@@ -70,10 +75,13 @@ class point extends item_viewer{
 		 *****************/
 			$vals=array();
 			if(!empty($this->data['tips'])){
-
 				foreach($this->data['tips'] as $k=>$v){
 					if(!empty($v['com_id']))$tpl=$this->tpl['comm_line'];
 					else  $tpl=$this->tpl['comm_line_fs'];
+					if($v['com_weight']>0)$v['com_weight']=$this->tpl['comm_weight_plus'];
+					elseif($v['com_weight']<0)$v['com_weight']=$this->tpl['comm_weight_minus'];
+					else $v['com_weight']='';
+					
 					$vals[]=strjtr($tpl,$v);
 				}
 				$repl['comms']=str_replace('{body}',implode('',$vals),$this->tpl['comm_body']);
@@ -384,7 +392,9 @@ class nav_cats extends list_viewer{
 }
 
 function point_stat($prm){
+	
 	$prm['parent']->pg='';
+	
 	//echo '<pre class="debug">'.print_r ( $GLOBALS['Jlib_frame']->obj['block1']->data ,true).'</pre>';
 	/*
 	//[p_weight] => -1
@@ -393,9 +403,16 @@ function point_stat($prm){
 		  p_votes 		- 100%
 		  p_plus_cnt	- ?%
   */
-  $pdt=&$GLOBALS['Jlib_frame']->obj['block1']->data;
 
   $repl=$GLOBALS['Jlib_frame']->obj['block1']->data;
+  //weight 1,0,-1
+		if( !empty($repl['p_weight']) ) $repl['p_weight']=($repl['p_weight']>1)?1:-1;
+
+	return strjtr($prm['parent']->tpl['statistic'], $repl );
+
+  $pdt=&$GLOBALS['Jlib_frame']->obj['block1']->data;
+
+	if(!empty($pdt['p_votes']) && empty($pdt['p_weight'])) $pdt['p_weight']=1;
 
 	if(!empty($_SESSION['Jlib_auth']['u_id'])){
 	  if(
@@ -431,8 +448,9 @@ function point_stat($prm){
 	if( $repl['pct']<100 ) $repl['many']=$prm['parent']->tpl['many'];
 	else  $repl['many']=$prm['parent']->tpl['many_all'];
 
+  $repl['p_weight']=( $repl['p_weight']>0 )?1:-1;
   //Мнение пользователя
-  $repl['youtoo']='';
+  //$repl['youtoo']='';
 
 
 	return strjtr($prm['parent']->tpl['statistic'], $repl );

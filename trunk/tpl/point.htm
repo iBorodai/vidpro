@@ -21,6 +21,19 @@
 			{comms}
 		</div>
 	</div>
+	
+	<div style="display:none;">
+	  <div id="prm_point">
+		  <i id="prm_point_weight">{p_weight}</i>
+		  <i id="prm_point_votes">{p_votes}</i>
+		  <i id="prm_point_plus_cnt">{p_plus_cnt}</i>
+		  <i id="prm_point_you">{p_you}</i>
+		  <i id="prm_point_lat">{p_lat}</i>
+		  <i id="prm_point_lng">{p_lng}</i>
+		  <i id="prm_loginza_token">{function:loginza_token_url}</i>
+		</div>
+		<div id="prm_tpl"></div>
+	</div>
 [auth]
 [not_auth]
 		<div id="point_social">
@@ -28,18 +41,28 @@
 					Кто-кто из твоих друзей уже пользуется сервисом Vidguk.Pro, присоединяйся!
 				</div>
 			  <div class="content">
-					<div style="margin:10px; background:#99f; text-align:center; padding:20px;">
-			    Тут плагин социалочек
+					<div style="background:#fff; padding: 10px 21px; height:85px;">
+			      {replacer: tpl=socials.htm section=fb_facepile}
 			    </div>
 				</div>
 			  <div class="foot">
-					<a href="http://loginza.ru/api/widget?token_url=http%3A%2F%2F{function:server_name}%2Floginza&provider=facebook" class="loginza button">
-					  Вход через openID
-					</a>
+					<script src="//ulogin.ru/js/ulogin.js"></script>
 
-				  или
+					<div id="uLogin5610ee76"
+					      style="float:left; background:url(/img/socials/login_button.jpg) no-repeat; width:320px; height:31px; position:relative; color:#fff; padding:4px 0 0 8px;"
+								data-ulogin="display=buttons;fields=first_name,last_name,email,bdate,sex,photo,photo_big;
+					        redirect_uri=http%3A%2F%2F{function:show_domain}/ulogin?reg=true;
+					        receiver=http%3A%2F%2F{function:show_domain}%2Fxd_custom.html">
+					        Войти через аккаунт в
+					        <a data-uloginbutton = "vkontakte" style="position:absolute; top:0; left:292px; width:36px; height:35px; cursor:pointer;" title="Вконтакте"></a>
+					        <a data-uloginbutton = "google" style="position:absolute; top:0; left:255px; width:37px; height:35px; cursor:pointer;" title="Google"></a>
+					        <a data-uloginbutton = "facebook" style="position:absolute; top:0; left:219px; width:35px; height:35px; cursor:pointer;" title="Facebook"></a>
+					        
+					        
+					</div>
 
-					<a href="/?reg=true">Зарегистрироваться через e-mail</a>
+					<a href="/?reg=true" style="float:right; font-size:17px; color:#000; padding:7px;">Зарегистрироваться через e-mail</a>
+					<div class="clear"></div>
 
 				</div>
 			</div>
@@ -53,7 +76,7 @@
 	<h1>уупс...</h1>
 	<p>Временные проблемы с отображением этой страницы</p>
 [gallery_item]
-	<a href="{photo_big}" class="fb">
+	<a href="{photo_big}" class="fb" rel="point_gallery">
 		<img src="{photo}" title="{title}" alt="{title}">
 	</a>
 [comm_body]
@@ -72,12 +95,14 @@
     </div>
 		<div class="user">
 			<span class="name">{u_name}</span>
-			<span class="recommend">рекомендует</span>
+			{com_weight}
 		  <span class="duration">на сайте <span class="from">{u_createdate}</span>.</span>
 			<!--<a href="">Подписаться на отзывы участника</a>-->
 		</div>
-		<span class="date">{com_date}</span>
+		
 		<div class="text">
+		  <span class="date">{com_date}</span>
+		  <br>
 		  {com_text}
 		</div>
 		<div class="bullet wide">
@@ -94,18 +119,24 @@
 			<span class="name">{user_name}</span>
 			<!--<a href="">Подписаться на отзывы участника</a>-->
 		</div>
-		<span class="date">{create}</span>
 		<div class="text">
+		  <span class="date">{create}</span>
+		  <br>
 		  {text}
 		</div>
   </div>
+[comm_weight_plus]
+<span class="recommend">рекомендует</span>
+[comm_weight_minus]
+<span class="not_recommend">не рекомендует</span>
+
 [statistic]
 	<div class="stat_block">
 		<div class="arrow stat_arr">
 			<span class="arr"></span>
 			<div>
 				<span>
-					<span class="js_point_type">{p_fscat_prim}</span>
+     			<span class="js_point_type">{p_fscat_prim}</span>
 					<span class="js_point_quotes">«</span><span class="js_point_name">{p_name}</span><span class="js_point_quotes">»</span>
 					<span class="weight w{p_weight}">{pct}%</span>
 				</span>
@@ -113,30 +144,39 @@
 			<span class="arr r"></span>
 		</div>
 		<div class="stat_info">
-		  Место
+		  <span id="place_visited" style="display:block;">
+		  	Место
 				<span class="pop_form">
 					<span class="pop_res" rel="посещал,посещали,посещало,еще не посещали">посещало</span>
 					<span class="pop_num">{p_votes}</span>
 					<span class="pop_res" rel="участник,участника,усастников,">участников</span>
 				</span>
 				Vidguk.pro<br>
-		  	{many}{youtoo} {recommend}
-		  <div class="stat_act">
-      {stat_act}
+			</span>
+			<span id="ptext_many"></span>
+			<span id="ptext_you"></span>
+			<span id="ptext_recomend"></span>
+		  <div class="stat_act" rel="stat_info">
+	      <a href="#" class="plus">Я рекомендую</a>
+			  <a href="#" class="minus">Я не рекомендую</a>
 		  </div>
 		</div>
 	</div>
-[many]
-Большинство
-[many_all]
-Все
-[stat_youtoo]
+[DELmany]
+	Большинство
+[DELmany_all]
+	Все
+[DELstat_youtoo]
 , в том числе и вы,
-[stat_recommend]
+[DELstat_recommend]
 	его рекоммендуют
-[stat_not_recommend]
+[DELstat_not_recommend]
   его не рекоммендуют
-[statistic_empty]
+[DELone_recomend]
+	Один участник Vidguk.pro рекомендует заведение.
+[DELone_recomend]
+	Один участник Vidguk.pro не рекомендует заведение.
+[DELstatistic_empty]
 	<div class="stat_block">
 		<div class="arrow stat_arr">
 			<span class="arr"></span>
@@ -151,44 +191,27 @@
 		<div class="stat_info">
 		  Место еще не посещали участники Vidguk.pro<br>
 		  Станьте первым, кто поделился своим мнением!
-		  <div class="stat_act">
-      {stat_act}
+		  <div class="stat_act" rel="stat_info">
+      	{stat_act}
 		  </div>
 		</div>
 	</div>
-[stat_act]
+[DELstat_act]
       <a href="#" class="plus">Я рекомендую</a>
-		    <a href="#" class="minus">Я не рекомендую</a>
-[stat_act_auth]
-				<a class="minus" href="/?reg=true">cоздать новый аккаунт</a>
-		  	<a href="http://loginza.ru/api/widget?token_url={loginza_token}&provider=facebook" class="loginza button" id="reg_type_soc">
-					  вход через openID
-				</a>
+		  <a href="#" class="minus">Я не рекомендую</a>
+[DELstat_act_auth]
+			<a class="minus" href="/?reg=true">cоздать новый аккаунт</a>
+	  	<a href="http://loginza.ru/api/widget?token_url={loginza_token}&provider=facebook" class="loginza button" id="reg_type_soc">
+				  вход через openID
+			</a>
 [mapbox]
-	<script src='//api.tiles.mapbox.com/mapbox.js//mapbox.js'></script>
-  <link href='//api.tiles.mapbox.com/mapbox.js//mapbox.css' rel='stylesheet' />
-<div id="map_box_block"><div id="map"></div></div>
-<script>
-var map = L.mapbox.map('map', 'examples.map-20v6611k')
-    .setView([37.9, -77], 6);
+	<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script src="/js/map.js"></script>
+	<div id="map_box_block"><div id="map"></div></div>
 
-L.mapbox.markerLayer({
-    // this feature is in the GeoJSON format: see geojson.org
-    // for the full specification
-    type: 'Feature',
-    geometry: {
-        type: 'Point',
-        // coordinates here are in longitude, latitude order because
-        // x, y is the standard for GeoJSON and many formats
-        coordinates: [-77, 37.9]
-    },
-    properties: {
-        title: 'A Single Marker',
-        description: 'Just one of me',
-        // one can customize markers by adding simplestyle properties
-        // http://mapbox.com/developers/simplestyle/
-        'marker-size': 'large',
-        'marker-color': '#f0a'
-    }
-}).addTo(map);
-</script>
+	<script>
+	  $(document).ready(function(){
+	    map_loader('map',$('#prm_point_lat').text(),$('#prm_point_lng').text(),false);
+		});
+	</script>
+	
