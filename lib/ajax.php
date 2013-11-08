@@ -103,7 +103,65 @@ class ajax extends icontrol{
 					  $this->pg=$this->tpl['send_vote_success'];
 				  break;
 				}
+				case 'store_profile':{
+/*
+<pre class="debug">Array
+(
+    [Jlib_target] => ajax
+    [pro_name] => Иван
+    [pro_sname] => Бородай
+    [pro_gender] => m
+    [pro_bdate] =>
+    [fields] => Array
+        (
+            [0] => block
+        )
+
+    [mode] => store_profile
+    [Jlib_lang] => RU
+    [Jlib_skin] =>
+)
+</pre><pre class="debug">Array
+(
+    [avatar] => Array
+        (
+            [name] =>
+            [type] =>
+            [tmp_name] =>
+            [error] => 4
+            [size] => 0
+        )
+
+)
+</pre>
+*/
+					$data=array(
+					  'u_name'=> 	mysql_real_escape_string($_REQUEST['pro_name']) ,
+					  'u_sname'=>	mysql_real_escape_string($_REQUEST['pro_sname']) ,
+					  'u_gender'=>'',
+					  'u_bdate'=>'',
+					);
+					if(!empty($_REQUEST['pro_gender'])){
+					  $data['u_gender']=($_REQUEST['pro_gender']=='f')?'f':'m';
+					}
+					if(!empty($_REQUEST['pro_bdate']))
+						$data['u_bdate']= date_processor('store',$_REQUEST['pro_bdate'],array('store' => 'Y-m-d','display' => 'd.m.Y') );
+						
+					$GLOBALS[CM]->run('sql:user?u_id='.$_SESSION['Jlib_auth']['u_id'],'update',$data);
+					if( mysql_error() ){
+					  $this->pg=$this->tpl['profile_store_fail'];
+					}else{
+          	$this->pg=$this->tpl['profile_store_success'];
+          	$_SESSION['Jlib_auth']=array_merge($_SESSION['Jlib_auth'], $data);
+          }
+				  break;
+				}
 				case 'search_points':{
+				  
+				  if(!empty($_REQUEST['val']['reg_new'])) {
+				    $this->pg='';
+				    return true;
+					}
 				  //echo '<pre class="debug">'.print_r ( $_REQUEST ,true).'</pre>';
 					if(empty($_REQUEST['val'])){
 						$GLOBALS['result']['error']='не передан запрос для поиска';

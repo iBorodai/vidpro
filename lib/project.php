@@ -143,6 +143,8 @@ class point_add extends icontrol{
 		
 		//Смотрю, а есть ли такой регион в БД
 		$r_url=translit($item['p_reg_name']);
+		$r_url=strtr($r_url, array('%'=>'','"'=>'',"'"=>'','+'=>'','/'=>'','\\'=>''));
+		
 		if(!$reg_id=$GLOBALS[CM]->run("sql:region#r_id?r_url='".$r_url."'\$limit=0,1 shrink=yes")){
 		  $reg_id=$GLOBALS[CM]->run("sql:region",'insert',array(
 		    'r_url'=>$r_url,
@@ -218,7 +220,7 @@ function project_search_points(&$obj){
 	//echo '<pre class="debug">'.print_r ( $request ,true).'</pre>';
 	$GLOBALS['FS']=init_fs();
 	if(!$dt=$GLOBALS['FS']->search( $request )){
-	  echo '<pre class="debug">'.print_r ( $GLOBALS['FS']->errors ,true).'</pre>';
+	  //echo '<pre class="debug">'.print_r ( $GLOBALS['FS']->errors ,true).'</pre>';
 		//return false;
 	}else{
 		//Запихиваю данные из fourscquare в $this->data

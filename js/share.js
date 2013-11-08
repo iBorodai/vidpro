@@ -50,8 +50,9 @@ function duration(){
 
 function dialog_show( callback ){
 	if( $('#dialog_block').is(':visible') ){
-	  dialog_hide();
-	  return false;
+	  var t=new callback;
+	  return true;
+	  //dialog_hide(); return false;
 	}
 	$('#dialog_block .content').css({'opacity':0, });
 	$('#dialog_block').css({'height':0,'display':'block'}).animate({height:600+'px'},200,function(){
@@ -112,26 +113,7 @@ function profile_dialog(){
 		t=$('.uinf_gender').text();
 		if(t) $('#gender_'+t.substr(0,1)  ).attr('checked','checked');
 			
-		
 		return;
-		    //Определяю какой шаблон подставить
-		    if($('#point').data('weight')>0){
-		      var tpl=$('#recommend_plus_tpl').html();  //recommend_plus_tpl
-				}else if($('#point').data('weight')<0){
-				  var tpl=$('#recommend_minus_tpl').html();	//recommend_minus_tpl
-				}else {
-				  var tpl=$('#recommend_def_tpl').html();	//recommend_def_tpl
-				}
-				tpl=tpl.replace(/onclick/g,'data-onClick');
-
-		    $('#dialog_block .content .recomend_block').html(tpl);
-		    $('#dialog_block .content .recomend_block a').unbind('click').click(function(){
-		    	var r=(($(this).data('onclick')+'').indexOf('(1)') <0 )?-1:1;
-		      $(this).parents('.review_form').find('.recomend_fld').val(  r  );
-		      return false;
-				});
-
-			
 	});
 }
 
@@ -153,7 +135,7 @@ function send_review(form){
 				  t.find('.text').html( $(form).find('textarea').val() );
 				  
 				  $('#point_comm .label').after('<div class="comment">'+t.html()+'</div>');
-				  dialog_hide();
+				  setTimeout( function(){dialog_hide();}, 1000 );
 				}
 			}
 			if(req.responseText!='') alert(req.responseText);
@@ -186,8 +168,24 @@ function send_vote(point, vote, marker){
 	req.send({ 'mode':'send_vote', fields:['block'], recomend:vote, 'point':point });
 }
 
-function send_recommend(){
-	alert('send_recommend');
+function send_profile(form){
+	var req = new JsHttpRequest("utf-8");
+	req.onreadystatechange = function(){
+		if (req.readyState == 4){
+			if(req.responseJS){
+			  if( req.responseJS.error ){
+			    display_error(req.responseJS.error);
+				}else{
+				  $('#dialog_block .content').html( req.responseJS.content );
+				  setTimeout( function(){dialog_hide();}, 1000 );
+				}
+			}
+			if(req.responseText!='') console.log(req.responseText);//alert(req.responseText);
+		}
+	}
+
+	req.open(null,'/ajax', true);
+	req.send({'mode':'store_profile',fields:['block'],form_profile:form});
 }
 
 //n, form1, form2, form5
@@ -308,7 +306,8 @@ $(document).ready(function(){
 			make_query:function(){
 			  return {
 					'query':$('#search_query').val(),
-					'reg':$('#search_reg').val()
+					'reg':$('#search_reg').val(),
+					'reg_new':$('#search_reg_other').val()
 				}
 			},
 			search_url:'/ajax/',
@@ -324,4 +323,8 @@ $(document).ready(function(){
 	}
 	
 	$('.fb').fancybox();
+	//Если есть ошибка авторизации - открыть диалог
+	if( $('#login_block .err_err').get().length>0 ){
+	  toggle_pop('#login_form');
+	}
 });

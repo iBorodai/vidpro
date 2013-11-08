@@ -37,7 +37,7 @@ ini_set('default_charset','utf-8');
 if (isset($_POST["PHPSESSID"]))		{	session_id($_POST["PHPSESSID"]);	}
 elseif (isset($_GET["PHPSESSID"])){ session_id($_GET["PHPSESSID"]);		}
 session_start();
-
+//echo '<pre class="debug">'.print_r ( $_SESSION['Jlib_auth'] ,true).'</pre>';
 require "lib/jlib.php";
 require 'lib/system.php';
 require 'lib/suppliers.php';

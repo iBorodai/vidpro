@@ -24,7 +24,11 @@ class site_sd extends sd {
 
 		$login=str_replace("'",'',str_replace(';','',$data['usr']));
 //		$sql="SELECT acc_subj,u_id,u_email,u_nick,LOWER(u_url) u_url,u_grp,u_img,u_name,u_sname,u_twitter,u_showtwit,u_maketwit,u_country,u_city,u_gender,u_birth,u_phone,u_sms,u_smoke,u_alcohol,u_lifestyle,u_about,u_musicstyles,u_last_login,u_pwd,u_id,u_nub,u_weight,u_bg,u_bg_mod FROM usr where u_lock='' AND u_grp!='fdj' AND  (u_nick='$login' OR u_email='$login')";
-		$sql="SELECT * FROM user where u_email='$login'";
+		$sql="SELECT	u_id,u_grp,u_url,u_email,u_pwd,u_name,u_sname,u_img,u_gender,u_bdate,u_createdate,u_lastlogin,u_lock,u_passre,
+						GROUP_CONCAT(u2t_key_t) u_themes
+					FROM user LEFT JOIN user2theme ON(u2t_key_u=u_id) where u_email='$login'
+					GROUP BY u_id";
+		$usr=$db->query_row($sql);
 
 		if(!$usr) return false;
 
@@ -38,12 +42,14 @@ class site_sd extends sd {
 			'admin'=>array('site_auth','admin_auth'),
 			'saller'=>array('site_auth'),
 			'vendor'=>array('site_auth'),
+			'usr'=>array('site_auth'),
 		);
 		$acc=array(
 		  'site_auth'=>false,
 		  'manager_auth'=>false,
 		  'admin_auth'=>false,
 		);
+		
 		foreach($auth_groups[ $usr['u_grp'] ] as $descriptor)	$acc[$descriptor] = 1;
 
 		if (!$acc[$this->params['name']]) return false;
@@ -100,27 +106,22 @@ class undercon extends sd {
 
 class passreminder extends form{
 	function init(){
-		if(empty($this->params['short'])){	// âûçâàíî íå âîçëå êîðîòêîé ôîðìû ëîãèíà, à â òåëå ñòðàíèöû
+		if(empty($this->params['short'])){	// Ð²Ñ‹Ð·Ð²Ð°Ð½Ð¾ Ð½Ðµ Ð²Ð¾Ð·Ð»Ðµ ÐºÐ¾Ñ€Ð¾Ñ‚ÐºÐ¾Ð¹ Ñ„Ð¾Ñ€Ð¼Ñ‹ Ð»Ð¾Ð³Ð¸Ð½Ð°, Ð° Ð² Ñ‚ÐµÐ»Ðµ ÑÑ‚Ñ€Ð°Ð½Ð¸Ñ†Ñ‹
 			if( empty($_GET['k']) ) redirect($this->get_url('Jlib_target=default'));
 			else{
-
-				// åñëè ñòîÿë òàéìåð è îí íå ïðîøåë - ïðîäëèòü òàéìåð è îòôóòáîëèòü â êîðåíü ñàéòà
+				// ÐµÑÐ»Ð¸ ÑÑ‚Ð¾ÑÐ» Ñ‚Ð°Ð¹Ð¼ÐµÑ€ Ð¸ Ð¾Ð½ Ð½Ðµ Ð¿Ñ€Ð¾ÑˆÐµÐ» - Ð¿Ñ€Ð¾Ð´Ð»Ð¸Ñ‚ÑŒ Ñ‚Ð°Ð¹Ð¼ÐµÑ€ Ð¸ Ð¾Ñ‚Ñ„ÑƒÑ‚Ð±Ð¾Ð»Ð¸Ñ‚ÑŒ Ð² ÐºÐ¾Ñ€ÐµÐ½ÑŒ ÑÐ°Ð¹Ñ‚Ð°
 				if( !empty($_SESSION['Jlib_auth']['passre_locker']) && $_SESSION['Jlib_auth']['passre_locker']+5>time() ){
 					$_SESSION['Jlib_auth']['passre_locker']=time();
 					redirect($this->get_url('Jlib_target=default'));
 				}
-
-				// âûäåðæàòü äëÿ ñîëèäíîñòè ïàðó ñåêóíä è ïðîâåðèòü íàëè÷èå òàêîãî êîäà â áàçå
-				sleep(2); $sql='sql:usr?u_passre=\''.$_GET['k'].'\' $shrink=yes auto_query=no';
+				// Ð²Ñ‹Ð´ÐµÑ€Ð¶Ð°Ñ‚ÑŒ Ð´Ð»Ñ ÑÐ¾Ð»Ð¸Ð´Ð½Ð¾ÑÑ‚Ð¸ Ð¿Ð°Ñ€Ñƒ ÑÐµÐºÑƒÐ½Ð´ Ð¸ Ð¿Ñ€Ð¾Ð²ÐµÑ€Ð¸Ñ‚ÑŒ Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ðµ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ ÐºÐ¾Ð´Ð° Ð² Ð±Ð°Ð·Ðµ
+				$sql='sql:user?u_passre=\''.$_GET['k'].'\' $shrink=yes auto_query=no';
 				$res=$GLOBALS[CM]->run($sql); if($res){
-
-					// åñòü òàêîé êîä - âûâåñòè ôîðìó äëÿ ñìåíû ïàðîëÿ
+					// ÐµÑÑ‚ÑŒ Ñ‚Ð°ÐºÐ¾Ð¹ ÐºÐ¾Ð´ - Ð²Ñ‹Ð²ÐµÑÑ‚Ð¸ Ñ„Ð¾Ñ€Ð¼Ñƒ Ð´Ð»Ñ ÑÐ¼ÐµÐ½Ñ‹ Ð¿Ð°Ñ€Ð¾Ð»Ñ
 					if(isset($_SESSION['Jlib_auth']['passre_locker']))unset($_SESSION['Jlib_auth']['passre_locker']);
 					$this->pg=$this->tpl['change'];
-
 				}else{
-
-					// êîä ëåâûé - ïîñòàâèòü òàéìåð è îòôóòáîëèòü â êîðåíü ñàéòà
+					// ÐºÐ¾Ð´ Ð»ÐµÐ²Ñ‹Ð¹ - Ð¿Ð¾ÑÑ‚Ð°Ð²Ð¸Ñ‚ÑŒ Ñ‚Ð°Ð¹Ð¼ÐµÑ€ Ð¸ Ð¾Ñ‚Ñ„ÑƒÑ‚Ð±Ð¾Ð»Ð¸Ñ‚ÑŒ Ð² ÐºÐ¾Ñ€ÐµÐ½ÑŒ ÑÐ°Ð¹Ñ‚Ð°
 					$_SESSION['Jlib_auth']['passre_locker']=time();
 					redirect($this->get_url('Jlib_target=default'));
 				}
@@ -129,43 +130,41 @@ class passreminder extends form{
 		parent::init();
 	}
 	function before_parse(){
-
-		if(empty($this->params['short'])){	// âûçâàíî íå âîçëå êîðîòêîé ôîðìû ëîãèíà, à â òåëå ñòðàíèöû
-
-			// ïðîöåäóðà èçìåíåíèÿ ïàðîëÿ
+		if(empty($this->params['short'])){	// Ð²Ñ‹Ð·Ð²Ð°Ð½Ð¾ Ð½Ðµ Ð²Ð¾Ð·Ð»Ðµ ÐºÐ¾Ñ€Ð¾Ñ‚ÐºÐ¾Ð¹ Ñ„Ð¾Ñ€Ð¼Ñ‹ Ð»Ð¾Ð³Ð¸Ð½Ð°, Ð° Ð² Ñ‚ÐµÐ»Ðµ ÑÑ‚Ñ€Ð°Ð½Ð¸Ñ†Ñ‹
+			// Ð¿Ñ€Ð¾Ñ†ÐµÐ´ÑƒÑ€Ð° Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ñ Ð¿Ð°Ñ€Ð¾Ð»Ñ
 			if( !empty($_GET['k']) && isset($_POST['newpass']) && isset($_POST['accpass']) ) {
-				$sql='sql:usr?u_passre=\''.$_GET['k'].'\' $shrink=yes auto_query=no'; $res=$GLOBALS[CM]->run($sql); if($res){
+				$sql='sql:user?u_passre=\''.$_GET['k'].'\' $shrink=yes auto_query=no';
+				$res=$GLOBALS[CM]->run($sql);
+				if($res){
 					if( empty($_POST['newpass']) || $_POST['newpass']!=$_POST['accpass'] ){
-						$this->pg=str_replace('<!--err:changepass-->','{msg:reg_pwd_att}',$this->pg);
-						return false;	// ïóñòî èëè íå ñîâïàäàåò
+						$this->pg=str_replace('<!--err:changepass-->','ÐŸÐ°Ñ€Ð¾Ð»Ð¸ Ð½Ðµ ÑÐ¾Ð²Ð¿Ð°Ð´Ð°ÑŽÑ‚',$this->pg);
+						return false;	// Ð¿ÑƒÑÑ‚Ð¾ Ð¸Ð»Ð¸ Ð½Ðµ ÑÐ¾Ð²Ð¿Ð°Ð´Ð°ÐµÑ‚
 					}else{
 						$GLOBALS[CM]->run($sql,'update',array('u_passre'=>'','u_pwd'=>$_POST['newpass']));
 						$this->pg=$this->tpl['changed'];
-						return true;	// ïàðîëü èçìåíåí
+						return true;	// Ð¿Ð°Ñ€Ð¾Ð»ÑŒ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½
 					}
 				}
 			}
-
-		}else{	// âûçâàíî âîçëå ôîðìû ëîãèíà êíîïêîé "íàïîìíèòü"
-
+		}else{	// Ð²Ñ‹Ð·Ð²Ð°Ð½Ð¾ Ð²Ð¾Ð·Ð»Ðµ Ñ„Ð¾Ñ€Ð¼Ñ‹ Ð»Ð¾Ð³Ð¸Ð½Ð° ÐºÐ½Ð¾Ð¿ÐºÐ¾Ð¹ "Ð½Ð°Ð¿Ð¾Ð¼Ð½Ð¸Ñ‚ÑŒ"
 			if(empty($_POST['passremail'])){
-				$this->pg=str_replace('<!--err:passremail-->','',$this->pg);	// åñëè åãî íå çà÷èùàòü, òî ÿâà-ñêðèïò îòîáðàçèò áëîê, ÷òîáû ïîêàçàòü ðåçóëüòàò
+				$this->pg=str_replace('<!--err:passremail-->','',$this->pg);	// ÐµÑÐ»Ð¸ ÐµÐ³Ð¾ Ð½Ðµ Ð·Ð°Ñ‡Ð¸Ñ‰Ð°Ñ‚ÑŒ, Ñ‚Ð¾ ÑÐ²Ð°-ÑÐºÑ€Ð¸Ð¿Ñ‚ Ð¾Ñ‚Ð¾Ð±Ñ€Ð°Ð·Ð¸Ñ‚ Ð±Ð»Ð¾Ðº, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¿Ð¾ÐºÐ°Ð·Ð°Ñ‚ÑŒ Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚
 			}else{
-
-				// ïðîâåðèòü íàëè÷èå äàííîãî åìûëà â áàçå
-				$sql='sql:usr?u_email=\''.$_POST['passremail'].'\' $shrink=yes auto_query=no'; $res=$GLOBALS[CM]->run($sql); if(!$res){
-					$this->pg=str_replace('<!--err:passremail-->','Ïîëüçîâàòåëü ñ òàêèì e-mail íå íàéäåí.',$this->pg);
-					return false;	// åìûë íå íàéäåí
+				// Ð¿Ñ€Ð¾Ð²ÐµÑ€Ð¸Ñ‚ÑŒ Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ðµ Ð´Ð°Ð½Ð½Ð¾Ð³Ð¾ ÐµÐ¼Ñ‹Ð»Ð° Ð² Ð±Ð°Ð·Ðµ
+				$sql='sql:user?u_email=\''.$_POST['passremail'].'\' $shrink=yes auto_query=no'; $res=$GLOBALS[CM]->run($sql);
+				if(!$res){
+					$this->pg=str_replace('<!--err:passremail-->','ÐŸÐ¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒ Ñ Ñ‚Ð°ÐºÐ¸Ð¼ e-mail Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½.',$this->pg);
+					return false;	// ÐµÐ¼Ñ‹Ð» Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½
 				}elseif(!empty($res['u_lock']) && $res['u_lock']!=''){
-					$this->pg=str_replace('<!--err:passremail-->','Ïîëüçîâàòåëü çàáëîêèðîâàí',$this->pg);
-					return false;	// àêê çàáëîêèðîâàí
+					$this->pg=str_replace('<!--err:passremail-->','ÐŸÐ¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒ Ð·Ð°Ð±Ð»Ð¾ÐºÐ¸Ñ€Ð¾Ð²Ð°Ð½',$this->pg);
+					return false;	// Ð°ÐºÐº Ð·Ð°Ð±Ð»Ð¾ÐºÐ¸Ñ€Ð¾Ð²Ð°Ð½
 				}
 
-				// ñîçäàòü ñåêðåòíûé êîä äëÿ áåñïàðîëüíîãî âõîäà è îòïðàâèòü åãî íà åìûë þçåðà
+				// ÑÐ¾Ð·Ð´Ð°Ñ‚ÑŒ ÑÐµÐºÑ€ÐµÑ‚Ð½Ñ‹Ð¹ ÐºÐ¾Ð´ Ð´Ð»Ñ Ð±ÐµÑÐ¿Ð°Ñ€Ð¾Ð»ÑŒÐ½Ð¾Ð³Ð¾ Ð²Ñ…Ð¾Ð´Ð° Ð¸ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ ÐµÐ³Ð¾ Ð½Ð° ÐµÐ¼Ñ‹Ð» ÑŽÐ·ÐµÑ€Ð°
 				if(empty($res['u_passre'])) { $res['u_passre']=substr(uniqid(mt_rand()),0,24); $GLOBALS[CM]->run($sql,'update',array('u_passre'=>$res['u_passre'])); }
 				$ml=new mailer(array('tpl'=>$this->params['email_tpl'])); $ml->send($res,$res['u_email']);
-				$this->pg=str_replace('<!--err:passremail-->','Ïèñüìî îòïðàâëåíî',$this->pg);
-				return true;	// ïàðîëü îòïðàâëåí
+				$this->pg=str_replace('<!--err:passremail-->','ÐŸÐ¸ÑÑŒÐ¼Ð¾ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¾',$this->pg);
+				return true;	// Ð¿Ð°Ñ€Ð¾Ð»ÑŒ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½
 			}
 		}
 		$tmp=new iControl(array('pg'=>$this->pg));

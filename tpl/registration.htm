@@ -6,6 +6,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link href="/css/share.css" rel="stylesheet" type="text/css">
 		<link href="/css/registration.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="/js/jquery.js"></script>
 		<script src="//ulogin.ru/js/ulogin.js"></script>
 	</head>
 	<body>
@@ -46,11 +47,10 @@
 					        <img src="/img/socials/twitter.jpg" data-uloginbutton = "twitter" class="button"/>
 					        <img src="/img/socials/google.jpg" data-uloginbutton = "google" class="button"/>
 					        <div >
-										<img src="/img/socials/sm_vk.jpg" data-uloginbutton = "vkontakte" class="button"/>
-										<img src="/img/socials/sm_odnoklassniki.jpg" data-uloginbutton = "odnoklassniki" class="button"/>
-										<img src="/img/socials/sm_mailru.jpg" data-uloginbutton = "mailru" class="button"/>
 										<img src="/img/socials/sm_yandex.jpg" data-uloginbutton = "yandex" class="button"/>
 										<img src="/img/socials/sm_lj.jpg" data-uloginbutton = "livejournal" class="button"/>
+										<img src="/img/socials/sm_odnoklassniki.jpg" data-uloginbutton = "odnoklassniki" class="button"/>
+										<img src="/img/socials/sm_mailru.jpg" data-uloginbutton = "mailru" class="button"/>
 									</div>
 <!--OpenID – openid,
 Flickr – flickr,
@@ -73,16 +73,44 @@ Dudu – dudu.-->
 					... или создать специальный аккаунт участника проекта,<br>
 					воспользовавшись адресом вашей электронной почты
 				</div>
-				<form name="registration" class="reg_form">
+				<form name="registration" class="auth_block reg_form">
 				  <input type="hidden" name="hidden" >
 				  <input type="text" name="name" placeholder="Имя" required><br>
 				  <input type="text" name="email" placeholder="E-mail" required style="email"><br>
 				  <button class="submit">Создать новый аккаунт</button>
-
-					<a href="/?reg_skip=watch" class="reg_skip">Пропустить регистрацию, хочу просто посмотреть</a>
+				  <a href="#" class="gray login_do">Войти с логином и паролем</a>
+					<a href="/?reg_skip=watch" class="gray reg_skip">Пропустить регистрацию, хочу просто посмотреть</a>
 				</form>
+				
+				{panel: security=site_auth auth_redirect=default auth_tpl=login_short.htm}
+				
 			</div>
 		</div>
+		<script>
+		  $(document).ready(function(){
+		    $('.remind_do').click(function(){
+		      $('.auth_block').hide();
+		      $('.remind_form').show();
+		      
+		      return false;
+				});
+		    $('.login_do').click(function(){
+		      $('.auth_block').hide();
+		      $('.login_form').show();
+		      
+		      return false;
+				});
+				$('.reg_do').click(function(){
+		      $('.auth_block').hide();
+		      $('.reg_form').show();
+		      
+		      return false;
+				});
+				if(document.location.hash){
+				  $('.'+document.location.hash.substr(1)+'_do').click();
+				}
+			})
+		</script>
 	</body>
 	</html>
 [loginza_social_logins]

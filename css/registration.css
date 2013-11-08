@@ -107,11 +107,12 @@
 	text-decoration:none;
 	outline:none;
 }
-.reg_form{
+.auth_block{
 	width:320px;
 	margin:0 auto;
+	padding-bottom:20px;
 }
-.reg_form input{
+.auth_block input{
 	width:100%;
 	padding:10px 0;
 	border-top:1px solid #c5c5c5;
@@ -122,7 +123,7 @@
 	text-align:center;
 	font-size:24px;
 }
-.reg_form .submit{
+.auth_block .submit{
 	color:#fff;
 	background:#00c6ff;
 	border:none;
@@ -139,9 +140,22 @@
 	height: 28px;
 	padding-top: 2px;
 }
-.reg_skip{
-	padding-bottom:20px;
+.auth_block  .gray{
 	text-align:center;
 	color:#999;
 	display:block;
+	padding-bottom:3px;
+}
+
+#auth_remi,
+#login_short_form{
+	display:none;
+}
+
+#err_passremail{
+	display:block;
+	font-weight:bold;
+	color:#F00;
+	text-align:center;
+	font-size:20px;
 }

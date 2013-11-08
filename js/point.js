@@ -24,11 +24,12 @@ $(document).ready(function(){
 	if( p_weight==0 && p_votes>0 ) p_weight=1;
 	//Проценты
   p_pct=Math.ceil(p_plus_cnt*100/ p_votes);
+  
   //Минусовой процент
 	if( p_weight<0 ) p_pct=100-p_pct;
 	var block_weight=$('.stat_block .weight');
 	block_weight.html(p_pct+'%');
-	block_weight.removeClass('w0').removeClass('w1').removeClass('w-1').addClass('w'+p_weight);
+	block_weight.removeClass('w0').removeClass('w1').removeClass('w-1').addClass( (p_weight<0)?'w-1':'w1' );
 	//if(block_weight.hasClass('w0')) {block_weight.removeClass('w0').addClass('w1');}
 	
 	//Требуется авторизация

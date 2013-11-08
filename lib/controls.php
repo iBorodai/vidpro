@@ -36,14 +36,14 @@ class user_info extends icontrol {
 		}
 		$_SESSION['Jlib_auth']['u_img_path']=$_SESSION['Jlib_auth']['u_img'];
 		
-		if(!empty($_SESSION['Jlib_auth']['u_nub'])) $this->pg=str_replace('{u_img}',$this->tpl['u_nub'],$this->pg);
-		elseif(!empty($_SESSION['Jlib_auth']['u_img']) && !empty($this->tpl['u_img'])) $this->pg=str_replace('{u_img}',$this->tpl['u_img'],$this->pg);
+		
+		if(!empty($_SESSION['Jlib_auth']['u_img']) && !empty($this->tpl['u_img'])) $this->pg=str_replace('{u_img}',$this->tpl['u_img'],$this->pg);
 		elseif(!empty($this->tpl['not_u_img'])) $this->pg=str_replace('{u_img}',$this->tpl['not_u_img'],$this->pg);
 		else $this->pg=str_replace('{u_img}','',$this->pg);
-		
-		foreach($_SESSION['Jlib_auth'] as $k=>$v){
-			$this->pg=str_replace('{'.$k.'}',$v,$this->pg);
-		}
+
+		$this->pg=strjtr( $this->pg, $_SESSION['Jlib_auth'] );
+//echo '<pre class="debug">'.print_r ( $_SESSION['Jlib_auth'] ,true).'</pre>';
+
 		$this->pg=str_replace('{rand}',rand(),$this->pg);
 		$this->pg=preg_replace('~{\w+}~', '', $this->pg);
 	}
@@ -723,4 +723,10 @@ function ulogin_script(){
 	if(!empty($_SESSION['Jlib_auth']))return '';
 	return '<script src="//ulogin.ru/js/ulogin.js"></script>';
 }
+function auth_redirect(){
+	if(!empty($_SESSION['Jlib_auth'])){
+	  redirect('/'); exit();
+	}
+}
+
 ?>
