@@ -516,7 +516,7 @@
 		'page' => 'default',
 		'starter' => 'starter',
 		'cms_root' => 'admin',
-		'database' => 'self',
+		'database' => 'db',
 		'lang' => 'RU',
 		'langset' => 'RU',
 		'skin' => '',
