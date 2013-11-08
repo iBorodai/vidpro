@@ -103,16 +103,11 @@ class lite_reg extends form {
 	  
 		if(!empty($this->ctrl['unlock'])){
 		  //Выбираю пользователя
-			$rs=$GLOBALS[CM]->run('sql:usr?u_lock=\''.$this->ctrl['unlock'].'\'$shrink=yes auto_query=no');
+			$rs=$GLOBALS[CM]->run('sql:user?u_lock=\''.$this->ctrl['unlock'].'\'$shrink=yes auto_query=no');
 			unset($rs['u_pwd']);
 
-			//Выбираю профайл
-			if($rs){
-			  if($rs['u_grp']=='saller') $rs2=$GLOBALS[CM]->run('sql:sallers?s_id='.$rs['u_key_subj'].'$auto_query=no shrink=yes ');
-			}
-
 			if($rs && $rs2){
-			  $GLOBALS[CM]->run('sql:usr?u_id=\''.$rs['u_id'].'\'$auto_query=no' ,'update', array('u_lock'=>'', 'u_last_login'=>date('Y-m-d H:i:s')));
+			  $GLOBALS[CM]->run('sql:user?u_id=\''.$rs['u_id'].'\'$auto_query=no' ,'update', array('u_lock'=>'', 'u_last_login'=>date('Y-m-d H:i:s')));
 				$_SESSION['Jlib_auth']=array_merge($rs, $rs2, array('site_auth'=>1,'admin_auth'=>0));
 				$this->pg=$this->tpl['reg_unlocked'];
 			}else
@@ -127,9 +122,7 @@ class lite_reg extends form {
 	  
 		//Инициализация хранилища визарда
 		$this->wizard_init();
-//echo '<pre class="debug">HERE1:'.print_r ( $GLOBALS['Jlib_page_extra'] ,true).'</pre>';
 	  if( !empty($GLOBALS['Jlib_page_extra'][0]) && $GLOBALS['Jlib_page_extra'][0]=='ulogin' ){
-	    //$this->loginza_reg();
 	    $this->ulogin_reg();
 		}
 
@@ -138,7 +131,6 @@ class lite_reg extends form {
 		if((!empty($this->ctrl[ $this->params['ctrl_steps'] ]))){
 		  $this->cur_step=$this->ctrl[ $this->params['ctrl_steps'] ];
 		}else{
-		  //echo '<pre class="debug">'.print_r ( $this->wizard_data ,true).'</pre>';
 		  $this->cur_step=array_shift(array_keys( $this->params['steps'] ))  ;
 		}
 
@@ -240,7 +232,7 @@ class lite_reg extends form {
 	      	if( $k!=$this->cur_step ) continue;
 		      else{ $ps=$this->cur_step; continue; }
 				}
-
+				
 				if( $ps!=$this->cur_step ) redirect( $this->get_url('step='.$this->cur_step) );
 				else {
 				  parent::onValid();
@@ -255,7 +247,7 @@ class lite_reg extends form {
 	  //echo '<br />wizard_data:<pre class="debug">'.print_r ( $this->wizard_data ,true).'</pre>';
 	  //exit();
 
-	  //if(!empty($_SESSION['Jlib_auth'])) $uid=$_SESSION['Jlib_auth']['u_id']; else//что это пока не понятно... хм.
+	  if(!empty($_SESSION['Jlib_auth'])) $uid=$_SESSION['Jlib_auth']['u_id']; else//что это пока не понятно... хм.
 		if(empty($this->wizard_data['u_id'])){
 			//Создание акка пользователя
 	    if(!empty($this->wizard_data['name'])){ $this->wizard_data['u_name']=$this->wizard_data['name']; unset($this->wizard_data['name']); }
@@ -385,10 +377,12 @@ class lite_reg extends form {
 	    'u_id'=>$this->wizard_data['u_id'],
 	    'u_email'=>(!empty($this->wizard_data['u_email']))?$this->wizard_data['u_email']:$this->wizard_data['email'],
 	    'u_name'=>(!empty($this->wizard_data['u_name']))?$this->wizard_data['u_name']:$this->wizard_data['name'],
+	    'u_sname'=>(!empty($this->wizard_data['u_sname']))?$this->wizard_data['u_sname']:$this->wizard_data['sname'],
 	    'u_grp'=>$this->wizard_data['u_grp'],
 	    'u_img'=>$this->wizard_data['u_img'],
 	    'u_gender'=>$this->wizard_data['u_gender'],
 	    'u_bdate'=>$this->wizard_data['u_bdate'],
+	    'u_bdate_format'=>(empty($this->wizard_data['u_bdate']))?'':date_processor('display',$this->wizard_data['u_bdate'],array('store' => 'Y-m-d','display' => 'd.m.Y')),
 	    'u_createdate'=>$this->wizard_data['u_createdate'],
 	    'u_lastlogin'=>$this->wizard_data['u_lastlogin'],
 	    'oid_openid'=>(!empty($this->wizard_data['oid_openid']))?$this->wizard_data['oid_openid']:'',
@@ -456,8 +450,7 @@ class lite_reg extends form {
 			if(!empty($t)) $tmp_data['u_themes']=$t;
 			$this->wizard_data=array_merge($tmp_data,$u_dt);
 		}
-
-		redirect('/catigories');
+		redirect('/catigories'); exit();
 	}
 }
 

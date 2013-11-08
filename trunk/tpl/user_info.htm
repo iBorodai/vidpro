@@ -21,7 +21,7 @@
 	    <i class="uinf_name">{u_name}</i>
 	    <i class="uinf_sname">{u_sname}</i>
 	    <i class="uinf_gender">{u_gender}</i>
-	    <i class="uinf_bdate">{u_bdate}</i>
+	    <i class="uinf_bdate">{u_bdate_format}</i>
 	    <i class="uinf_geo">{u_geo}</i>
 	    <i class="uinf_img">{u_img_path}</i>
 	  </div>
@@ -90,14 +90,14 @@
 						<input type="radio" name="pro_gender" value="f" id="jsremove_gender_f" class="sh"> <label for="jsremove_gender_f" class="sh">женщина</label>
 	     			<span class="err"></span>
 					</div>
-					<div class="field usr_sname">
+					<div class="field usr_bdate">
 					  <label>Дата рождения</label>
 						<input type="text" name="pro_bdate" >
 	     			<span class="err"></span>
 					</div>
-					<div class="field usr_sname">
+					<div class="field">
 					  <label>&nbsp;</label>
-						<input type="submit" class="submit" onclick="save_profile( this.form ); return false;">
+						<input type="submit" value="Сохранить" class="submit" onclick="send_profile( this.form ); return false;">
 					</div>
 		      
 		    </form>
@@ -111,11 +111,13 @@
   <img src="/img/usr_def.jpg" title="{u_name}">
 [form]
 	<div id="login_block">
-		<form name="login" id="login_form" class="pop">
+		<form name="jlib_auth_form" id="login_form" class="pop">
 		  <span class="arr"><span></span></span>
 		  <span class="title">Вам необходимо авторизироваться.</span>
 		  <input type="hidden" name="hidden">
-		  {error: type=user}
+			<!--auth_msg-->
+			{error: type=user}
+				
 		  <input type="text" name="usr" placeholder="e-mail" style="email"><br>
 		  <!--err:usr-->
 		  <input type="password" name="pwd" placeholder="пароль"><br>

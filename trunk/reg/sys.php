@@ -807,6 +807,24 @@
 				'block1' => 'project_list_viewer: dir_name=search_fs_points',
 			),
 		),
+		'default_reminder'=>array(
+			'frame' => 'default',
+			'class' => 'icontrol',
+			'security'=>'',
+			'content' => array(
+			  'block1'=>'passreminder: ',
+			),
+		),
+		'default_auth'=>array(
+			'frame' => 'default',
+			'class' => 'icontrol',
+			'security'=>'',
+			'content' => array(
+			  'block1'=>'panel: security=site_auth auth_redirect=default auth_tpl=login_short.htm',
+			  'block2'=>'function: name=auth_redirect',
+			),
+		),
+
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------\ P A G E S /--------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -879,6 +897,12 @@
 					),
 					'search'=>array(
 					  'page' => 'default_search',
+					),
+					'reminder'=>array(
+					  'page' => 'default_reminder',
+					),
+					'auth'=>array(
+					  'page' => 'default_auth',
 					)
 				),
 			),

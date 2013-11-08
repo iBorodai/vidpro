@@ -1,0 +1,43 @@
+[body]
+		<form id="auth_remi" class="auth_block remind_form">
+		  <span class="err_err" id="err_passremail"><!--err:passremail--></span>
+			<input name="tmp" type="hidden">
+			{error: type=user}
+			<input type="text" id="passremail" name="passremail" stype="email" required placeholder="email">
+			<span class="help-inline"><!--err:usr--></span>
+			<input class="submit" type="submit" value="Напомнить">
+
+		  <a class="gray login_do" href="#">Я вспомнил пароль!</a>
+		  <a class="gray reg_do" href="#">Создать новый аккаунт</a>
+		</form>
+		<script>
+		  $(document).ready(function(){
+		    var tst=$('#err_passremail').text();
+		    if( tst!='' && tst!='<!--err:'+'passremail-->' ){
+		      $('.auth_block').hide();
+		      $('.remind_form').show();
+				}
+			});
+		</script>
+[change]
+		<link href="/css/share.css" rel="stylesheet" type="text/css">
+		<link href="/css/registration.css" rel="stylesheet" type="text/css">
+		<form id="auth_remi" class="auth_block" style="display:block;">
+		  <h2 style="color:#00C6FF; font-size:26px; text-align:center; margin:30px 0 10px;">Изменение пароля</h2>
+		  <p class="err"><!--err:changepass--></p>
+			<input type="password" id="newpass" name="newpass" value="" required placeholder="Новый пароль">
+      <!--err:newpass-->
+			<input type="password" id="accpass" name="accpass" value="" required placeholder="Повторите новый пароль">
+			<!--err:accpass-->
+			<button type="submit" style="width:100%" class="submit"> Изменить</button>
+		</form>
+[changed]
+		<link href="/css/share.css" rel="stylesheet" type="text/css">
+		<link href="/css/registration.css" rel="stylesheet" type="text/css">
+
+    <div class="container auth_block"  style="display:block;">
+   		<h2 style="color:#00C6FF; font-size:26px; text-align:center; margin:30px 0 10px;">Пароль успешно изменен!</h2>
+	    <a href="/#login">Вернуться к авторизации.</a>
+    </div>
+		{panel: security=site_auth auth_redirect=default auth_tpl=login_short.htm}
+		

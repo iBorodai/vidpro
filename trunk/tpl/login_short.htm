@@ -1,0 +1,12 @@
+[form]
+	<form name="jlib_auth_form" id="login_short_form" class="auth_block login_form" action="/auth">
+	  <input type="hidden" name="hidden">
+		{error: type=user}
+	  <input type="text" name="usr" placeholder="e-mail" style="email"><br>
+	  <!--err:usr-->
+	  <input type="password" name="pwd" placeholder="пароль"><br>
+	  <input type="submit" value="вход" class="submit">
+	  <a class="gray remind_do" href="#">Я забыл пароль</a>
+	  <a class="gray reg_do" href="#">Создать новый аккаунт</a>
+	</form>
+	{passreminder: short=yes}

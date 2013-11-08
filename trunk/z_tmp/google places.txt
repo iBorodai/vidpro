@@ -1,0 +1,12 @@
+google places
+API_KEY:AIzaSyAH7PC7sxCeHfuq_D6J234qQxZjse7I9jo
+
+Поиск мест
+https://maps.googleapis.com/maps/api/place/search/json?location=50.37056740366422,30.462512969970707&radius=500&types=food&name=Route+66&sensor=false&key=AIzaSyAH7PC7sxCeHfuq_D6J234qQxZjse7I9jo
+
+Сведения о месте "РЕсторан Прага"
+
+
+https://maps.googleapis.com/maps/api/place/details/json?reference=CoQBfwAAACHkEH2vtbH5dIHeG5q5wnhzWCwQXcOIlzQS1gwV0Cy95GGvO7mbfExGdz9Eqlzsi8N7jfi4lZOjJGno6-2_ELTVcieexrNmpJheII4c0R7O3Fo7nms81ueA346iLsdZ0sMACA5bSxMR8y_-mweXQRRCbLUZ7f_PV6f6caiSszwDEhAlkSQBdahl0tmKxaqGc_VbGhT6-z6DaraT-paCJWIFMxbukLo12A&sensor=true&key=AIzaSyAH7PC7sxCeHfuq_D6J234qQxZjse7I9jo
+
+
