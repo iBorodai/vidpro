@@ -27,12 +27,19 @@ class point extends item_viewer{
 		$dt=$GLOBALS['FS']->venue( $this->data['p_fsid'] );
 		//echo '<pre class="debug">DT:'.print_r ( $dt ,true).'</pre>';
 		if(!$dt){
-		  echo '<pre class="debug">'.$GLOBALS['FS']->cur_json.'</pre>';
+		  //echo '<pre class="debug">'.$GLOBALS['FS']->cur_json.'</pre>';
 		  $this->data=array(); return true;
 		}
 		
 		//Запихиваю данные из fourscquare в $this->data
 		$this->data=array_merge($this->data, parse_venue_item($dt));
+
+		//GOOGLE
+		$GLOBALS['GA']=init_ga();
+		$gdt=$GLOBALS['GA']->find( array('query'=>$this->data['p_name'],'lat'=>$this->data['p_lat'],'lng'=>$this->data['p_lng']) );
+		$t=parse_google_data($gdt);
+		if(!empty($t['comms']) && is_array($t['comms']))
+			$this->data['tips']=array_merge($this->data['tips'], $t['comms']);
 
 		//Выбрать каменты из БД
 		$t=$GLOBALS[CM]->run('sql:comment,user
@@ -40,10 +47,12 @@ class point extends item_viewer{
                            u_id,u_grp,u_url,u_email,u_name,u_img,u_gender,u_createdate,u_lastlogin,u_lock,
 													DATE_FORMAT( com_date ,\'%Y%m%d%H%i%s\') did,
 													DATE_FORMAT( com_date ,\'%d.%m.%Y %H:%i\') com_date
-													?com_type=\'pnt\' AND com_key_obj='.$this->data['p_id'].' AND com_key_u=u_id$id=did ');
+													?com_type=\'pnt\' AND com_key_obj='.$this->data['p_id'].' AND com_key_u=u_id
+													$id=did ');
 
 		$this->data['tips']=array_merge($this->data['tips'], $t);
 		krsort($this->data['tips']);
+		//echo '<pre class="debug">'.print_r ( $this->data['tips'] ,true).'</pre>';
 		unset($t);
 	}
 	
@@ -76,8 +85,12 @@ class point extends item_viewer{
 			$vals=array();
 			if(!empty($this->data['tips'])){
 				foreach($this->data['tips'] as $k=>$v){
-					if(!empty($v['com_id']))$tpl=$this->tpl['comm_line'];
-					else  $tpl=$this->tpl['comm_line_fs'];
+					if(!empty($v['com_id']))
+						$tpl=$this->tpl['comm_line'];
+					elseif( !empty($v['vendor']) && !empty($this->tpl['comm_line_'.$v['vendor']]) )
+					  $tpl=$this->tpl['comm_line_'.$v['vendor']];
+					else
+						$tpl=$this->tpl['comm_line_fs'];
 					if($v['com_weight']>0)$v['com_weight']=$this->tpl['comm_weight_plus'];
 					elseif($v['com_weight']<0)$v['com_weight']=$this->tpl['comm_weight_minus'];
 					else $v['com_weight']='';
@@ -163,7 +176,7 @@ class point_add extends icontrol{
 		//Добаить индексы по имени
 		$item['p_name']=strtr(
 			$item['p_name'] ,
-			array( '"'=>' ', "'"=>' ', '`'=>'', '/'=>'', '_'=>' ', '-'=>' ', '  '=>'')
+			array( '"'=>' ', "'"=>'`', '/'=>'', '_'=>' ', '-'=>' ', '  '=>'')
 		);
 		$m=explode(' ', $item['p_name']);
     $sql="REPLACE INTO search_words_index VALUES ";
@@ -332,13 +345,18 @@ function parse_venue_item($dt){
 		if(!empty($d->tips)){
 			for($i=0; $i<count($d->tips->groups); $i++){
 			  for($j=0; $j<count($d->tips->groups[$i]->items); $j++){
+			    $photo=strtr(
+						$d->tips->groups[$i]->items[$j]->user->photo->prefix.'/50x50/'.$d->tips->groups[$i]->items[$j]->user->photo->suffix,
+						array('//'=>'/')
+					);
 			    $res_data['tips'][ date('YmdHis', $d->tips->groups[$i]->items[$j]->createdAt ) ]=array(
 			      'text'=>$d->tips->groups[$i]->items[$j]->text,
 			      'create'=>date('d.m.Y', $d->tips->groups[$i]->items[$j]->createdAt ),
 			      'user_id'=>$d->tips->groups[$i]->items[$j]->user->id,
 			      'user_name'=>$d->tips->groups[$i]->items[$j]->user->firstName.' '.$d->tips->groups[$i]->items[$j]->user->lastName,
-			      'user_photo'=>$d->tips->groups[$i]->items[$j]->user->photo->prefix.'/50x50/'.$d->tips->groups[$i]->items[$j]->user->photo->suffix,
+			      'user_photo'=>$photo,
 					);
+					
 			  }
 			}
 		}

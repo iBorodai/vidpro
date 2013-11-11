@@ -159,3 +159,10 @@
 	text-align:center;
 	font-size:20px;
 }
+
+.auth_block .err_err{
+	display:block;
+	text-align:center;
+	color:#f00;
+	font-size:18px;
+}

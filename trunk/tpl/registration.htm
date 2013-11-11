@@ -34,7 +34,6 @@
 			</div>
 
 			<div class="content">
-			  {error:error}
 				<div class="reg_info">
 					Вы можете воспользоваться одним из ваших существующих<br>
 					профилей для участия в проекте vidguk.pro
@@ -46,26 +45,6 @@
 					        <img src="/img/socials/facebook.jpg" data-uloginbutton = "facebook" class="button"/>
 					        <img src="/img/socials/twitter.jpg" data-uloginbutton = "twitter" class="button"/>
 					        <img src="/img/socials/google.jpg" data-uloginbutton = "google" class="button"/>
-					        <div >
-										<img src="/img/socials/sm_yandex.jpg" data-uloginbutton = "yandex" class="button"/>
-										<img src="/img/socials/sm_lj.jpg" data-uloginbutton = "livejournal" class="button"/>
-										<img src="/img/socials/sm_odnoklassniki.jpg" data-uloginbutton = "odnoklassniki" class="button"/>
-										<img src="/img/socials/sm_mailru.jpg" data-uloginbutton = "mailru" class="button"/>
-									</div>
-<!--OpenID – openid,
-Flickr – flickr,
-Last Fm – lastfm,
-LinkedIn – linkedin,
-Live ID – liveid,
-SoundCloud – soundcloud,
-Steam – steam,
-Vimeo – vimeo,
-WebMoney – webmoney,
-YouTube– youtube,
-foursquare – foursquare,
-tumblr – tumblr,
-Google+ – googleplus,
-Dudu – dudu.-->
 					</div>
 				</div>
 
@@ -73,7 +52,9 @@ Dudu – dudu.-->
 					... или создать специальный аккаунт участника проекта,<br>
 					воспользовавшись адресом вашей электронной почты
 				</div>
+				
 				<form name="registration" class="auth_block reg_form">
+				  {error:error type=user}
 				  <input type="hidden" name="hidden" >
 				  <input type="text" name="name" placeholder="Имя" required><br>
 				  <input type="text" name="email" placeholder="E-mail" required style="email"><br>

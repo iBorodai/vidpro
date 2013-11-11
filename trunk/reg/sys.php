@@ -431,10 +431,10 @@
 		),
 		'host'=>array(
 			'class' => 'mysql_db',
-			'server' => 'localhost',
-			'db' => '',
-			'usn' => '',
-			'pwd' => '',
+			'server' => 'vidguk.mysql.ukraine.com.ua',
+			'db' => 'vidguk_db',
+			'usn' => 'vidguk_db',
+			'pwd' => '2kmvSvYB',
 			'set_names' => 'utf-8',
 		),
 	),
@@ -528,7 +528,7 @@
 
 	'projects' => array (
 		array (
-			'ptn' => '.com.ua',
+			'ptn' => 'vidguk.pro',
 			'where' => 'SERVER_NAME',
 			'database' => 'host',
 			'proj' => 'local',

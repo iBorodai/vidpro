@@ -175,12 +175,14 @@ class ajax extends icontrol{
 					$GLOBALS['result']['val']=$_REQUEST['val']['query'];
 					$GLOBALS['result']['reg']=$_REQUEST['val']['reg'];
 
-					$query=preg_replace('/[\-+\/\\_&^%$#*!`\'"]/',' ',$_REQUEST['val']['query']);
+					$query=preg_replace('/[\-+\/\\_&^%$#*!`"]/',' ',$_REQUEST['val']['query']);
 					$query=explode(' ',$query);
 
 					$inp=array();
 					foreach($query as $v){
 						if(!empty($v) && empty($inp[$v])) {
+						  $v=strtr($v, array("'"=>'`'));
+						  mysql_real_escape_string($v);
 							$inp[$v]="sw_word LIKE '".$v."%'";
 							//$inp[$v]="sw_word = '".$v."'";
 						}
