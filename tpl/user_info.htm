@@ -7,9 +7,9 @@
 		<div id="user_subnav" class="pop">
 		  <span class="arr"><span></span></span>
 		  <span class="title">{u_name}</span>
-		  <a href="/profile" id="my_profile">Мой профиль</a>
-		  <a href="/profile/subscribe" id="my_subscribes">Мои подписки</a>
-		  <a href="/profile/settings" id="my_settings">Мои настройки</a>
+		  <a href="#" id="my_profile">Мой профиль</a>
+		  <a href="#" onclick="return false;" id="my_subscribes">Мои подписки</a>
+		  <a href="#" onclick="return false;" id="my_settings">Мои настройки</a>
 			<a href="/?logout=yes" id="user_logout">Выйти из аккаунта</a>
 			<div class="clear"></div>
 		</div>
@@ -123,7 +123,7 @@
 		  <input type="password" name="pwd" placeholder="пароль"><br>
 		  <input type="submit" value="вход" class="submit">
 			<div class="foot">
-				<div id="uLogin" data-ulogin="display=small;fields=first_name,last_name;providers=facebook,twitter,google,yandex,foursquare,openid;hidden=mailru,odnoklassniki,livejournal,lastfm,linkedin,liveid,soundcloud,steam,flickr,vimeo,youtube,webmoney,tumblr,googleplus,dudu;redirect_uri=http%3A%2F%2F{function:show_back_path}/ulogin"></div>
+				<div id="uLogin" data-ulogin="display=small;fields=first_name,last_name;providers=facebook,twitter,google;redirect_uri=http%3A%2F%2F{function:show_back_path}/ulogin"></div>
 				<center>
 					или	<br>
 		  		<a href="/?reg=true">cоздать новый аккаунт</a>

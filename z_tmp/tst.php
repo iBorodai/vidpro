@@ -1,4 +1,11 @@
 <?php
+$a='https://plus.google.com/103741613209019900308';
+echo $a;
+echo "<br />";
+echo substr($a, strrpos($a, '/')+1 );
+exit();
+
+
 $arr=array(
 'https://api.foursquare.com/v2/venues/search?ll=50.467995,30.567856&radius=10000&intent=browse&query=%D0%BF%D0%BE%D1%80%D1%82%D0%B5%D1%80&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901',
 'https://api.foursquare.com/v2/venues/search?near=kiev&intent=browse&query=%D0%BF%D0%BE%D1%80%D1%82%D0%B5%D1%80&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901',

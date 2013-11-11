@@ -48,12 +48,18 @@ function duration(){
 	});
 }
 
-function dialog_show( callback ){
+var cur_dialog=false;
+function dialog_show(name, callback ){
 	if( $('#dialog_block').is(':visible') ){
-	  var t=new callback;
-	  return true;
-	  //dialog_hide(); return false;
+	  if(cur_dialog!=name){
+		  var t=new callback;
+		  cur_dialog=name;
+		  return true;
+		}else{
+		  dialog_hide(); return false;
+		}
 	}
+	cur_dialog=name;
 	$('#dialog_block .content').css({'opacity':0, });
 	$('#dialog_block').css({'height':0,'display':'block'}).animate({height:600+'px'},200,function(){
 	  var t=new callback;
@@ -69,7 +75,7 @@ function dialog_hide(){
 }
 
 function review_dialog(){
-  dialog_show( function(){
+  dialog_show( 'review_dialog', function(){
 	    if($('#point').get().length>0){
 		    $('#dialog_block .content').html($('#review_form_tpl').html());
 		    //Определяю какой шаблон подставить
@@ -96,7 +102,7 @@ function review_dialog(){
 }
 
 function profile_dialog(){
-  dialog_show( function(){
+  dialog_show( 'profile_dialog',function(){
     var t=$('#profile_form_tpl').html();
     t=t.replace(/jsremove_/g,'');
 		$('#dialog_block .content').html( t );

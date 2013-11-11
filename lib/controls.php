@@ -597,9 +597,9 @@ function reg_check_name($obj){
     if( empty($data['test']) )return false;
 	}
   
-  $t=$GLOBALS[CM]->run('sql:user?u_email=\''. mysql_real_escape_string($obj->data['u_email']) .'\'$shrink=yes');
+  $t=$GLOBALS[CM]->run('sql:user?u_email=\''. mysql_real_escape_string($obj->data['email']) .'\'$shrink=yes ');
   if(!empty($t)) {
-		set_error_ex('Пользователь с таким e-mail уже зарегистрирован');
+		set_error_ex('Пользователь с таким e-mail уже зарегистрирован',USR_ERR);
 		return false;
 	}
 	return true;
@@ -629,8 +629,12 @@ function reg_build_cats($obj){
 	return $t->pg;
 }
 
-function get_page($source_domain, $link){
-		$fp = fsockopen($source_domain, 80, $errno, $errstr, 30);
+function get_page($source_domain, $link, $https=false){
+		if(!$https)
+			$fp = fsockopen($source_domain, 80, $errno, $errstr, 30);
+		else
+		  $fp = fsockopen('ssl://'.$source_domain, 443, $errno, $errstr, 30);
+		  
 		if (!$fp) {
 		    //echo "$errstr ($errno)<br />\n";
 		} else {

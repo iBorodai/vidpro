@@ -36,6 +36,7 @@ class cache {
 		*/
 		
 	  $this->temp="REPLACE INTO z_fs_queries SET fq_id='$id', fq_content='$serr', fq_create=". $t .", fq_dead=".($t+$period_sec);
+
 	  $this->last_id=$id;
 	  return true;
 	}
@@ -48,8 +49,11 @@ class cache {
 	  $this->db=init_db();
 	  //Если передано что сохранять
 		if($id && $data)	$this->prepare($id,$data,$period_sec);
+		//echo $this->temp;
 	  $this->db->query($this->temp);
-	  if(mysql_errno())return false;
+	  if(mysql_errno()){
+			return false;
+		}
 	  $this->last_id=$id;
 	  return true;
 	}

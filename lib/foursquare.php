@@ -1,4 +1,13 @@
 <?
+require 'lib/google.php';
+
+function &init_fs(){
+  static $fs=false;
+  if (!empty($fs)) return $fs; //уже есть
+  $fs=new foursquare();
+  return $fs;
+}
+
 class foursquare{
 	//Ключ и параметры по умолчанию для запросов без пользовательской авторизации
 	var $api_key='client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901&locale=ru';
@@ -12,8 +21,8 @@ class foursquare{
 	 *	Произвольный запрос к API
 	***************************/
 	function request($fs_query, $cache_time=false){
-//echo md5($fs_query).'<br /><br />';
-		if( $tst=$GLOBALS[CACHE]->get(md5($fs_query)) ){
+    $fs_query_id=substr(md5($fs_query), 0,32);
+		if( $tst=$GLOBALS[CACHE]->get($fs_query_id) ){
 	     $dt= unserialize($tst);
 		}
 		if(empty($dt)){
@@ -23,11 +32,11 @@ class foursquare{
 		    $this->errors[]=array('err','пустой ответ');
 		    return false;
 			}
-//echo '<pre class="debug">'.print_r ( $json ,true).'</pre>';
+			
 		  $dt=json_decode($json);
 		  $this->cur_json=$json;
 			//кеширую
-		  if( !$GLOBALS[CACHE]->prepare( md5($fs_query), $dt, $cache_time ) ){
+		  if( !$GLOBALS[CACHE]->prepare( $fs_query_id, $dt, $cache_time ) ){
 		    $this->errors[]=array('wrn','ошибка кеширования - не удалось сохранить данные');
 			}
 		}
@@ -88,12 +97,5 @@ class foursquare{
 		$GLOBALS[CACHE]->set();
 	  return $dt;
 	}
-}
-
-function &init_fs(){
-  static $fs=false;
-  if (!empty($fs)) return $fs; //уже есть
-  $fs=new foursquare();
-  return $fs;
 }
 ?>
