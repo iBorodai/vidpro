@@ -22,6 +22,10 @@ class ajax extends icontrol{
 					  $repl['themes_place']=$t->params['ucl_themes'];
 					  $repl['themes']=$_SESSION['Jlib_auth']['u_themes'];
 					} else $repl['themes_place']='';
+					
+					$repl['exclude']='';
+					//if(!empty($_REQUEST['exclude'])) $repl['exclude']=' AND p_id NOT IN('.$_REQUEST['exclude'].') ';
+					
 			    $t->params['ucl'] = strjtr($t->params['ucl'], $repl);
 			    $t->params['page_ctrl']='t_pg';
 			    $t->params['vars'].='&t_pg='. intval($_REQUEST['page']);
@@ -231,6 +235,38 @@ class ajax extends icontrol{
 						
 					unset($GLOBALS['result']['content']);
 					break;
+				}
+				case 'show_interest':{
+				  $data=$GLOBALS[CM]->run('sql:theme LEFT JOIN user2theme ON(u2t_key_t=t_id AND u2t_key_u='.$_SESSION['Jlib_auth']['u_id'].')');
+				  $this->pg='';
+				  foreach($data as $v){
+				    $l=strjtr($this->tpl['interest_category'],$v);
+				    if( $v['u2t_key_u'] ) $l=str_replace('{checked}','checked',$l);
+				    $this->pg.=$l;
+					}
+				  break;
+				}
+				case 'send_interest':{
+					if(empty($_REQUEST['themes'])){
+						$GLOBALS['result']['error']='Data not send';
+						return false;
+					}
+
+					$GLOBALS[CM]->run('sql:user2theme?u2t_key_u='.$_SESSION['Jlib_auth']['u_id'].' AND u2t_key_t NOT IN('.implode(',', $_REQUEST['themes'] ).')','delete');
+					$sql="REPLACE into user2theme values "; $vals=array();
+					foreach($_REQUEST['themes'] as $v){
+					  $vals[]='('.$_SESSION['Jlib_auth']['u_id'].', '.$v.' )';
+					}
+					$sql.=implode(',', $vals);
+					$db=init_db();
+					$db->query($sql);
+
+					if( mysql_error() ){
+					  $GLOBALS['result']['error']='Данные не сохранены';
+					}else
+					  $this->pg=$this->tpl['send_interest_success'];
+				  break;
+				  break;
 				}
 			}
 		}

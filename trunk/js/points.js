@@ -19,6 +19,7 @@ $(document).ready(function(){
 
 var show_list=[];
 var loading_more=false;
+
 function load_page(page_num,callback){
     loading_page=true;
 		var req = new JsHttpRequest("utf-8");
@@ -39,7 +40,6 @@ function load_page(page_num,callback){
 						}
 					  
 						if(!adding){
-							//$('#point_container').append( $(req.responseJS.content).find('.point_list').html() );
 							$('#point_container').html( req.responseJS.content );
 							var $container = $('.point_list');
 							$container.masonry({
@@ -52,13 +52,22 @@ function load_page(page_num,callback){
 						  
 							var t=$(req.responseJS.content);
 							$('.point_pages').html( t.find('.point_pages').html() );
-						  var ilist=t.find('.item').get();
-						  
-						  for ( var i = 0; i < ilist.length; i++ ) {
-						    $container.append( ilist[i] );
-						    show_list.push(ilist[i]);
+						  //var ilist=t.find('.item').get();
+						  var ilist=[];
+						  var tlist=t.find('.item').get();
+						  var j=0;
+						  for ( var i = 0; i < tlist.length; i++ ) {
+						    if( $('#'+$(tlist[i]).attr('id')).get().length>0 ){
+console.log('skip ',$(tlist[i]).attr('id'));
+									continue;
+								}
+								//console.log($(ilist[i]).attr('id'));
+								ilist[j]=tlist[i]
+						    $container.append( ilist[j] );
+						    show_list.push( ilist[j] );
+						    j++;
 						  }
-              //$container.masonry( 'appended', ilist );
+console.log('ilist', ilist);
               $container.masonry( 'addItems', ilist);
               $container.masonry( 'layout' );
               $(window).resize();
@@ -106,12 +115,15 @@ function load_more(){
 	var page_cur=parseInt($('.point_pages').last().find('.current').html());
 	var page_count=parseInt($('.point_pages').last().find('.on_page').html());
 	var page_ttl=parseInt($('.point_pages').last().find('.total').html());
-	loaded_count+=page_cur*page_count;
 	if( loaded_count<page_ttl){
 	  console.log( page_cur*page_count+'<'+page_ttl );
 	  $('#point_container').append( $('#js_tpl_points .loading_tpl').html() );
-	  load_page(page_cur+1 ,function(req){
+	  load_page(page_cur+1, function(req){
+			page_count=parseInt($('.point_pages').last().find('.on_page').html());
+	    loaded_count+=page_count;
 	    $('#point_container').find('.loading').remove();
 		});
+	}else{
+	  console.log( 'stoped at '+page_cur+' loaded:'+loaded_count );
 	}
 }

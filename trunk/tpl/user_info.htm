@@ -8,7 +8,7 @@
 		  <span class="arr"><span></span></span>
 		  <span class="title">{u_name}</span>
 		  <a href="#" id="my_profile">Мой профиль</a>
-		  <a href="#" onclick="return false;" id="my_subscribes">Мои подписки</a>
+		  <a href="#" id="my_interest">Мои интересы</a>
 		  <a href="#" onclick="return false;" id="my_settings">Мои настройки</a>
 			<a href="/?logout=yes" id="user_logout">Выйти из аккаунта</a>
 			<div class="clear"></div>
@@ -97,10 +97,24 @@
 					</div>
 					<div class="field">
 					  <label>&nbsp;</label>
-						<input type="submit" value="Сохранить" class="submit" onclick="send_profile( this.form ); return false;">
+						<button type="submit" class="submit" onclick="send_profile( this.form ); return false;">Сохранить</button>
 					</div>
 		      
 		    </form>
+			</div>
+		</div>
+		<div id="interest_form_tpl">
+		  <div class="interest_dialog" style="margin: 0 auto; position: relative; width: 60%;">
+				<a href="#" class="close" onClick="interest_dialog(); return false;">Закрыть интересы</a>
+		    <form class="interest_form" enctype="multipart/form-data" method="POST">
+        	<div class="catigiries">
+        	  <img src="/img/loading-line.gif" style="margin:40px 0 0 40%; height:17px;" >
+					</div>
+        	<div style="margin-top:10px; padding:10px 0 0 5px; border-top:1px solid #e4e4e4;">
+        	  <button type="submit" class="submit" onclick="send_interest(this.form); return false;">Сохранить</button>
+					</div>
+        	
+				</form>
 			</div>
 		</div>
     
@@ -121,7 +135,7 @@
 		  <input type="text" name="usr" placeholder="e-mail" style="email"><br>
 		  <!--err:usr-->
 		  <input type="password" name="pwd" placeholder="пароль"><br>
-		  <input type="submit" value="вход" class="submit">
+    	<button class="submit">Вход</button>
 			<div class="foot">
 				<div id="uLogin" data-ulogin="display=small;fields=first_name,last_name;providers=facebook,twitter,google;redirect_uri=http%3A%2F%2F{function:show_back_path}/ulogin"></div>
 				<center>

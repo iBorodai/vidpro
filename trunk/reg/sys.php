@@ -450,12 +450,13 @@
 							 r_id,r_name,r_url,r_lat,r_lng,
 							 COUNT( com_id ) p_comms
 							?com_key_obj=p_id AND com_type=\'pnt\' AND com_key_u=u_id AND p_key_reg=r_id AND
-							 p2t_key_p=p_id AND t_id=p2t_key_t {themes_place} {city_place}
-							$group=p_id order=com_date direcrtion=desc',
+							 p2t_key_p=p_id AND t_id=p2t_key_t {themes_place} {city_place} {exclude}
+							$group=p_id order=com_date direction=desc ',
 			'ucl_themes'=>' AND p2t_key_t IN({themes})',
 			'ucl_city'=>' AND r_url IN( {city} )',
 	    //'ucl_cats'
 	    'tpl'=>'point_comm_list.htm',
+	    'quantity'=>10,
 	    'filter'=>array(
 	      'theme'		=> array(' = ','t_url',false,true)
 	      //'search'	=> array(' LIKE ','u_login','as_start',true)
