@@ -226,9 +226,10 @@ function project_search_points(&$obj){
 	
 	//Данные из  foursquare
 	$data_fs=array();
+
 	$request=array(
-	  'query'=> ( mysql_real_escape_string($obj->ctrl['query'] ) ) ,
-	  'location'=> (!empty($obj->ctrl['region_other']))? ( urlencode( mysql_real_escape_string($obj->ctrl['region_other'] ) ) ) :( mysql_real_escape_string($obj->ctrl['region'] ) ) ,
+	  'query'=> urlencode( $obj->ctrl['query']  ),
+	  'location'=> (!empty($obj->ctrl['region_other']))? ( urlencode( $obj->ctrl['region_other']  ) ) :( mysql_real_escape_string($obj->ctrl['region'] ) ) ,
 	);
 	//echo '<pre class="debug">'.print_r ( $request ,true).'</pre>';
 	$GLOBALS['FS']=init_fs();
@@ -477,6 +478,6 @@ function point_stat($prm){
 }
 
 function display_search_query($prm){
-	return mysql_real_escape_string($_GET['query']);
+	return $_GET['query'];
 }
 ?>

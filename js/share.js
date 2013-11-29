@@ -1,3 +1,5 @@
+var DIALOG_HIDE_TIMEOUT=1000;
+
 function display_message(text){
 		var msg=$('<div class="pop_msg" style="display:none;">'+text+'<a href="#" class="close" onClick="$(this).parent().remove(); return false;">закрыть</a> </div>');
 		var tst=$('body').find('.pop_msg');
@@ -123,6 +125,53 @@ function profile_dialog(){
 	});
 }
 
+function interest_dialog(){
+  dialog_show( 'interest_dialog',function(){
+    var t=$('#interest_form_tpl').html();
+    t=t.replace(/jsremove_/g,'');
+		$('#dialog_block .content').html( t );
+
+		var req = new JsHttpRequest("utf-8");
+		req.onreadystatechange = function(){
+			if (req.readyState == 4){
+				if(req.responseJS){
+				  if( req.responseJS.error ){
+				    display_error(req.responseJS.error);
+					}else{
+						$('#dialog_block .catigiries').html( req.responseJS.content );
+						set_act_radio();
+					}
+				}
+				if(req.responseText!='') console.log(req.responseText);
+			}
+		}
+
+		req.open(null,'/ajax', true);
+		req.send({'mode':'show_interest',fields:['block'] });
+		return;
+	});
+}
+
+function send_interest(form){
+	var req = new JsHttpRequest("utf-8");
+	req.onreadystatechange = function(){
+		if (req.readyState == 4){
+			if(req.responseJS){
+			  if( req.responseJS.error ){
+			    display_error(req.responseJS.error);
+				}else{
+				  $('#dialog_block .interest_dialog').html( req.responseJS.content );
+				  setTimeout( function(){dialog_hide();}, DIALOG_HIDE_TIMEOUT );
+				}
+			}
+			if(req.responseText!='') console.log(req.responseText);
+		}
+	}
+	req.open(null,'/ajax', true);
+	req.send({'mode':'send_interest',fields:['block'],form:form });
+  //$('#dialog_block .interest_dialog').html( '<img src="/img/loading-line.gif" style="margin:30px 0 0 40%;">' );
+}
+
 function send_review(form){
 	var req = new JsHttpRequest("utf-8");
 	req.onreadystatechange = function(){
@@ -141,10 +190,10 @@ function send_review(form){
 				  t.find('.text').html( $(form).find('textarea').val() );
 				  
 				  $('#point_comm .label').after('<div class="comment">'+t.html()+'</div>');
-				  setTimeout( function(){dialog_hide();}, 1000 );
+				  setTimeout( function(){dialog_hide();}, DIALOG_HIDE_TIMEOUT );
 				}
 			}
-			if(req.responseText!='') alert(req.responseText);
+			if(req.responseText!='') console.log(req.responseText);
 		}
 	}
 
@@ -166,7 +215,7 @@ function send_vote(point, vote, marker){
 				  elm.html( req.responseJS.content );
 				}
 			}
-			if(req.responseText!='') alert(req.responseText);
+			if(req.responseText!='') console.log(req.responseText);
 		}
 	}
 
@@ -182,8 +231,8 @@ function send_profile(form){
 			  if( req.responseJS.error ){
 			    display_error(req.responseJS.error);
 				}else{
-				  $('#dialog_block .content').html( req.responseJS.content );
-				  setTimeout( function(){dialog_hide();}, 1000 );
+				  $('#dialog_block .profile_dialog').html( req.responseJS.content );
+				  setTimeout( function(){dialog_hide();}, DIALOG_HIDE_TIMEOUT );
 				}
 			}
 			if(req.responseText!='') console.log(req.responseText);//alert(req.responseText);
@@ -250,6 +299,25 @@ function toggle_pop(jq_selector, shower ){
 	}
 }
 
+//Для всех радиокнопок-иконок - выставление класса "актив" при выборе
+function set_act_radio(){
+  if( $('.radio_block input,.check_block input').get().length<1 ) return;
+
+  $('.radio_block input,.check_block input').each(function(){
+    if($(this).hasClass('done')) return;
+		$(this).click(function(){set_act_radio();});
+		$(this).addClass('done');
+	});
+  
+	$('.radio_block.active,.check_block.active').removeClass('active');
+	$('.radio_block input:checked').each(function(){
+	  $(this).parents('.radio_block').addClass('active');
+	});
+	$('.check_block input:checked').each(function(){
+	  $(this).parents('.check_block').addClass('active');
+	});
+}
+
 $(document).ready(function(){
 	//Проставить все длительности
 	moment.lang('ru');
@@ -271,6 +339,11 @@ $(document).ready(function(){
 		//Нажатие на мой профиль
 	  $('#my_profile').click(function(){
 	    toggle_pop('#dialog_block',profile_dialog);
+	    return false;
+		});
+		//Нажатие на мои интересы
+	  $('#my_interest').click(function(){
+	    toggle_pop('#dialog_block',interest_dialog);
 	    return false;
 		});
 	}
@@ -333,4 +406,5 @@ $(document).ready(function(){
 	if( $('#login_block .err_err').get().length>0 ){
 	  toggle_pop('#login_form');
 	}
+	set_act_radio();
 });
