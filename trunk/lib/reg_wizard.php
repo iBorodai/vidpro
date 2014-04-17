@@ -154,7 +154,6 @@ class lite_reg extends form {
 	}
 	
 	function ajax_process(){
-	    
 			if(!empty($_REQUEST['mode'])){
 	  	  switch($_REQUEST['mode']){
 					case 'upload_photo':
@@ -252,47 +251,67 @@ class lite_reg extends form {
 			//Создание акка пользователя
 	    if(!empty($this->wizard_data['name'])){ $this->wizard_data['u_name']=$this->wizard_data['name']; unset($this->wizard_data['name']); }
 	    if(!empty($this->wizard_data['email'])){ $this->wizard_data['u_email']=$this->wizard_data['email']; unset($this->wizard_data['email']); }
-		  //Создать аккаунт
-		  $data=array(
-			  'u_email'=>(!empty($this->wizard_data['u_email']))?$this->wizard_data['u_email']:uniqid('') ,
-			  'u_name'=>$this->wizard_data['u_name'],
-			  'u_sname'=>$this->wizard_data['u_sname'],
-			  'u_url'=>translit($this->wizard_data['u_name'].'.'.$this->wizard_data['u_sname']),
-			  'u_grp'=>'usr',
-			  'u_img'=>$this->wizard_data['u_img'],
-			  'u_gender'=>$this->wizard_data['u_gender'],
-			  'u_createdate'=>date('Y-m-d H:i:s'),
-			  'u_lastlogin'=>date('Y-m-d H:i:s'),
-			  'u_pwd'=>( empty($this->wizard_data['oid_openid']) )?uniqid(''):'',
-			  'u_lock'=>0,
-			);
-			//Проверить URL на уникальность
-			$tst=$GLOBALS[CM]->run('sql:user?u_url=\''.$data['u_url'].'\'');
-			if( !empty($tst) ) $data['u_url'].='-'.uniqid('');
-			
-			$uid=$GLOBALS[CM]->run('sql:user','insert',$data);
-			if(empty($uid)){echo "ОШибка регистрации ".mysql_error(); exit();}
-			
-			if(!empty($this->wizard_data['u_email']) && !empty( $data['u_pwd'] ) ){
-				//Отправляю мыло
-			  require_once 'lib/class.phpmailer.php';
-			  $data['proj_email_name']=$GLOBALS['Jlib_proj_name'];
-			  $data['server']=$_SERVER['SERVER_NAME'];
-			  $msg=strjtr($this->tpl['mail_msg'], $data);
+	    
+	    //Есть ли уже такой пользователь
+	    $t=$GLOBALS[CM]->run('sql:user?u_email=\''.$this->wizard_data['email'].'\'');
+	    if(empty($t)){
+				$u_url=translit($this->wizard_data['u_name'].'.'.$this->wizard_data['u_sname']);
+		    while( $t=$GLOBALS[CM]->run('sql:user#u_id?u_url=\''.$u_url.'\'') ){
+		      $u_url=translit($this->wizard_data['u_name'].'.'.$this->wizard_data['u_sname']).substr(uniqid(''), 0, 6);
+				}
 
-				$mail = new PHPMailer();
-				$mail->From = $GLOBALS['Jlib_defaults']['proj_email'];
-				$mail->FromName = $GLOBALS['Jlib_defaults']['proj_email_name'];
-				$mail->IsHTML(true);
-				$mail->AddAddress($this->wizard_data['u_email']);
-				$mail->Subject = 'Доступ к Вашему акаунту на '.$GLOBALS['Jlib_proj_name'];
-				$mail->Body = $msg;
-				$mail->Send();
+			  //Создать аккаунт
+			  $data=array(
+				  'u_email'=>(!empty($this->wizard_data['u_email']))?$this->wizard_data['u_email']:uniqid('') ,
+				  'u_name'=>$this->wizard_data['u_name'],
+				  'u_sname'=>$this->wizard_data['u_sname'],
+				  'u_url'=>$u_url,
+				  'u_grp'=>'usr',
+				  'u_img'=>$this->wizard_data['u_img'],
+				  'u_gender'=>$this->wizard_data['u_gender'],
+				  'u_createdate'=>date('Y-m-d H:i:s'),
+				  'u_lastlogin'=>date('Y-m-d H:i:s'),
+				  'u_pwd'=>( empty($this->wizard_data['oid_openid']) )?uniqid(''):'',
+				  'u_lock'=>0,
+				);
+				//Проверить URL на уникальность
+				$tst=$GLOBALS[CM]->run('sql:user?u_url=\''.$data['u_url'].'\'');
+				if( !empty($tst) ) $data['u_url'].='-'.uniqid('');
+
+				$uid=$GLOBALS[CM]->run('sql:user','insert',$data);
+				if(empty($uid)){echo "ОШибка регистрации ".mysql_error(); exit();}
+
+				if(!empty($this->wizard_data['u_email']) && !empty( $data['u_pwd'] ) ){
+					//Отправляю мыло
+				  require_once 'lib/class.phpmailer.php';
+				  $data['proj_email_name']=$GLOBALS['Jlib_proj_name'];
+				  $data['server']=$_SERVER['SERVER_NAME'];
+				  $msg=strjtr($this->tpl['mail_msg'], $data);
+
+					$mail = new PHPMailer();
+					$mail->From = $GLOBALS['Jlib_defaults']['proj_email'];
+					$mail->FromName = $GLOBALS['Jlib_defaults']['proj_email_name'];
+					$mail->IsHTML(true);
+					$mail->AddAddress($this->wizard_data['u_email']);
+					$mail->Subject = 'Доступ к Вашему акаунту на '.$GLOBALS['Jlib_proj_name'];
+					$mail->Body = $msg;
+					$mail->Send();
+				}
+
+				//Мерджу измененные данные
+			  $data['u_id']=$uid;
+			  $this->wizard_data=array_merge($this->wizard_data, $data);
+			}else{
+			  $this->wizard_data=array_merge($this->wizard_data, $t);
+			  $alredy_registered=true;
+			  $tmp=$GLOBALS[CM]->run('sql:user2theme?u2t_key_u='. $t['u_id']);
+				//Запоминаю темы, если есть
+			  $this->data['themes']=array();
+			  foreach($tmp as $v){
+			    $this->data['themes'][ $v['u2t_key_t'] ]=$v['u2t_key_t'];
+				}
+			  $this->wizard_data['u_themes']=$this->data['themes'];
 			}
-
-			//Мерджу измененные данные
-		  $data['u_id']=$uid;
-		  $this->wizard_data=array_merge($this->wizard_data, $data);
 		}else{
 		  //ПРофайл есть - проверяю поля: картинка, фамилия, т.п
 		  //echo 'Ulogin:<pre class="debug">'.print_r ( $_SESSION['ulogin_data'] ,true).'</pre>';
@@ -333,6 +352,7 @@ class lite_reg extends form {
 			//echo '<pre class="debug">'.print_r ( $_SESSION['ulogin_data'] ,true).'</pre>';
 			//echo '<pre class="debug">'.print_r ( $update ,true).'</pre>';
 		}
+		
 		//привязываю к акку темы, если нужно
 		if(!empty($this->data['themes'])){
 			//Привязать темы
@@ -345,7 +365,6 @@ class lite_reg extends form {
 		  $this->wizard_data['u_themes']=$this->data['themes'];
 		}
 		
-		//echo '<pre class="debug">'.print_r ( $this->wizard_data ,true).'</pre>';
 		//Создаю запись OpenID ели нужно
 		if( empty($this->wizard_data['oid_id']) && !empty($this->wizard_data['oid_openid'])){
 		  $data=array(

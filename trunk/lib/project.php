@@ -10,9 +10,9 @@ class point extends item_viewer{
 	    $you_sql_add=" ,'' p_you ";
 	
 	  $this->data=$GLOBALS[CM]->run("sql:point LEFT JOIN likes ON(l_key_obj=p_id AND l_type='pnt')
-	                                #*,
-																		SUM(l_weight) p_weight,
-																		COUNT(l_weight) p_votes,
+	                                #p_id,p_url,p_fsid,p_name,p_img,p_dscr,p_key_reg,p_addr,p_lat,p_lng,p_createdate,p_more,
+																	 SUM(l_weight) p_weight,
+																	 COUNT(l_weight) p_votes,
 																	 (SELECT COUNT(l1.l_key_obj) FROM likes l1 WHERE l1.l_key_obj=p_id AND l1.l_type='pnt' AND l_weight>0) p_plus_cnt
 																	 ".$you_sql_add."
 																	?p_url='".$this->ctrl['p_url']."'\$auto_query=no group=p_id shrink=yes limit=0,1");
@@ -25,15 +25,55 @@ class point extends item_viewer{
 		//Обращение к foursquare (там есть кэш)
 		$GLOBALS['FS']=init_fs();
 		$dt=$GLOBALS['FS']->venue( $this->data['p_fsid'] );
-		//echo '<pre class="debug">DT:'.print_r ( $dt ,true).'</pre>';
+//echo '<pre class="debug">'.print_r ( $dt ,true).'</pre>';exit();
 		if(!$dt){
-		  //echo '<pre class="debug">'.$GLOBALS['FS']->cur_json.'</pre>';
+			//echo '<pre class="debug">'.print_r ( $GLOBALS['FS']->errors ,true).'</pre>'; exit();
 		  $this->data=array(); return true;
 		}
 		
 		//Запихиваю данные из fourscquare в $this->data
-		$this->data=array_merge($this->data, parse_venue_item($dt));
+		//$this->data=array_merge($this->data, parse_venue_item($dt));
+		//echo '<pre class="debug">'.print_r ( $this->data ,true).'</pre>'; exit();
+		$fs_dt=parse_venue_item($dt);
+		//echo '<pre class="debug">'.print_r ( $fs_dt ,true).'</pre>'; exit();
+		
+		//Распаковать доп данные
+		if(!empty( $this->data['p_more'] )) $this->data['p_more']=unserialize( $this->data['p_more'] );
+		else $this->data['p_more']=array();
+		
+		$updates=array(
+		  'base'=>array(),
+		  'more'=>array(),
+		);
+		
+		foreach($fs_dt as $k=>$v){
+		  //пустные значения пропускаю
+		  if(empty($v) ) continue;
+		  if( isset( $this->data[$k] ) ){
+		    //позиция есть в основном кортеже записи
+		    if( empty( $this->data[$k] ) && !is_array($v) )
+	    	  $updates['base'][ $k ] = $v;
+			}else{
+			  //Проверяю в дополнительных даннх
+			  if( empty($this->data['p_more'][$k]) && !is_array($v) )
+			    $updates['more'][ $k ] = $v;
+			}
+			$this->data[$k] = $v;
+		}
+		
+		//переношу данные из доп поля в основной кортеж.
+		foreach($this->data['p_more'] as $k=>$v)	$this->data[$k]=$v;
+		unset( $this->data['p_more'] );
 
+		$updates['res']=$updates['base'];
+		if(!empty($updates['more'])) $updates['res']['p_more']=serialize($updates['more']);
+		
+		if(!empty($updates['res'])){
+		  $GLOBALS[CM]->run('sql:point?p_id='.$this->data['p_id'],'update',$updates['res']);
+		}
+		
+
+		if(empty($this->data['tips']))$this->data['tips']=array();
 		//GOOGLE
 		$GLOBALS['GA']=init_ga();
 		$gdt=$GLOBALS['GA']->find( array('query'=>$this->data['p_name'],'lat'=>$this->data['p_lat'],'lng'=>$this->data['p_lng']) );
@@ -58,6 +98,12 @@ class point extends item_viewer{
 	
 	function before_parse(){
 	  parent::before_parse();
+	  
+	  if(empty($this->data)){
+	  	$this->pg=str_replace('{error}',$GLOBALS['FS']->errors[ count($GLOBALS['FS']->errors)-1 ][1],$this->tpl['FS_empty']);
+	  	return false;
+		}
+	  
 	  $repl=array(
 	    'gallery'=>'',
 	    'auth'=>'',
@@ -109,7 +155,11 @@ class point extends item_viewer{
 		/*****************
 		 *  Голосовалка / рекоммендовалка
 		 *****************/
-		 
+		//echo '<pre class="debug">'.print_r ( $this->data ,true).'</pre>';
+		$GLOBALS['Jlib_meta']['title'][]=$this->data['p_name'].' '.$this->data['p_addr'].' на vidguk.pro';
+		$GLOBALS['Jlib_meta']['keywords'][]=$this->data['p_phrases'];
+		$GLOBALS['Jlib_meta']['description'][]=$this->data['p_dscr'];
+		//implode(',', $this->data['p_fs_cats'])
 	}
 }
 /*************************************
@@ -119,6 +169,7 @@ class point_add extends icontrol{
 	function make(){
 	  //ТОчно такой точки нет?
 	  $tst=$GLOBALS[CM]->run('sql:point?p_fsid=\''. mysql_real_escape_string($GLOBALS['Jlib_page_extra'][0]) .'\'$limit=0,1 shrink=yes ');
+	  
 	  if(!empty($tst)){
 	    redirect('/point/'.$tst['p_url']);
 	    exit();
@@ -129,17 +180,27 @@ class point_add extends icontrol{
 		  echo "Ошибка:( <script>//history.back();</script>";
 	    exit();
 		}
+//echo '<pre class="debug">'.print_r ( $dt ,true).'</pre>';
 		$item=parse_venue_item($dt);
 //echo '<pre class="debug">'.print_r ( $item ,true).'</pre>'; exit();
 		//УРЛ
-		$item['p_url']=strtolower(translit( $item['p_name'] ));
-		$t=$GLOBALS[CM]->run('sql:point?p_url=\''.$item['p_url'].'\'');
-		if(!empty($t)) $item['p_url'].=uniqid('-');
+		$p_url=$p_transl=strtolower(translit( $item['p_name'] ));
+		$limit=10;
+		while($t=$GLOBALS[CM]->run('sql:point?p_url=\''.$p_url.'\'') && $limit>0){
+		  $p_url=$p_transl.uniqid('-');
+		  $limit--;
+		}
+		$item['p_url']=$p_url;
+		
 		//Картинка
 		if(!empty($item['photos']))
 			$item['p_img']=str_replace('/150x150/','/200x150/',$item['photos'][0]['photo']);
+		if(empty($item['p_img'])) {
+		  $icn=&$dt->response->venue->categories[0]->icon;
+			$item['p_img']=$icn->prefix.'88'.$icn->suffix;
+		}
 		//Описание
-		$item['p_dscr']= $item['p_fs_reasons'].' '.$item['p_fs_atts'];
+		//$item['p_dscr']= $item['p_fs_reasons'].' '.$item['p_fs_atts'];
 		
 		//Регион
 		//Спрашиваю гугль по русски, БЛИН!
@@ -301,7 +362,9 @@ function parse_venue_item($dt){
 		$res_data['p_name']=$d->name;
 		if(!empty($d->contact->formattedPhone))
 			$res_data['p_phone']=$d->contact->formattedPhone;
-		$res_data['p_addr']=$d->location->city.', '.$d->location->address;
+			
+		$res_data['p_addr']=(!empty($d->location->city))?$d->location->city:'';
+		$res_data['p_addr'].=(!empty($d->location->address))?(', '.$d->location->address):'';
 
 		//РЕГИОН
 		$res_data['p_reg_name']=$d->location->city;
@@ -332,6 +395,10 @@ function parse_venue_item($dt){
 					);
 			  }
 			}
+		}
+		
+		if(!empty($d->description)){
+		  $res_data['p_dscr']=$d->description;
 		}
 
 		if(!empty($d->reasons)){
@@ -378,7 +445,41 @@ function parse_venue_item($dt){
 			  $hours[]=$d->hours->timeframes[$i]->days.', '.$d->hours->timeframes[$i]->open[0]->renderedTime;
 			}
 			$res_data['p_timeframes']= implode(', ', $hours);
-		}$res_data['p_timeframes']='';
+		}else
+			$res_data['p_timeframes']='';
+		//echo '<pre class="debug">'.print_r ( $d ,true).'</pre>';exit();
+		
+		if(!empty($d->attributes->groups)){
+		  $g=&$d->attributes->groups;
+		  //echo '<pre class="debug">'.print_r ( $d->attributes->groups ,true).'</pre>'; exit();
+		  for($i=0, $cnt=count($g); $i<$cnt; $i++ ){
+				switch( $g[$i]->type ){
+				  case 'reservations'://Бронирование
+				  	break;
+				  case 'payments'://Кредитные карты
+				    $res_data['p_cards']=$g[$i]->summary;
+				    break;
+				  case 'outdoorSeating'://Есть места на улице
+				    $res_data['p_summerplace']=$g[$i]->summary;
+						break;
+				  case 'wifi'://Интернет WIFI
+				    $res_data['p_wifi']=$g[$i]->summary;
+						break;
+					case 'serves'://Меню (summary)
+				    $res_data['p_menu']=$g[$i]->summary;
+						break;
+				}
+			}
+		}
+		
+		//phrases
+		if(!empty($d->phrases)){
+		  $t=array();
+		  for($i=0; $i<count($d->phrases); $i++){
+			  $t[]=$d->phrases[$i]->phrase;
+			}
+		  $res_data['p_phrases']=implode(', ',$t);
+		}
 	return $res_data;
 }
 
@@ -426,11 +527,13 @@ function point_stat($prm){
   */
 
   $repl=$GLOBALS['Jlib_frame']->obj['block1']->data;
+  if(empty($repl)) return '';
+  
   //weight 1,0,-1
-		if( !empty($repl['p_weight']) ) $repl['p_weight']=($repl['p_weight']>1)?1:-1;
+	if( !empty($repl['p_weight']) ) $repl['p_weight']=($repl['p_weight']>1)?1:-1;
 
 	return strjtr($prm['parent']->tpl['statistic'], $repl );
-
+	/*
   $pdt=&$GLOBALS['Jlib_frame']->obj['block1']->data;
 
 	if(!empty($pdt['p_votes']) && empty($pdt['p_weight'])) $pdt['p_weight']=1;
@@ -475,9 +578,20 @@ function point_stat($prm){
 
 
 	return strjtr($prm['parent']->tpl['statistic'], $repl );
+	*/
 }
 
 function display_search_query($prm){
 	return $_GET['query'];
+}
+
+function comms_list_last_ltuner(&$data,&$line_tpl,$parent){
+	if(empty( $data['p_votes'])){
+	  $data['pct']=0;
+	  $line_tpl=str_replace('{pct}',$parent->tpl['not_pct'],$line_tpl);
+	}else{
+	  $data['pct']=round($data['p_plus_cnt']*100/ $data['p_votes']);
+	  $line_tpl=str_replace('{pct}',$parent->tpl['pct'],$line_tpl);
+	}
 }
 ?>

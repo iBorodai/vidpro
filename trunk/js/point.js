@@ -79,3 +79,8 @@ $(document).ready(function(){
 		});
 	});
 });
+
+function FS_onLoadSaveToWidget(){
+	alert('show');
+	$('.fourSq-modal iframe').css('display','block');
+}
