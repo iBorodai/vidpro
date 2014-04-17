@@ -41,6 +41,10 @@ class ajax extends icontrol{
 
 			    break;
 				}
+				case 'points_group':{
+				  $this->pg=show_geo();
+				  
+				}
 				case 'send_review':{
 					if(empty($_REQUEST['point']) || empty($_REQUEST['text'])){
 						$GLOBALS['result']['error']='не переданы данные';

@@ -1,4 +1,11 @@
+Поиск океан плаза БЕЗ категории
+https://api.foursquare.com/v2/venues/search?near=kiev&radius=5000&intent=browse&categoryId=4d4b7105d754a06374d81259&query=ocean%20plaza&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+Выборка океан плаза
+
+
+
 https://api.foursquare.com/v2/venues/search?ll=50.467995,30.567856&radius=5000&intent=browse&categoryId=4d4b7105d754a06374d81259&client_id=ZM3ON3ZHY3TWMU4XYSCVDWYCYGMZVZQ23IBL5BSBN0J10VWS&client_secret=CJHGV2KMFICEJ5DMCLWIQG5UZ51ZFC0QH1KZ4L1EMQ1KTT1J&v=20130901
+
 {
   "meta": {
     "code": 200

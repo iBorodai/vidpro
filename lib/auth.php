@@ -90,7 +90,7 @@ class undercon extends sd {
 	}
 	function already_auth() {
 	  if(
-			1==3 && in_array($_SERVER['REMOTE_ADDR'], array('127.0.0.1','192.168.0.237'))
+			in_array($_SERVER['REMOTE_ADDR'], array('127.0.0.1'))
 		)
 		$_SESSION['Jlib_udc']=true;
 		return !empty($_SESSION['Jlib_udc']);

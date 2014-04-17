@@ -27,7 +27,10 @@ class foursquare{
 		}
 		if(empty($dt)){
 		  //Запрашиваю
-		  $json=get_page('api.foursquare.com', $fs_query );
+		  //echo 'api.foursquare.com'.$fs_query.'<br />';
+		  //$json=get_page('api.foursquare.com', $fs_query );
+		  $json=@file_get_contents('http://api.foursquare.com'.$fs_query);
+		  
 		  if(empty($json)){
 		    $this->errors[]=array('err','пустой ответ');
 		    return false;
@@ -35,8 +38,8 @@ class foursquare{
 			
 		  $dt=json_decode($json);
 		  $this->cur_json=$json;
-			//кеширую
-		  if( !$GLOBALS[CACHE]->prepare( $fs_query_id, $dt, $cache_time ) ){
+			//кеширую, если есть что кешировать
+		  if( !empty($dt) && !$GLOBALS[CACHE]->prepare( $fs_query_id, $dt, $cache_time ) ){
 		    $this->errors[]=array('wrn','ошибка кеширования - не удалось сохранить данные');
 			}
 		}

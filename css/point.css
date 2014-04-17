@@ -28,9 +28,10 @@
 
 #point_main{
 	background:#fff;
-	box-shadow:0 3px 3px #ccc;
+	box-shadow:0 1px 3px #ccc;
 	margin-bottom:20px;
 	padding-bottom:16px;
+	position: relative;
 }
 
 #point_gallery{
@@ -51,25 +52,49 @@
 #point_tags,
 #point_info{
   margin-left:20px;
+  
 }
-
+#point_tags{
+	font-size:14px;
+	color:#687184;	
+}
+#point_name_line{
+	position:relative;
+	padding-right:165px;
+}
 #point_name{
-	font-size:20px;
+	font-size:30px;
 	margin-bottom:10px;
+	font-weight:bold;
 }
-#point_info{
+#point_likes{
+	position:absolute;
+	top:0;
+	right:0;
+	width:165px;
+}
+#point_info{margin-right: 20px; width:460px;}
+#point_info li span{width:385px;}
+#point_info2{width:310px;}
+#point_info2 li span{width:200px; }
+
+.point_info{
+	list-style:none;
   margin-top:10px;
   margin-bottom:10px;
-	list-style:none;
 	padding:0;
-	width:300px;
 	float:left;
+	color: #687184;
+	font-size: 11px;
 }
-
-#point_info li span{
+.point_info li{
+	margin-bottom:5px;
+}
+.point_info li span{
 	font-weight:bold;
+	color:#000;
+	font-size:12px;
 	float:right;
-	width:200px;
 }
 
 #point_social{
@@ -84,14 +109,14 @@
 }
 
 .comment{
-	padding:65px 40px 10px 85px;
+	padding:35px 40px 10px 85px;
 	margin-bottom:16px;
 	position:relative;
-	border:1px solid #e9e8e8;
+	/*border:1px solid #e9e8e8;*/
 	
-	-moz-box-shadow: 0 3px 3px #CCCCCC;
-	-webkit-box-shadow: 0 3px 3px #CCCCCC;
-	box-shadow: 0 3px 3px #CCCCCC;
+	-moz-box-shadow: 0 1px 3px #CCCCCC;
+	-webkit-box-shadow: 0 1px 3px #CCCCCC;
+	box-shadow: 0 1px 3px #CCCCCC;
 	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=3, Direction=180, Color='#CCCCCC')";
 	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=3, Direction=180, Color='#CCCCCC');
 }
@@ -114,16 +139,17 @@
 
 #point_comm h3{
 	color:#434343;
-	margin:0 0 20px 0;
+	margin:0 0 20px 20px;
 	font-size:30px;
+	font-weight:normal;
 }
 
 .comment .user{position:absolute; top:10px; left: 85px;}
-.comment .date{color:#687184; font-size:9px;}
+.comment .date{color:#687184; font-size:10px;}
 .comment .not_recommend,.comment .recommend,.comment .name{color:#4d4d4d; font-size:14px; font-weight:bold;}
 .comment .recommend{color:#00c6ff;}
 .comment .not_recommend{color:#000;}
-.comment .duration{display:block; font-size:11px; color:#687184;}
+.comment .duration{ font-size:11px; color:#687184;}
 
 .comment .text{color:#687184; font-size:13px; line-height:18px; }
 
@@ -147,13 +173,18 @@
 	*display: inline;
 	position:relative;
 	width:39%;
+	font-size:11px;
+	line-height:14px;
+	color:#a4a5a7;
+	margin-top:2px;
 }
 .stat_block .stat_info .stat_act{
 	display:none;
 }
 .stat_block .stat_info.hover .stat_act{
 	position:absolute;
-	top:0;left:-35px;
+	top:-2px;
+	left:-35px;
 	width:100%;
 	display:block;
 }
@@ -168,6 +199,8 @@
 	text-align: center;
 	text-decoration: none;
 	font-size: 12px;
+	font-weight: bold;
+	line-height: 18px;
 }
 .stat_block .stat_info.hover .stat_act a.minus{
 	background:#000;
@@ -181,7 +214,7 @@
 .stat_arr .weight{
 	position: absolute;
   right: 6px;
-  top: 6px;
+  top: 3px;
 
 	font-size:16px;
   padding:0 0 0 24px;
@@ -203,9 +236,35 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	line-height: 24px;
+	font-weight: normal;
 }
 
 #head{
-    margin: 0 auto;
-    max-width: 1440px;
+  margin: 0 auto;
+}
+
+#point_control{
+	display:block;
+  float: left;
+  width: 180px;
+  margin-top:20px;
+}
+#point_control a{
+	color:#777a7f;
+	font-size:11px;
+	text-decoration:none;
+	display:block;
+}
+#point_control a i{
+	width:10px; height:15px;
+	display:block; float:left;
+	background:url(/img/sprite.png) -15px -17px;
+	margin-right:5px;
+}
+p.dscr{
+	font-size:11px;
+	color:#777a7f;
+	margin-left: 20px;
+	width: 800px;
 }

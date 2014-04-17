@@ -10,18 +10,34 @@
 	</div>
 	
 [line]
-	<div class="item" id="point_{p_id}">
+	<div class="item" id="point_{p_id}" rel="{p_id}">
 	  <div class="point">
 		  <div class="ill">
 		  	<img src="{p_img}">
-		  	<span class="comms"><i></i>{p_comms}</span>
 		  </div>
 		  <label>{p_name}</label>
 		  <small>{p_addr}</small>
 		  <a href="/point/{p_url}"></a>
 	  </div>
 	  <div class="vote">
+	    {pct}
+	    <div class="recommend">
+	      <a href="#" class="plus" >Рекомендую</a>
+	      <a href="#" class="minus">Не рекомендую</a>
+	    </div>
+		</div>
+	  {com_short}
+	  <div class="foot">
+	    <a href="#" class="rss"><i class="icon"></i></a>
+	    <a href="#" class="geo"><i class="icon"></i></a>
+	    <span class="comms"><i class="icon"></i>{p_comms}</span>
+	    <span class="votes"><i class="icon"></i>{p_votes}</span>
+	    <div class="clear"></div>
 	  </div>
+	</div>
+[title_def]
+	Свежие отзывы о заведениях из сферы ваших интересов:
+[com_short]
 	  <div class="comm">
 	    <a href="/users/{u_url}">
 	      <img src="{u_img}">
@@ -33,6 +49,21 @@
 	      {com_short}
 	    </p>
 	  </div>
-	</div>
-[title_def]
-	Свежие отзывы на заведения из ваших интересов.
+[pct]
+			<div class="arrow votes{p_votes}">
+				<div>
+					<span>
+						<span class="weight w{p_weight}">{pct}%</span>
+					</span>
+				</div>
+				<span class="arr r"></span>
+			</div>
+[not_pct]
+			<div class="arrow empty">
+				<div>
+					<span>
+						<span class="weight">еще никто не голосовал</span>
+					</span>
+				</div>
+				<span class="arr r"></span>
+			</div>

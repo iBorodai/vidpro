@@ -27,27 +27,32 @@
 	  </div>
 	  <div id="review_form_tpl">
 	    <form class="review_form">
-	      <div class="recomend_block"></div>
-	      
+	      <label>Ваш отзыв об этом заведении</label>
+	      <p>
+	        Расскажите нам все, что вы думаете об этом месте. не стесняйтесь! Только, пожалуйста, помните, нас смотрят дети, читают старики и впечатлительные люди. Поэтому - дуржите себя в руках и контролируйте свою лексику. Спасибо заранее.
+				</p>
 	      <input type="hidden" name="recomend" value="" class="recomend_fld">
-	      <textarea name="reveiw"></textarea>
-	      <br>
-	      <input type="submit" onclick="send_review( this.form ); return false;">
+	      <textarea name="reveiw" class="reveiw"></textarea>
+	      
+	      <div class="foot">
+	        <div class="recomend_block"></div>
+	        <input type="submit" onclick="send_review( this.form ); return false;" class="submit" value="Готово!">
+	        <div class="clear"></div>
+	      </div>
+	      
 	    </form>
 		</div>
 		<div id="recommend_plus_tpl" class="recomend_block">
-		  <p>
+		  
 				<span>Большинство рекомендует</span>
-				<a href="#" onClick="send_recommend(1); return false;" class="plus">Я тоже рекомендую</a>
-				<a href="#" onClick="send_recommend(-1); return false;" class="minus">Я не рекомендую</a>
-			</p>
+				<a href="#" onClick="send_recommend(1); return false;" class="plus"><span>Я тоже рекомендую</span></a>
+				<a href="#" onClick="send_recommend(-1); return false;" class="minus"><span>Я не рекомендую</span></a>
+			
 		</div>
 		<div id="recommend_minus_tpl" class="recomend_block">
-		  <p>
 				<span>Большинство не рекомендует</span>
-				<a href="#" onClick="send_recommend(-1); return false;" class="plus">Я тоже не рекомендую</a>
-				<a href="#" onClick="send_recommend(1); return false;" class="minus">Я все-таки рекомендую</a>
-			</p>
+				<a href="#" onClick="send_recommend(-1); return false;" class="plus"><span>Я тоже не рекомендую</span></a>
+				<a href="#" onClick="send_recommend(1); return false;" class="minus"><span>Я все-таки рекомендую</span></a>
 		</div>
 		<div id="recommend_def_tpl">
 		  <span rel="Подставить ID заведения">

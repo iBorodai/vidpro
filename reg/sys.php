@@ -443,15 +443,47 @@
 	    'ctrl'=>'p_id',
 	    'vars'=>'p_id',
 	    'url'=>'p_id',
-	    'ucl'=>'sql:point,comment,user,region,point2theme,theme
+	    'ucl_old'=>'sql:point LEFT JOIN
+									comment ON(com_key_obj=p_id AND com_type=\'pnt\') LEFT JOIN
+									user ON(com_key_u=u_id) LEFT JOIN
+									likes ON(l_key_obj=p_id AND l_type=\'pnt\')
+									,region,point2theme,theme
 	            #p_id,p_url,p_fsid,p_name,p_img,p_dscr,p_key_reg,p_addr,p_lat,p_lng,p_createdate,
 	             com_id,com_type,com_date,com_short,com_cachelikes,com_cahecomms,
 							 u_id,u_grp,u_url,u_name,u_img,u_gender,u_createdate,u_lastlogin,
 							 r_id,r_name,r_url,r_lat,r_lng,
-							 COUNT( com_id ) p_comms
-							?com_key_obj=p_id AND com_type=\'pnt\' AND com_key_u=u_id AND p_key_reg=r_id AND
+							 COUNT( com_id ) p_comms,
+							 SUM(l_weight) p_weight,
+							 COUNT(l_weight) p_votes,
+							 (SELECT COUNT(l1.l_key_obj) FROM likes l1 WHERE l1.l_key_obj=p_id AND l1.l_type=\'pnt\' AND l_weight>0) p_plus_cnt
+							?p_key_reg=r_id AND
 							 p2t_key_p=p_id AND t_id=p2t_key_t {themes_place} {city_place} {exclude}
-							$group=p_id order=com_date direction=desc ',
+							$group=p_id order=com_date direction=desc debug=yes',
+			'ucl'=>'sql:point LEFT JOIN (
+										SELECT	com_key_obj last_obj, max(com_id) max_com_id, com_key_u last_com_uid
+								    FROM		comment
+								    WHERE		com_type=\'pnt\'
+								    GROUP BY com_key_obj
+								)cm ON (last_obj=p_id) LEFT JOIN
+								comment ON ( com_id=max_com_id ) LEFT JOIN
+								user ON ( com_key_u = u_id ) LEFT JOIN
+								likes ON ( l_key_obj = p_id AND l_type = \'pnt\' ) ,
+								region,
+								point2theme,
+								theme
+							#p_id, p_url, p_fsid, p_name, p_img, p_dscr, p_key_reg, p_addr, p_lat, p_lng,
+								p_createdate,
+								com_id, com_type, com_date, com_short, com_cachelikes, com_cahecomms,
+								u_id, u_grp, u_url, u_name, u_img, u_gender, u_createdate, u_lastlogin,
+								r_id, r_name, r_url, r_lat, r_lng,
+							 	COUNT( com_id ) p_comms, SUM( l_weight ) p_weight, COUNT( l_weight ) p_votes,
+								(
+									SELECT COUNT( l1.l_key_obj ) FROM likes l1 WHERE l1.l_key_obj = p_id AND l1.l_type = \'pnt\' AND l_weight >0
+								)p_plus_cnt
+							?p_key_reg=r_id AND
+							 p2t_key_p=p_id AND t_id=p2t_key_t {themes_place} {city_place} {exclude}
+							$group=p_id order=com_date direction=desc debug=yes',
+							
 			'ucl_themes'=>' AND p2t_key_t IN({themes})',
 			'ucl_city'=>' AND r_url IN( {city} )',
 	    //'ucl_cats'
@@ -460,6 +492,10 @@
 	    'filter'=>array(
 	      'theme'		=> array(' = ','t_url',false,true)
 	      //'search'	=> array(' LIKE ','u_login','as_start',true)
+			),
+			'line_tuner'=>'comms_list_last_ltuner',
+			'sections'=>array(
+			  'com_short'=>'any',
 			),
 		),
 		'point'=>array(
@@ -473,6 +509,12 @@
 		    'p_site'=>'any',
 		    'p_fs_reasons'=>'any',
 		    'p_fs_atts'=>'any',
+		    
+		    'p_menu'=>'any',
+				'p_cards'=>'any',
+				'p_wifi'=>'any',
+				'p_summerplace'=>'any',
+				'p_dscr'=>'any',
 			),
 		),
 		'search_fs_points'=>array(

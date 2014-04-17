@@ -25,7 +25,7 @@ function load_page(page_num,callback){
 		var req = new JsHttpRequest("utf-8");
 		req.onreadystatechange = function(){
 			if (req.readyState == 4){
-			  console.log(req);
+console.log(req);
 				if(req.responseJS){
 				  if( req.responseJS.error ){
 				    display_error(req.responseJS.error);
@@ -74,6 +74,7 @@ console.log('ilist', ilist);
 						}
 						
 						duration();
+						init_votes();
 						
 						for(var j, x, i = show_list.length; i; j = Math.floor(Math.random() * i), x = show_list[--i], show_list[i] = show_list[j], show_list[j] = x);
 
@@ -103,8 +104,8 @@ console.log('ilist', ilist);
 		  if( typeof(tt[1])=='undefined' ) continue;
 		  params_obj[tt[0]]=tt[1];
 		}
-		console.log(params_obj);
 		//$('#point_container');
+console.log('request:',params_obj);
   	req.open(null,'/ajax', true);
 		req.send( params_obj );
 }
@@ -126,4 +127,16 @@ function load_more(){
 	}else{
 	  console.log( 'stoped at '+page_cur+' loaded:'+loaded_count );
 	}
+}
+
+function init_votes(){
+  $('.recommend .plus,.recommend .minus').unbind('click').click(function(){
+	  if( $(this).hasClass('plus') ) var vote=1;
+	  else var vote=-1;
+
+	  send_vote( $(this).parents('.item').attr('rel') , vote,  $(this).parent(), function(req,elm){
+	    $(elm).parents('.vote').html( req.responseJS.content );
+		});
+	  return false;
+	});
 }
