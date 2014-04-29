@@ -46,6 +46,7 @@ class ajax extends icontrol{
 				  
 				}
 				case 'send_review':{
+				  
 					if(empty($_REQUEST['point']) || empty($_REQUEST['text'])){
 						$GLOBALS['result']['error']='не переданы данные';
 						return false;
@@ -72,22 +73,47 @@ class ajax extends icontrol{
 					}else{
 					  $like=0;
 					}
-
-					$com_id=$GLOBALS[CM]->run('sql:comment$','insert',array(
+					//echo '<pre class="debug">'.print_r ( $_REQUEST ,true).'</pre>';
+					if(!empty($_REQUEST['parent'])) {
+					  if( !is_numeric($_REQUEST['parent']) ) exit();
+					  $parent=$_REQUEST['parent'];
+					}else{
+					  $parent=0;
+					}
+					
+					
+					$dt=array(
 					  'com_type'=>'pnt',
 						'com_key_obj'=> intval($_REQUEST['point']),
+						'com_pid'=> $parent,
 						'com_key_u'=>$_SESSION['Jlib_auth']['u_id'],
 						'com_date'=>date('Y-m-d H:i:s'),
 						'com_weight'=>$like,
 						'com_text'=>$text,
 						'com_short'=>$short
-					));
-
-					if(!empty($com_id)){
-					  $this->pg=$this->tpl['send_review_success'];
+					);
+					
+					if(!empty($_REQUEST['com_id'])) {
+					  $GLOBALS[CM]->run('sql:comment#com_text,com_short,com_date?com_id='.intval($_REQUEST['com_id']) ,'update',$dt);
 					}else{
-					  $GLOBALS['result']['error']='Отзыв не добавлен';
+					  $com_id=$GLOBALS[CM]->run('sql:comment','insert',$dt);
+						if(!empty($com_id)){
+						}else{
+						  $GLOBALS['result']['error']='Отзыв не добавлен';
+						  $this->pg='';
+						  return false;
+						}
 					}
+					
+					
+					if(!empty($_REQUEST['parent']) || !empty($_REQUEST['com_id'])){
+				    $tpl=$this->tpl['send_answer_success'];
+				    $ans=str_replace('{com_id}',$com_id,$tpl);
+				    $ans=strjtr($ans, $dt);
+				    $ans=strjtr($ans, $_SESSION['Jlib_auth']);
+				    $this->pg=preg_replace('~\{[^\}]+\}~', '', $ans)  ;
+					}else
+					  $this->pg=$this->tpl['send_review_success'];
 				  break;
 				}
 				case 'send_vote':{

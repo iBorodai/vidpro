@@ -92,6 +92,34 @@ class google_addr{
 		//$GLOBALS[CACHE]->temp=substr($cache_temp, 0,  strpos($cache_temp, "fq_content='")+12 ). $serr . substr($cache_temp, strpos($cache_temp, "', fq_create=") );
 //echo '<br />'.$GLOBALS[CACHE]->temp;
 		$GLOBALS[CACHE]->set();
+		
+		
+		for($i=0, $cnt=count($item->result->reviews); $i<$cnt; $i++){
+		  if(empty( $item->result->reviews[$i]->author_url )){
+		    $item->result->reviews[$i]->author_photo='/img/def_usr.jpg';
+		    continue;
+			}
+			
+		  $ph_tst='https://www.googleapis.com/plus/v1/people/'.
+							substr($item->result->reviews[$i]->author_url, strrpos($item->result->reviews[$i]->author_url, '/')+1 ) .
+							'?fields=image&key='.$this->key;
+	    $query_id=substr(md5($ph_tst), 0, 32);
+			if( $json=$GLOBALS[CACHE]->get($query_id) ){
+		     //echo '<pre class="debug">'.print_r ( $json ,true).'</pre>';exit();
+			}else{
+			  $json=false;
+			  try{
+			    $json=file_get_contents($ph_tst);
+			    $GLOBALS[CACHE]->set($query_id,$json,2592000); //30 дней в секундах
+				}catch(Exception $e){
+				}
+			}
+		  if($json)	$dt=json_decode($json);
+
+		  if(!empty($dt) && !empty($dt->image))$item->result->reviews[$i]->author_photo=$dt->image->url;
+			else  $photo='/img/def_usr.jpg';
+		}
+		//echo '<pre class="debug">'.print_r ( $item ,true).'</pre>';exit();
 	  return $item;
 	}
 }
@@ -101,21 +129,24 @@ function parse_google_data($data){
     return array();
 	}
 	$data=$data->result->reviews;
-	
+	//echo '<pre class="debug">'.print_r ( $data ,true).'</pre>'; exit();
 	$ret=array('comms'=>array());
 	for($i=0,$cnt=count($data);$i<$cnt;$i++){
-	  $ph_tst='http://profiles.google.com/s2/u/0/photos/profile/' . substr($data[$i]->author_url, strrpos($data[$i]->author_url, '/')+1 ) . '?sz=120';
+		/*
+		$ph_tst='http://profiles.google.com/s2/u/0/photos/profile/' . substr($data[$i]->author_url, strrpos($data[$i]->author_url, '/')+1 ) . '?sz=120';
 	  $headers = get_headers($ph_tst, 1);
 		if(!empty( $headers['Location'] ))	$photo=$headers['Location'];
 		else $photo='/img/def_usr.jpg';
-	  
+		*/
+
 	  $ret['comms'][date('YmdHis',$data[$i]->time)]=array(
 	    'vendor'=>'google',
 	    'text'=>$data[$i]->text,
       'create' => date('d.m.Y H:i:s',$data[$i]->time),
       'user_name' => $data[$i]->author_name,
-      'user_photo' => $photo,
-      'user_url'=>$data[$i]->author_url
+      'user_photo' => $data[$i]->author_photo,
+      'user_url'=>$data[$i]->author_url,
+      'time' => $data[$i]->time
 		);
 	}
 	//http://profiles.google.com/s2/u/0/photos/profile/106754536592514321880
