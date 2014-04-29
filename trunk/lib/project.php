@@ -83,16 +83,26 @@ class point extends item_viewer{
 
 		//Выбрать каменты из БД
 		$t=$GLOBALS[CM]->run('sql:comment,user
-													#com_id,com_type,com_key_obj,com_weight,com_key_u,com_text,com_short,com_cachelikes,com_cahecomms,
+													#com_id,com_id id,com_pid,com_type,com_key_obj,com_weight,com_key_u,com_text,com_short,com_cachelikes,com_cahecomms,
                            u_id,u_grp,u_url,u_email,u_name,u_img,u_gender,u_createdate,u_lastlogin,u_lock,
 													DATE_FORMAT( com_date ,\'%Y%m%d%H%i%s\') did,
 													DATE_FORMAT( com_date ,\'%d.%m.%Y %H:%i\') com_date
-													?com_type=\'pnt\' AND com_key_obj='.$this->data['p_id'].' AND com_key_u=u_id
-													$id=did ');
+													?(com_type=\'pnt\' OR com_type=\'ans\') AND com_key_obj='.$this->data['p_id'].' AND com_key_u=u_id
+													$id=did order=com_pid direction=asc');
 
-		$this->data['tips']=array_merge($this->data['tips'], $t);
+		//Раскидываю на коменты и ответы
+		$coms=array(); $this->data['tips_ans']=array(); 
+		foreach($t as $k=>$v){
+		  if( empty($v['com_pid']) )$coms[$k]=$v;
+		  else{
+				$this->data['tips_ans'][$k]=$v;
+			}
+		}
+		
+		$this->data['tips']=array_merge($this->data['tips'], $coms);
 		krsort($this->data['tips']);
-		//echo '<pre class="debug">'.print_r ( $this->data['tips'] ,true).'</pre>';
+		krsort($this->data['tips_ans']);
+		//echo '<pre class="debug">'.print_r ( $this->data['tips_ans'] ,true).'</pre>';exit();
 		unset($t);
 	}
 	
@@ -129,7 +139,13 @@ class point extends item_viewer{
 		 *  comments
 		 *****************/
 			$vals=array();
+			//echo '<pre class="debug">'.print_r ( $this->data['tips_ans'] ,true).'</pre>';exit();
+			//echo '<pre class="debug">'.print_r ( $this->data['tips'] ,true).'</pre>';exit();
+			$answers=array();
 			if(!empty($this->data['tips'])){
+			  $index=array(); $ans=array();
+			  $this->data['tips']=array_merge($this->data['tips'],$this->data['tips_ans']);
+			  
 				foreach($this->data['tips'] as $k=>$v){
 					if(!empty($v['com_id']))
 						$tpl=$this->tpl['comm_line'];
@@ -137,13 +153,40 @@ class point extends item_viewer{
 					  $tpl=$this->tpl['comm_line_'.$v['vendor']];
 					else
 						$tpl=$this->tpl['comm_line_fs'];
+						
+					$v['owner_func']='';
+					if(!empty( $v['vendor'] )) $v['id']=$this->data['tips'][$k]['id']=$this->data['p_id'].$v['time'];
+					else{
+					  //echo $_SESSION['Jlib_auth']['u_id'].'~'.$v['com_key_u'].'<br />';
+					  if(	!empty($_SESSION['Jlib_auth']) && (
+								$_SESSION['Jlib_auth']['u_grp']=='admin' ||
+								$v['com_key_u']==$_SESSION['Jlib_auth']['u_id']
+							)
+						){
+					    $v['owner_func']=$this->tpl['comm_owner_func'];
+						}
+					}
+					
+					$index[$v['id']]=$k;
+					
 					if($v['com_weight']>0)$v['com_weight']=$this->tpl['comm_weight_plus'];
 					elseif($v['com_weight']<0)$v['com_weight']=$this->tpl['comm_weight_minus'];
 					else $v['com_weight']='';
-					
-					$vals[]=strjtr($tpl,$v);
+
+					if(!empty($v['com_pid'])){
+					  $v['ans_button']='';
+						if( !empty( $index[$v['com_pid']] )){
+						  if(!isset( $ans[ $v['com_pid'] ] )) $ans[ $v['com_pid'] ]=array();
+						  $ans[ $v['com_pid'] ][]=strjtr($tpl,$v);
+						}
+					}else{
+					  $v['ans_button']=$this->tpl['ans_button'];
+					  $vals[]=strjtr($tpl,$v);
+					}
 				}
+				
 				$repl['comms']=str_replace('{body}',implode('',$vals),$this->tpl['comm_body']);
+				foreach($ans as $k=>$v){  $repl['answer_'.$k]=str_replace('{body}',implode('', $v), $this->tpl['comm_answer_body']); }
 			}else
 			  $repl['comms']='';
 			unset($vals);
@@ -152,6 +195,10 @@ class point extends item_viewer{
 			
 			//.... подстановка
 			$this->pg=strjtr($this->pg,$repl);
+			//Убираю плейсходлеры ответов
+			$rega='~\{answer_\d+\}~';
+    	$this->pg=preg_replace($rega, '', $this->pg);
+			
 		/*****************
 		 *  Голосовалка / рекоммендовалка
 		 *****************/
@@ -411,6 +458,9 @@ function parse_venue_item($dt){
 
     $res_data['tips']=array();
 		if(!empty($d->tips)){
+		  //echo '<pre class="debug">'.print_r ( $d->tips ,true).'</pre>';exit();
+		  //5856682717935047530
+		  
 			for($i=0; $i<count($d->tips->groups); $i++){
 			  for($j=0; $j<count($d->tips->groups[$i]->items); $j++){
 			    $photo=strtr(
@@ -418,6 +468,8 @@ function parse_venue_item($dt){
 						array('//'=>'/')
 					);
 			    $res_data['tips'][ date('YmdHis', $d->tips->groups[$i]->items[$j]->createdAt ) ]=array(
+			      'vendor'=>'foursquare',
+			      'time'=>$d->tips->groups[$i]->items[$j]->createdAt,
 			      'text'=>$d->tips->groups[$i]->items[$j]->text,
 			      'create'=>date('d.m.Y', $d->tips->groups[$i]->items[$j]->createdAt ),
 			      'user_id'=>$d->tips->groups[$i]->items[$j]->user->id,

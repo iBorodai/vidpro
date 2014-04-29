@@ -84,3 +84,69 @@ function FS_onLoadSaveToWidget(){
 	alert('show');
 	$('.fourSq-modal iframe').css('display','block');
 }
+
+
+function comm_rel_block(obj){
+	var prt=$(obj).parents('.foot');
+	if( prt.find('.relator').get().length<1 ){
+	  prt.append('<div class="relator"></div>');
+	}
+	return $('.relator',prt);
+}
+
+function comm_ans(obj){
+  var rel=comm_rel_block(obj);
+  $('.relator').html('');
+	rel.html( $('#ans_tpl').html() );
+	$('.parent_fld',rel).val( $(obj).parents('.comment').attr('rel') );
+  return false;
+}
+function send_answer(form){
+  var comObj=$(form).parents('.comment');
+	var req = new JsHttpRequest("utf-8");
+	req.onreadystatechange = function(){
+		if (req.readyState == 4){
+			if(req.responseJS){
+			  if( req.responseJS.error ){
+			    display_error(req.responseJS.error);
+				}else{
+				  var mode_edit=$('.relator').find('.com_id_fld').val();
+				  
+				  $('.relator').html('');
+				  if(mode_edit){
+				    $('.comment[rel="'+mode_edit+'"]').replaceWith( req.responseJS.content );
+					}else{
+						var ansObj=comObj.find('.answers');
+
+					  if( ansObj.get().length<1 ){
+							comObj.append('<div class="answers">'+req.responseJS.content+'</div>');
+					  }else{
+					    ansObj.append( req.responseJS.content );
+						}
+					}
+				}
+			}
+			if(req.responseText!='') console.log(req.responseText);
+		}
+	}
+
+	req.open(null,'/ajax', true);
+	req.send({
+		'mode':'send_review',
+		fields:['block'],
+		text:$(form).find('textarea').val(),
+		point:$('#point').attr('rel'),
+		parent:$(form).find('.parent_fld').val(),
+		com_id:$(form).find('.com_id_fld').val()
+	});
+}
+
+function comm_edit(obj){
+  var rel=comm_rel_block(obj);
+  $('.relator').html('');
+	rel.html( $('#ans_tpl').html() );
+	var prt=$(obj).parents('.comment').first();
+	$('.com_id_fld',rel).val( prt.attr('rel') );
+	$('.reveiw',rel).val( $.trim(prt.find('.text').text()) );
+  return false;
+}
