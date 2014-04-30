@@ -732,5 +732,42 @@ function auth_redirect(){
 	  redirect('/'); exit();
 	}
 }
+function point_edit_before_form(&$obj){
+	$obj->table_keys=array_keys($obj->data);
+	if(!empty($obj->data['p_more'])){
+	  $obj->data=array_merge($obj->data, unserialize($obj->data['p_more']) );
+	}
+	
+}
+function point_edit_before_save($form){
+	$keys=array_flip($form->parent->table_keys);
+  $data=array(); $more=array();
+  foreach($form->data as $k=>$v){
+    if(substr($k, 0, 5)=='jlib_'  ) continue;
+    if( isset($keys[$k]) )$data[$k]=$v;
+    else $more[$k]=$v;
+	}
+	
+	$form->data=$data;
+	$form->data['p_more']=serialize($more);
+}
 
+function point_edit_after_save($form){
+	redirect( str_replace('/edit','', $GLOBALS['Jlib_target']) ); exit();
+}
+
+class list_viewer_noucl extends list_viewer{
+	//метод не должен ничего делать
+	function get_data(){
+		return true;
+	}
+	function set_data($data){
+	  $this->params['cnt']=$data['meta'];
+	  $this->data=$data['data'];
+	}
+	function before_parse(){
+	  $this->pg=str_replace('{page}',$this->params['cnt']['page'],$this->pg);
+	  parent::before_parse();
+	}
+}
 ?>

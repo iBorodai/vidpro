@@ -1,4 +1,6 @@
 <?
+$data['proj_email_name']='Vidguk.pro';
+$GLOBALS['Jlib_proj_name']='info@vidguk.pro';
 
 function getmicrotime($elapsed=false){
     list($usec, $sec) = explode(" ", microtime());

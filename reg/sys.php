@@ -126,6 +126,10 @@
 			'class' => 'list_viewer',
 			'page_selector_tpl' => 'pages.htm',
 		),
+		'list_viewer_noucl' => array (
+			'class' => 'list_viewer_noucl',
+			'page_selector_tpl' => 'pages.htm',
+		),
 		'item_viewer' => array (
 			'class' => 'item_viewer',
 		),
@@ -443,22 +447,6 @@
 	    'ctrl'=>'p_id',
 	    'vars'=>'p_id',
 	    'url'=>'p_id',
-	    'ucl_old'=>'sql:point LEFT JOIN
-									comment ON(com_key_obj=p_id AND com_type=\'pnt\') LEFT JOIN
-									user ON(com_key_u=u_id) LEFT JOIN
-									likes ON(l_key_obj=p_id AND l_type=\'pnt\')
-									,region,point2theme,theme
-	            #p_id,p_url,p_fsid,p_name,p_img,p_dscr,p_key_reg,p_addr,p_lat,p_lng,p_createdate,
-	             com_id,com_type,com_date,com_short,com_cachelikes,com_cahecomms,
-							 u_id,u_grp,u_url,u_name,u_img,u_gender,u_createdate,u_lastlogin,
-							 r_id,r_name,r_url,r_lat,r_lng,
-							 COUNT( com_id ) p_comms,
-							 SUM(l_weight) p_weight,
-							 COUNT(l_weight) p_votes,
-							 (SELECT COUNT(l1.l_key_obj) FROM likes l1 WHERE l1.l_key_obj=p_id AND l1.l_type=\'pnt\' AND l_weight>0) p_plus_cnt
-							?p_key_reg=r_id AND
-							 p2t_key_p=p_id AND t_id=p2t_key_t {themes_place} {city_place} {exclude}
-							$group=p_id order=com_date direction=desc debug=yes',
 			'ucl'=>'sql:point LEFT JOIN (
 										SELECT	com_key_obj last_obj, max(com_id) max_com_id, com_key_u last_com_uid
 								    FROM		comment
@@ -481,11 +469,11 @@
 									SELECT COUNT( l1.l_key_obj ) FROM likes l1 WHERE l1.l_key_obj = p_id AND l1.l_type = \'pnt\' AND l_weight >0
 								)p_plus_cnt
 							?p_key_reg=r_id AND
-							 p2t_key_p=p_id AND t_id=p2t_key_t {themes_place} {city_place} {exclude}
+							 p2t_key_p=p_id AND t_id=p2t_key_t {queries}
 							$group=p_id order=com_date direction=desc debug=yes',
 							
-			'ucl_themes'=>' AND p2t_key_t IN({themes})',
-			'ucl_city'=>' AND r_url IN( {city} )',
+			'ucl_themes'=>' p2t_key_t IN({themes}) ',
+			'ucl_city'=>' r_url IN( {city} ) ',
 	    //'ucl_cats'
 	    'tpl'=>'point_comm_list.htm',
 	    'quantity'=>10,
@@ -504,6 +492,7 @@
 		  'url'=>'p_url',
 		  'tpl'=>'point.htm',
 		  'sections'=>array(
+		    'subscribed'=>'any',
 		    'p_timeframes'=>'any',
 		    'p_phone'=>'any',
 		    'p_site'=>'any',
@@ -528,6 +517,15 @@
 		    'com_id'=>'any',
 		    'p_comms'=>'any',
 			),
+		),
+		'point_edit'=>array(
+		  'ctrl'=>'p_id',
+		  'vars'=>'p_id',
+		  'url'=>'p_id',
+		  'ucl'=>'sql:point#p_id,p_name,p_dscr,p_addr,p_more?p_url=\'{p_id}\'',
+		  'before_form_create'=>'point_edit_before_form',
+		  'before_save'=>'point_edit_before_save',
+		  'after_save'=>'point_edit_after_save',
 		),
 	),
 
@@ -840,6 +838,16 @@
 				'under_wrapper'=>'replacer: tpl=point.htm section=mapbox',
 			),
 		),
+		'point_edit' => array (
+			'frame' => 'empty',
+			'class' => 'item_editor',
+			'dir_name'=> 'point_edit',
+			'tpl' => 'point_edit.htm',
+			'security'=>'admin_auth',
+			'content' => array(
+			),
+		),
+
 		'point_add'=>array(
 		  'frame' => 'empty',
 		  'class'=>'point_add',
@@ -932,6 +940,12 @@
 					'point'=>array(
 					  'page' => 'default_point',
 						'status'=>'sys',
+						'handle' => array (
+							array (
+								'case' => " '{1}'=='edit' ",
+								'page' => 'point_edit',
+							),
+						),
 						'content'=>array(
 						  'add'=>array(
 						  	'page'=>'point_add'

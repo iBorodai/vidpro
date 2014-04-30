@@ -5,27 +5,97 @@ class ajax extends icontrol{
 			switch($_REQUEST['mode']) {
 			  case 'points_comm_last':{
 					$this->pg=show_geo();
-					
 					//Вывожу
-			    $t=new list_viewer(array('dir_name'=>'comms_list_last'));
+       		$t=new list_viewer(array('dir_name'=>'comms_list_last'));
+       		/*
+       		$ucl='sql:point LEFT JOIN (
+										SELECT	com_key_obj last_obj, max(com_id) max_com_id, com_key_u last_com_uid
+								    FROM		comment
+								    WHERE		com_type=\'pnt\'
+								    GROUP BY com_key_obj
+								)cm ON (last_obj=p_id) LEFT JOIN
+								comment ON ( com_id=max_com_id ) LEFT JOIN
+								user ON ( com_key_u = u_id ) LEFT JOIN
+								likes ON ( l_key_obj = p_id AND l_type = \'pnt\' ) ,
+								region,
+								point2theme,
+								theme
+							#p_id, p_url, p_fsid, p_name, p_img, p_dscr, p_key_reg, p_addr, p_lat, p_lng,
+								p_createdate,
+								com_id, com_type, com_date, com_short, com_cachelikes, com_cahecomms,
+								u_id, u_grp, u_url, u_name, u_img, u_gender, u_createdate, u_lastlogin,
+								r_id, r_name, r_url, r_lat, r_lng,
+							 	COUNT( com_id ) p_comms, SUM( l_weight ) p_weight, COUNT( l_weight ) p_votes,
+								(
+									SELECT COUNT( l1.l_key_obj ) FROM likes l1 WHERE l1.l_key_obj = p_id AND l1.l_type = \'pnt\' AND l_weight >0
+								)p_plus_cnt
+							?p_key_reg=r_id AND
+							 p2t_key_p=p_id AND t_id=p2t_key_t {themes_place} {city_place} {exclude}
+							$group=p_id order=com_date direction=desc ';
+					$ucl_limit=' limit='.intval($_REQUEST['page']).',10 ';
+					*/
+							
+					$queries=array();
+					
 			    if( !empty($_SESSION['geolocation']['city']) ){
+			      if(!isset($queries[0])) $queries[0]=array();
+			      $queries[0][]=str_replace('{city}',("'".$_SESSION['geolocation']['city']."','".$_SESSION['geolocation']['reg']."'"),$t->params['ucl_city']);
+			      /*
 			      $repl=array(
 			        'city_place'=>$this->params['ucl_city'],
 				      'city'=>"'".$_SESSION['geolocation']['city']."','".$_SESSION['geolocation']['reg']."'",
 						);
-					}else{
+						*/
+					}/*else{
 					  $repl=array(
 					    'city_place'=>'',
 					  );
 					}
+					*/
 					if( !empty($_SESSION['Jlib_auth']['u_themes']) ){
+					  if(!isset($queries[0])) $queries[0]=array();
+					  $queries[0][]=str_replace('{themes}',$_SESSION['Jlib_auth']['u_themes'],$t->params['ucl_themes']);
+					  /*
 					  $repl['themes_place']=$t->params['ucl_themes'];
 					  $repl['themes']=$_SESSION['Jlib_auth']['u_themes'];
-					} else $repl['themes_place']='';
+					  */
+					} /*else $repl['themes_place']='';*/
 					
-					$repl['exclude']='';
+					//subscribes
+					if(!empty($queries['subscribes'])){
+					  if(!isset($queries[1])) $queries[1]=array();
+						$queries[1][]=$queries['subscribes'];
+					}
+					
+					//({themes_place} {city_place} {exclude}) {subscribes}
+					
+
+     
+					if(!empty($queries[0])) $queries[0]=implode(' AND ', $queries[0]);
+					if(!empty($queries[1])) $queries[1]=implode(' AND ', $queries[1]);
+					$repl['queries']=' AND ('.implode(') OR (', $queries).')';
+					
+					//$GLOBALS[CM]->run('sql:user2point#u2p_key_p?u2p_key_u='.$_SESSION['Jlib_auth']['u_id']);
+					
 					//if(!empty($_REQUEST['exclude'])) $repl['exclude']=' AND p_id NOT IN('.$_REQUEST['exclude'].') ';
 					
+					
+					/*
+			    $ucl = strjtr($ucl, $repl);
+			    $data=$GLOBALS[CM]->run($ucl.$ucl_limit);
+			    $t=new list_viewer_noucl(array('dir_name'=>'comms_list_last'));
+			    $ttl=$GLOBALS[CM]->run($ucl.' debug=yes','count');
+			    $t->set_data(array(
+						'data'=>$data,
+						'meta'=>array(
+							'count'=>count($data),
+				      'total'=>$ttl,
+				      'page'=>intval($_REQUEST['page'])
+						)
+					));
+					unset($data);
+					*/
+			    
 			    $t->params['ucl'] = strjtr($t->params['ucl'], $repl);
 			    $t->params['page_ctrl']='t_pg';
 			    $t->params['vars'].='&t_pg='. intval($_REQUEST['page']);
@@ -296,10 +366,193 @@ class ajax extends icontrol{
 					}else
 					  $this->pg=$this->tpl['send_interest_success'];
 				  break;
+				}
+				case 'com_alarm':{
+					if(empty($_REQUEST['com_id']) ){
+						$GLOBALS['result']['error']='Data not send';
+						return false;
+					}
+					//Смотрю, что за комент
+					if(!$data=$GLOBALS[CM]->run('sql:comment,point,user o, user s
+					                        #com_id,com_pid,com_type,com_key_obj,com_key_u,com_date,com_weight,com_text,com_short,com_cachelikes,com_cahecomms,
+					                        p_id,p_url,p_name,p_img,
+																	o.u_id o_id,o.u_url o_url,o.u_email o_email,o.u_name o_name,o.u_sname o_sname,o.u_img  o_img,
+																	s.u_id s_id,s.u_url s_url,s.u_email s_email,s.u_name s_name,s.u_sname s_sname,s.u_img  s_img
+																	?p_id=com_key_obj AND
+																	 o.u_id=com_key_u AND
+																	 s.u_id='. $_SESSION['Jlib_auth']['u_id'] .' AND
+																	 com_id='.intval($_REQUEST['com_id'])
+																	.'$limit=0,1 shrink=yes'
+					)){
+					  if( mysql_errno() )
+					    $GLOBALS['result']['error']= mysql_error();
+					    $this->pg=''; return false;
+					}
+          //echo 'data:<pre class="debug">'.print_r ( $data ,true).'</pre>'; exit();
+					
+					require_once 'lib/class.phpmailer.php';
+					$tpl=load('mail/com_alarm.htm');
+
+				  $data['proj_email_name']=$GLOBALS['Jlib_defaults']['proj_email_name'];
+				  $data['proj_email']=$GLOBALS['Jlib_defaults']['proj_email'];
+				  
+				  $data['server']=$_SERVER['SERVER_NAME'];
+				  $msg=strjtr($tpl, $data);
+
+					$mail = new PHPMailer();
+					$mail->From = $GLOBALS['Jlib_defaults']['proj_email'];
+					$mail->FromName = $GLOBALS['Jlib_defaults']['proj_email_name'];
+					$mail->IsHTML(true);
+					$mail->AddAddress($GLOBALS['Jlib_defaults']['proj_email']);
+					$mail->Subject = 'Жалоба на комментарий на Vidguk.pro';
+					$mail->Body = $msg;
+					$mail->Send();
+				  break;
+				}
+				case 'com_del':{
+					if(empty($_REQUEST['com_id'])){
+						$GLOBALS['result']['error']='Data not send';
+						return false;
+					}
+
+          $GLOBALS[CM]->run('sql:comment?com_id='.intval($_REQUEST['com_id']).' AND com_key_u='.$_SESSION['Jlib_auth']['u_id'].'$limit=0,1 debug=yes','delete');
+          if( mysql_affected_rows()<1 ){
+            if( mysql_errno() )
+            	$GLOBALS['result']['error']= mysql_error();
+            else
+              $GLOBALS['result']['error']= 'Коментарий не удален.';
+		        $this->pg='';
+						return false;
+					}
+				  break;
+				}
+				case 'admin_cover':{
+				  //Проверки
+					if( $_SESSION['Jlib_auth']['u_grp']!='adm' ){
+					  $GLOBALS['result']['error']='Access denied';
+						return false;
+					}
+					if( empty($_REQUEST['p_id']) || empty($_FILES['cover']['name']) ){
+						$GLOBALS['result']['error']='Data not send';
+						return false;
+					}
+					if( !empty($_FILES['cover']['error'] ) ){
+					  $GLOBALS['result']['error']='Upload file error: '+$_FILES['cover']['error'];
+						return false;
+					}
+          //Работа
+          $ext=pathinfo($_FILES['cover']['name'], PATHINFO_EXTENSION);
+          $pfn=intval($_REQUEST['p_id']);
+          $fnm='img/point/'.$pfn.'_original.'.$ext;
+          
+          if(!$img_nm=j_make_image(
+						$_FILES['cover']['tmp_name'],
+						$pfn,
+						array(
+      				'tmb_x' => '-1',
+							'pic_px' => '1024',
+							'pic_py' => '1024',
+							'pic_lx' => '1024',
+							'pic_ly' => '1024',
+							'path'=>'img/point/'
+						),false)
+					){
+            $GLOBALS['result']['error']='Copy image error';
+						return false;
+					}
+          if(!$tmb_nm=j_make_image(
+						$_FILES['cover']['tmp_name'],
+						$pfn,
+						array(
+      				'tmb_x' => '-1',
+							'pic_px' => '150',
+							'pic_py' => '150',
+							'pic_lx' => '150',
+							'pic_ly' => '150',
+							'pic_fix' => 2,
+							'pic_nm' => 'tmb_{name}',
+							'path'=>'img/point/'
+						),false)
+					){
+            $GLOBALS['result']['error']='Copy tmb error';
+						return false;
+					}
+
+					$img_nm='img/point/'.$tmb_nm;
+          $GLOBALS[CM]->run('sql:point#p_img?p_id='.intval($_REQUEST['p_id']),'update',array(
+            'p_img'=>$img_nm,
+					));
+          if( mysql_affected_rows()<1 && mysql_errno()){
+            $GLOBALS['result']['error']= mysql_error();
+		        $this->pg='';
+						return false;
+					}
+					$this->pg=$img_nm;
+				  break;
+				}
+				case 'subscribe':{
+					if( empty($_REQUEST['type']) || empty($_REQUEST['obj']) ){
+						$GLOBALS['result']['error']='Data not send';
+						return false;
+					}
+					$o_id=intval($_REQUEST['obj']);
+					switch($_REQUEST['type']){
+					  case 'point':
+					    $GLOBALS[CM]->run('sql:user2point','replace',array(
+		            'u2p_key_u'=>$_SESSION['Jlib_auth']['u_id'],
+		            'u2p_key_p'=>$o_id
+							));
+							$tpl=load('point.htm');
+					  	break;
+					  case 'user':
+					    $GLOBALS[CM]->run('sql:user2point','replace',array(
+		            'u2u_sub'=>$_SESSION['Jlib_auth']['u_id'],
+		            'u2u_sig'=>$o_id
+							));
+					}
+					
+          if( mysql_affected_rows()<1 && mysql_errno() ){
+            $GLOBALS['result']['error']= mysql_error();
+		        $this->pg='';
+						return false;
+					}
+
+					$this->pg=str_replace('{p_id}',$o_id, $tpl['subscribed']);
+				  break;
+				}
+				case 'unsubscribe':{
+					if( empty($_REQUEST['type']) || empty($_REQUEST['obj']) ){
+						$GLOBALS['result']['error']='Data not send';
+						return false;
+					}
+					$o_id=intval($_REQUEST['obj']);
+					switch($_REQUEST['type']){
+					  case 'point':
+					    $GLOBALS[CM]->run('sql:user2point','delete',array(
+		            'u2p_key_u'=>$_SESSION['Jlib_auth']['u_id'],
+		            'u2p_key_p'=>$o_id
+							));
+							$tpl=load('point.htm');
+					  	break;
+					  case 'user':
+					    $GLOBALS[CM]->run('sql:user2point','delete',array(
+		            'u2u_sub'=>$_SESSION['Jlib_auth']['u_id'],
+		            'u2u_sig'=>$o_id
+							));
+					}
+
+          if( mysql_affected_rows()<1 && mysql_errno() ){
+            $GLOBALS['result']['error']= mysql_error();
+		        $this->pg='';
+						return false;
+					}
+
+					$this->pg=str_replace('{p_id}',$o_id, $tpl['not_subscribed']);
 				  break;
 				}
 			}
 		}
+		
 	}
 	function after_make(){
 		if(!empty($_REQUEST['swf'])) exit($this->pg);

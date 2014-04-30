@@ -284,7 +284,10 @@ class lite_reg extends form {
 				if(!empty($this->wizard_data['u_email']) && !empty( $data['u_pwd'] ) ){
 					//Отправляю мыло
 				  require_once 'lib/class.phpmailer.php';
-				  $data['proj_email_name']=$GLOBALS['Jlib_proj_name'];
+				  
+      		$data['proj_email_name']=$GLOBALS['Jlib_defaults']['proj_email_name'];
+				  $data['proj_email']=$GLOBALS['Jlib_defaults']['proj_email'];
+      		
 				  $data['server']=$_SERVER['SERVER_NAME'];
 				  $msg=strjtr($this->tpl['mail_msg'], $data);
 
