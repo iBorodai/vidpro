@@ -45,28 +45,32 @@ class point extends item_viewer{
 		  'base'=>array(),
 		  'more'=>array(),
 		);
-		
+
 		foreach($fs_dt as $k=>$v){
 		  //пустные значения пропускаю
 		  if(empty($v) ) continue;
-		  if( isset( $this->data[$k] ) ){
-		    //позиция есть в основном кортеже записи
-		    if( empty( $this->data[$k] ) && !is_array($v) )
-	    	  $updates['base'][ $k ] = $v;
+		  if( is_array($v) ){
+		    $this->data[$k] = $v;
 			}else{
-			  //Проверяю в дополнительных даннх
-			  if( empty($this->data['p_more'][$k]) && !is_array($v) )
-			    $updates['more'][ $k ] = $v;
+				if( isset( $this->data[$k] ) ){
+			    //позиция есть в основном кортеже записи
+			    if( empty( $this->data[$k] )  )
+		    	   $this->data[$k] = $updates['base'][ $k ] = $v;
+				}else{
+				  //Проверяю в дополнительных даннх
+				  if( empty($this->data['p_more'][$k]) && !is_array($v) )
+				    $this->data['p_more'][$k]=$updates['more'][ $k ] = $v;
+				}
 			}
-			$this->data[$k] = $v;
 		}
+
 		
 		//переношу данные из доп поля в основной кортеж.
 		foreach($this->data['p_more'] as $k=>$v)	$this->data[$k]=$v;
 		unset( $this->data['p_more'] );
 
 		$updates['res']=$updates['base'];
-		if(!empty($updates['more'])) $updates['res']['p_more']=serialize($updates['more']);
+		//if(!empty($updates['more'])) $updates['res']['p_more']=serialize($updates['more']);
 		
 		if(!empty($updates['res'])){
 		  $GLOBALS[CM]->run('sql:point?p_id='.$this->data['p_id'],'update',$updates['res']);
@@ -104,6 +108,13 @@ class point extends item_viewer{
 		krsort($this->data['tips_ans']);
 		//echo '<pre class="debug">'.print_r ( $this->data['tips_ans'] ,true).'</pre>';exit();
 		unset($t);
+		
+		//Подписка авторизированного
+		if(!empty($_SESSION['Jlib_auth'])){
+		  //echo '<pre class="debug">'.print_r ( $this->data ,true).'</pre>';
+		  $tst=$GLOBALS[CM]->run('sql:user2point?u2p_key_u='.$_SESSION['Jlib_auth']['u_id'].' AND u2p_key_p='.$this->data['p_id'].'$shrink=yes limit=0,1 ');
+		  $this->data['subscribed']=!empty($tst);
+		}
 	}
 	
 	function before_parse(){
@@ -124,12 +135,26 @@ class point extends item_viewer{
 		 *****************/
 	  $p=array();
 	  if(!empty($this->data['photos'])){
+	    $first=true;
 			foreach( $this->data['photos'] as $v ){
+			  if($first){
+			    if(!empty($this->data['p_img']) && $this->data['p_img']!=$v['photo']){
+			      $tp=str_replace('{photo_big}', str_replace('tmb_','',$this->data['p_img']) , $this->tpl['gallery_item']);
+			      $tp=str_replace('{photo}',$this->data['p_img'], $tp);
+			      $p[]=str_replace('{title}',$this->data['p_name'], $tp);
+					}
+				}
 		    $p[]=strjtr( $this->tpl['gallery_item'],$v );
+		    $first=false;
 			}
 			$repl['gallery']=implode('', $p);
-		}else
-		  $repl['gallery']='';
+		}else{
+		  if( !empty($this->data['p_img']) ){
+		    $tp=str_replace('{photo_big}', str_replace('tmb_','',$this->data['p_img']) , $this->tpl['gallery_item']);
+	      $tp=str_replace('{photo}',$this->data['p_img'], $tp);
+	      $repl['gallery']=str_replace('{title}',$this->data['p_name'], $tp);
+			}else	$repl['gallery']='';
+		}
 		
 		/*****************
 		 *  auth

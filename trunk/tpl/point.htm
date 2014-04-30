@@ -6,7 +6,7 @@
 			    {gallery}
 				</div>
 				<div id="point_name_line">
-					<div id="point_name">{p_name}</div>
+					<div id="point_name" class="aef" rel="name">{p_name}</div>
 					<div id="point_likes">
 						{socials}
 						<!-- Place this anchor tag where you want the button to go -->
@@ -27,9 +27,9 @@
 					</div>
 				</div>
 				<div class="clear"></div>
-				<div id="point_tags">{p_themes}</div>
+				<div id="point_tags"  class="aef" rel="tags">{p_themes}</div>
 				<ul id="point_info" class="point_info">
-				  <li>Адрес <span>{p_addr}</span></li>
+				  <li>Адрес <span class="aef" rel="addr">{p_addr}</span></li>
 				  {p_timeframes}
 				  {p_phone}
 				  {p_site}
@@ -41,9 +41,9 @@
 				  {p_summerplace}
 				</ul>
 				<div id="point_control">
-					<a href="#"><i></i>Подписаться на это место</a>
-					<a href="#"><i></i>Поделиться ссылкой </a>
-					<a href="#"><i></i>Оставить отзыв</a>
+				  {subscribed}
+					<a href="#" onclick="return false;"><i></i>Поделиться ссылкой </a>
+					<a href="#" onclick="$('#write_review').click(); return false;"><i></i>Оставить отзыв</a>
 				</div>
 				<div class="clear"></div>
 				{p_dscr}
@@ -55,6 +55,7 @@
 	
 	<div style="display:none;">
 	  <div id="prm_point">
+	    <i id="prm_point_url">{p_url}</i>
 		  <i id="prm_point_weight">{p_weight}</i>
 		  <i id="prm_point_votes">{p_votes}</i>
 		  <i id="prm_point_plus_cnt">{p_plus_cnt}</i>
@@ -77,6 +78,10 @@
 	    </form>
 		</div>
 	</div>
+[not_subscribed]
+	<a href="#" id="subscribe" onclick="subscribe('point',{p_id}); return false;"><i></i>Подписаться на это место</a>
+[subscribed]
+	<a href="#" id="unsubscribe" onclick="unsubscribe('point',{p_id}); return false;"><i></i>Отписаться от комментариев</a>
 [auth]
 [not_auth]
 		<div id="point_social">
@@ -142,7 +147,7 @@
 		{body}
 	</div>
 [comm_line]
-  <div class="comment" rel="{com_id}">
+  <div class="comment" rel="{com_id}" id="com_{com_id}">
     <span class="arr"><span></span></span>
     <div class="bullet">
     	<img src="{u_img}">

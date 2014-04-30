@@ -78,6 +78,7 @@ $(document).ready(function(){
 		  $(this).css('opacity',1);
 		});
 	});
+	init_admin();
 });
 
 function FS_onLoadSaveToWidget(){
@@ -149,4 +150,175 @@ function comm_edit(obj){
 	$('.com_id_fld',rel).val( prt.attr('rel') );
 	$('.reveiw',rel).val( $.trim(prt.find('.text').text()) );
   return false;
+}
+
+function comm_alarm(obj){
+  var prt=$(obj).parents('.comment').first();
+	var id=prt.attr('rel');
+	
+	var req = new JsHttpRequest("utf-8");
+	req.onreadystatechange = function(){
+		if (req.readyState == 4){
+			if(req.responseJS){
+			  if( req.responseJS.error ){
+			    display_error(req.responseJS.error);
+				}else{
+				  display_message( 'Ваша жалоба отправлена модератору.<br>Спасибо за участие в проекте.' );
+				}
+			}
+			if(req.responseText!='') console.log(req.responseText);
+		}
+	}
+
+	req.open(null,'/ajax', true);
+	req.send({
+		'mode':'com_alarm',
+		fields:['block'],
+		com_id:id
+	});
+	return false;
+}
+
+function comm_del(obj){
+  var prt=$(obj).parents('.comment').first();
+	var id=prt.attr('rel');
+
+	var req = new JsHttpRequest("utf-8");
+	req.onreadystatechange = function(){
+		if (req.readyState == 4){
+			if(req.responseJS){
+			  if( req.responseJS.error ){
+			    display_error(req.responseJS.error);
+				}else{
+				  $('#com_'+id).remove();
+				  display_message( 'Коментарий удален' );
+				}
+			}
+			if(req.responseText!='') console.log(req.responseText);
+		}
+	}
+
+	req.open(null,'/ajax', true);
+	req.send({
+		'mode':'com_del',
+		fields:['block'],
+		com_id:id
+	});
+	return false;
+}
+
+function init_admin(){
+	if( $.trim($('#user_info .uinf_grp').text()) !='adm') return;
+	$('#point_main').addClass('editMode');
+	$('#point_main').append('<form id="uploadCover" style="display:none;" method="post" enctype="multipart/form-data" onsubmit="return false"><input type="file" name="newCover" id="newCover_fld" onChange="doCoverUpload(this);"></form>');
+	//Подставить ссылки управления
+	var fgi=$('#point_gallery a:first');
+	if(fgi.get().length<1){
+	  $('#point_gallery').append('<a href="#"><img src="/img/profile_def.jpg"></a>');
+	  var fgi=$('#point_gallery a:first');
+	}
+	fgi.prepend('<span><i></i></span>');
+	fgi.addClass('admin').removeClass('fb').unbind('click').attr('title','Изменить обложку').click(function(){
+	  $('#newCover_fld').click();
+	  return false;
+	});
+	
+	$('#point_main').append('<a href="#" class="admin_edit" onclick="gotoEdit(); return false;">Редактировать данные</a>')
+}
+
+function doCoverUpload(file_fld){
+	var req = new JsHttpRequest("utf-8");
+	req.onreadystatechange = function(){
+		if (req.readyState == 4){
+			if(req.responseJS){
+			  if( req.responseJS.error ){
+			    display_error(req.responseJS.error);
+				}else{
+				  $('#point_gallery a.admin span i').css('background',bgtmp);
+				  
+					$('#point_gallery .admin img').attr('src', req.responseJS.content+'?rnd='+Math.random() );
+				  display_message( 'Обложка изменена' );
+				}
+			}
+			if(req.responseText!='') console.log(req.responseText);
+		}
+	}
+	
+	var bgtmp=$('#point_gallery a.admin span i').css('background');
+	$('#point_gallery a.admin span i').css('background','url(/img/loading.gif) center center no-repeat');
+	var id=$('#point').attr('rel');
+	req.open(null,'/ajax', true);
+	req.send({
+		'mode':'admin_cover',
+		fields:['block'],
+		p_id:id,
+		cover:file_fld
+	});
+}
+
+function subscribe(type_var, id_var ){
+	var req = new JsHttpRequest("utf-8");
+	req.onreadystatechange = function(){
+		if (req.readyState == 4){
+			if(req.responseJS){
+			  if( req.responseJS.error ){
+			    display_error(req.responseJS.error);
+				}else{
+					$('#subscribe').replaceWith(req.responseJS.content);
+				  display_message( 'Подписка оформлена' );
+				}
+			}
+			if(req.responseText!='') console.log(req.responseText);
+		}
+	}
+
+	req.open(null,'/ajax', true);
+	req.send({
+		'mode':'subscribe',
+		fields:['block'],
+		type:type_var,
+		obj:id_var
+	});
+}
+function unsubscribe(type_var, id_var ){
+	var req = new JsHttpRequest("utf-8");
+	req.onreadystatechange = function(){
+		if (req.readyState == 4){
+			if(req.responseJS){
+			  if( req.responseJS.error ){
+			    display_error(req.responseJS.error);
+				}else{
+					$('#unsubscribe').replaceWith(req.responseJS.content);
+				  display_message( 'Подписка отменена' );
+				}
+			}
+			if(req.responseText!='') console.log(req.responseText);
+		}
+	}
+
+	req.open(null,'/ajax', true);
+	req.send({
+		'mode':'unsubscribe',
+		fields:['block'],
+		type:type_var,
+		obj:id_var
+	});
+}
+
+function gotoEdit(){
+	var url=$('#prm_point_url').text();
+	url='/point/'+url+'/edit';
+	//alert(url);
+	document.location=url;
+	return false;
+		$.fancybox({
+			'padding'		: 0,
+			'autoScale'		: false,
+			'transitionIn'	: 'none',
+			'transitionOut'	: 'none',
+			'width'		: 800,
+			'height'		: 600,
+			'href'			: url,
+			'type'			: 'iframe',
+		});
 }

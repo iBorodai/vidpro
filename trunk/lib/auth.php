@@ -33,15 +33,14 @@ class site_sd extends sd {
 		if(!$usr) return false;
 
 		if ($usr['u_pwd']!=$data['pwd']) return false;
+
 		if(!empty($usr['u_lock'])){
 			set_error_ex('user_locked',USR_MSG);
 			return false;
 		}
 
 		$auth_groups=array(
-			'admin'=>array('site_auth','admin_auth'),
-			'saller'=>array('site_auth'),
-			'vendor'=>array('site_auth'),
+			'adm'=>array('site_auth','admin_auth'),
 			'usr'=>array('site_auth'),
 		);
 		$acc=array(
