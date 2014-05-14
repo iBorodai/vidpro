@@ -8,6 +8,7 @@ function getmicrotime($elapsed=false){
     if ($elapsed) return $tm-$GLOBALS['jl_time_start'];
     else return $tm;
 }
+
 define ('DEBUG',0); // 3-extended debug
 define ('MSG_LEVEL',0);
 define ('Jlib_USE_CACHE',0);

@@ -207,10 +207,11 @@
 
 .comment .likes{
 		background:#fff;
-    top: 40px;
+    
     display: block;
     height: 15px;
-    left: 40px;
+    left: -50px;
+    top: 40px;
     position: absolute;
     text-align: center;
     width: 15px;

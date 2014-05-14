@@ -1,10 +1,28 @@
-[body]
+[wrapper]
 	<a href="#" id="nav_cats_lnk"><i></i><i></i><i></i></a>
 	<div id="nav_cats_block" class="nav_drop pop" style="display:none;">
 		<span class="arr"><span></span></span>
-	  {body}
+		{users}
+		{points}
+		{themes}
 	</div>
+	<script> window['active_nav_point']='{active}';</script>
+	<div id="line_nav_html" style="display:none;">
+	  <div id="line_nav">
+			{line_nav}
+		</div>
+	</div>
+[body]
+	<label>Интересы</label>
+	{link_all}
+  {body}
 [line]
 	<a href="{link-back}?theme={t_url}">{t_name}</a>
 [link_all]
   <a href="{link-back}">все</a>
+[users]
+  <a href="/?users=yes" class="nav_elm users">Люди</a>
+[points]
+  <a href="/?points=yes" class="nav_elm points">Места</a>
+[themes]
+  <a href="/" class="nav_elm theme">Интересы</a>

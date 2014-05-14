@@ -455,7 +455,8 @@
 								)cm ON (last_obj=p_id) LEFT JOIN
 								comment ON ( com_id=max_com_id ) LEFT JOIN
 								user ON ( com_key_u = u_id ) LEFT JOIN
-								likes ON ( l_key_obj = p_id AND l_type = \'pnt\' ) ,
+								likes ON ( l_key_obj = p_id AND l_type = \'pnt\' ) LEFT JOIN
+								user2point ON( u2p_key_p=p_id AND ( u2p_key_u=\'{auth_u_id}\' ) ),
 								region,
 								point2theme,
 								theme
@@ -464,13 +465,14 @@
 								com_id, com_type, com_date, com_short, com_cachelikes, com_cahecomms,
 								u_id, u_grp, u_url, u_name, u_img, u_gender, u_createdate, u_lastlogin,
 								r_id, r_name, r_url, r_lat, r_lng,
+								u2p_key_p,
 							 	COUNT( com_id ) p_comms, SUM( l_weight ) p_weight, COUNT( l_weight ) p_votes,
 								(
 									SELECT COUNT( l1.l_key_obj ) FROM likes l1 WHERE l1.l_key_obj = p_id AND l1.l_type = \'pnt\' AND l_weight >0
 								)p_plus_cnt
 							?p_key_reg=r_id AND
 							 p2t_key_p=p_id AND t_id=p2t_key_t {queries}
-							$group=p_id order=com_date direction=desc debug=yes',
+							$group=p_id order=com_date direction=desc',
 							
 			'ucl_themes'=>' p2t_key_t IN({themes}) ',
 			'ucl_city'=>' r_url IN( {city} ) ',
@@ -484,6 +486,67 @@
 			'line_tuner'=>'comms_list_last_ltuner',
 			'sections'=>array(
 			  'com_short'=>'any',
+			  'u2p_key_p'=>'any',
+			),
+		),
+		'comms_user_subscribed'=>array(
+	    'ctrl'=>'p_id',
+	    'vars'=>'p_id',
+	    'url'=>'p_id',
+			'ucl'=>'sql:point JOIN
+								comment ON ( p_id=com_key_obj AND com_type=\'pnt\' ) JOIN
+								user ON ( com_key_u = u_id ) JOIN
+								user2user ON ( u2u_sub={auth_u_id} AND u2u_sig=u_id )	LEFT JOIN
+								likes ON ( l_key_obj = p_id AND l_type = \'pnt\' ) LEFT JOIN
+								user2point ON( u2p_key_p=p_id AND ( u2p_key_u=\'{auth_u_id}\' ) ),
+								region
+							#p_id, p_url, p_fsid, p_name, p_img, p_dscr, p_key_reg, p_addr, p_lat, p_lng,
+								p_createdate,
+								com_id, com_type, com_date, com_short, com_cachelikes, com_cahecomms,
+								u_id, u_grp, u_url, u_name, u_img, u_gender, u_createdate, u_lastlogin,
+								r_id, r_name, r_url, r_lat, r_lng,
+								u2p_key_p,
+							 	COUNT( com_id ) p_comms, SUM( l_weight ) p_weight, COUNT( l_weight ) p_votes,
+								(
+									SELECT COUNT( l1.l_key_obj ) FROM likes l1 WHERE l1.l_key_obj = p_id AND l1.l_type = \'pnt\' AND l_weight >0
+								)p_plus_cnt
+							?p_key_reg=r_id
+							$group=p_id order=com_date direction=desc',
+	    'tpl'=>'point_user_subscribed.htm',
+	    'quantity'=>10,
+			'line_tuner'=>'comms_list_last_ltuner',
+			'sections'=>array(
+			  'com_short'=>'any',
+			  'u2p_key_p'=>'any',
+			),
+		),
+		'comms_points_subscribed'=>array(
+	    'ctrl'=>'p_id',
+	    'vars'=>'p_id',
+	    'url'=>'p_id',
+			'ucl'=>'sql:user2point, point LEFT JOIN
+								likes ON ( l_key_obj = p_id AND l_type = \'pnt\' ) JOIN
+								comment ON ( p_id=com_key_obj AND com_type=\'pnt\' ) JOIN
+								user ON ( com_key_u = u_id ),
+								region
+							#p_id, p_url, p_fsid, p_name, p_img, p_dscr, p_key_reg, p_addr, p_lat, p_lng,
+								p_createdate,
+								com_id, com_type, com_date, com_short, com_cachelikes, com_cahecomms,
+								u_id, u_grp, u_url, u_name, u_img, u_gender, u_createdate, u_lastlogin,
+								r_id, r_name, r_url, r_lat, r_lng,
+								u2p_key_p,
+							 	COUNT( com_id ) p_comms, SUM( l_weight ) p_weight, COUNT( l_weight ) p_votes,
+								(
+									SELECT COUNT( l1.l_key_obj ) FROM likes l1 WHERE l1.l_key_obj = p_id AND l1.l_type = \'pnt\' AND l_weight >0
+								)p_plus_cnt
+							?p_key_reg=r_id AND u2p_key_p=p_id AND u2p_key_u={auth_u_id}
+							$debug=yes group=p_id order=com_date direction=desc',
+	    'tpl'=>'point_user_subscribed.htm',
+	    'quantity'=>10,
+			'line_tuner'=>'comms_list_last_ltuner',
+			'sections'=>array(
+			  'com_short'=>'any',
+			  'u2p_key_p'=>'any',
 			),
 		),
 		'point'=>array(
@@ -492,7 +555,6 @@
 		  'url'=>'p_url',
 		  'tpl'=>'point.htm',
 		  'sections'=>array(
-		    'subscribed'=>'any',
 		    'p_timeframes'=>'any',
 		    'p_phone'=>'any',
 		    'p_site'=>'any',
@@ -563,7 +625,8 @@
 		'skin' => '',
 		'skinset' => 'pda',
 		'set_names' => 'utf8',
-		'proj_email'=>'mailbox@vidguk.pro',
+		//'proj_email'=>'mailbox@vidguk.pro',
+		'proj_email'=>'kronius@yandex.ru',
 		'proj_email_name'=>'vidguk.pro',
 	),
 
@@ -792,8 +855,8 @@
 			'frame' => 'default',
 			'class' => 'reg_handler',
 			'content' => array(
-			  'block1'=>'icontrol: tpl=index_layout.htm',
-			  'logo_nav'=>'nav_cats: tpl="nav_cats.htm" vars=theme ',
+			  'logo_nav'=>'nav_cats: tpl="nav_cats.htm" vars="theme&users&points" ',
+     		'block1'=>'icontrol: tpl=index_layout.htm',
 			),
 		),
 		'static_content' => array (

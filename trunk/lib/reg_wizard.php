@@ -160,7 +160,7 @@ class lite_reg extends form {
 					  if(!empty($_FILES['avatar'])){
 					    $fnm=$_FILES['avatar']['tmp_name']; if(isset($fnm[0]))$fnm=$fnm[0];
 					    $nnm='tmp_'.session_id();
-					    if(!empty($this->saller) && $_SESSION['Jlib_auth']['u_grp']=='admin'){
+					    if(!empty($this->saller) && $_SESSION['Jlib_auth']['u_grp']=='adm'){
 								$nnm=intval($this->saller);
 							}
 					    $i=j_make_image(

@@ -208,7 +208,7 @@ function comm_del(obj){
 }
 
 function init_admin(){
-	if( $.trim($('#user_info .uinf_grp').text()) !='adm') return;
+	if( $.trim($('#user_inf .uinf_grp').text()) !='adm') return;
 	$('#point_main').addClass('editMode');
 	$('#point_main').append('<form id="uploadCover" style="display:none;" method="post" enctype="multipart/form-data" onsubmit="return false"><input type="file" name="newCover" id="newCover_fld" onChange="doCoverUpload(this);"></form>');
 	//Подставить ссылки управления
@@ -256,6 +256,12 @@ function doCoverUpload(file_fld){
 	});
 }
 
+function subscribe_abs(obj){
+  subscribe('point', $('#point').attr('rel') );
+}
+function unsubscribe_abs(obj){
+  unsubscribe('point', $('#point').attr('rel') );
+}
 function subscribe(type_var, id_var ){
 	var req = new JsHttpRequest("utf-8");
 	req.onreadystatechange = function(){
@@ -264,7 +270,15 @@ function subscribe(type_var, id_var ){
 			  if( req.responseJS.error ){
 			    display_error(req.responseJS.error);
 				}else{
-					$('#subscribe').replaceWith(req.responseJS.content);
+				  switch(type_var){
+				    case 'point':
+				      $('#subscribe').replaceWith(req.responseJS.content);
+				      break;
+				    case 'user':
+				      $('.u_'+id_var).replaceWith(req.responseJS.content);
+				      break;
+					}
+					
 				  display_message( 'Подписка оформлена' );
 				}
 			}
@@ -288,7 +302,14 @@ function unsubscribe(type_var, id_var ){
 			  if( req.responseJS.error ){
 			    display_error(req.responseJS.error);
 				}else{
-					$('#unsubscribe').replaceWith(req.responseJS.content);
+				  switch(type_var){
+				    case 'point':
+				      $('#unsubscribe').replaceWith(req.responseJS.content);
+				      break;
+				    case 'user':
+				      $('.u_'+id_var).replaceWith(req.responseJS.content);
+				      break;
+					}
 				  display_message( 'Подписка отменена' );
 				}
 			}
@@ -309,8 +330,7 @@ function gotoEdit(){
 	var url=$('#prm_point_url').text();
 	url='/point/'+url+'/edit';
 	//alert(url);
-	document.location=url;
-	return false;
+	//document.location=url; return false;
 		$.fancybox({
 			'padding'		: 0,
 			'autoScale'		: false,
