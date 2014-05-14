@@ -41,8 +41,8 @@
 				  {p_summerplace}
 				</ul>
 				<div id="point_control">
-				  {subscribed}
-					<a href="#" onclick="return false;"><i></i>Поделиться ссылкой </a>
+				  {subscribed_block}
+					<!--<a href="#" onclick="return false;"><i></i>Поделиться ссылкой </a>-->
 					<a href="#" onclick="$('#write_review').click(); return false;"><i></i>Оставить отзыв</a>
 				</div>
 				<div class="clear"></div>
@@ -79,9 +79,9 @@
 		</div>
 	</div>
 [not_subscribed]
-	<a href="#" id="subscribe" onclick="subscribe('point',{p_id}); return false;"><i></i>Подписаться на это место</a>
+	<a href="#" id="subscribe" onclick="subscribe_abs(); return false;"><i></i>Подписаться на это место</a>
 [subscribed]
-	<a href="#" id="unsubscribe" onclick="unsubscribe('point',{p_id}); return false;"><i></i>Отписаться от комментариев</a>
+	<a href="#" id="unsubscribe" onclick="unsubscribe_abs(); return false;"><i></i>Отписаться от комментариев</a>
 [auth]
 [not_auth]
 		<div id="point_social">
@@ -158,23 +158,31 @@
 			<span class="date">{com_date}</span>
 			
 		  <span class="duration">на сайте <span class="from">{u_createdate}</span>.</span>
-			<a href="#" class="subscribe">Подписаться на отзывы участника</a>
+			{subscribe_user}
 		</div>
 		
 		<div class="text">{com_text}</div>
 		<div class="foot">
 		  {ans_button}
-		  <a href="#" class="fnc alarm" onclick="return comm_alarm(this);">Пожаловаться</a>
+		  {alarm_global_set}
 		  {owner_func}
 		  <a href="#" class="likes likes_{com_cachelikes}"><i></i>{com_cachelikes}</a>
 		</div>
 		{answer_{com_id}}
   </div>
+[subscribe_user]
+	<a href="#" class="subscribe u_{u_id}" id="subscribe_user" onclick="subscribe('user',{u_id}); return false;" >Подписаться на отзывы участника</a>
+[unsubscribe_user]
+	<a href="#" class="subscribe u_{u_id}" id="unsubscribe_user" onclick="unsubscribe('user',{u_id}); return false;">Отписаться от отзывов участника</a>
 [ans_button]
+  {ans_global_set}
+[ans_global_set]
   <a href="#" class="fnc answer" onclick="return comm_ans(this);">Ответить</a>
+[alarm_global_set]
+  <a href="#" class="fnc alarm" onclick="return comm_alarm(this);">Пожаловаться</a>
 [comm_owner_func]
 			<a href="#" class="fnc edit" onclick="return  comm_edit(this); ">Редактировать</a>
-		  <a href="#" class="fnc delete" onclick="return comm_del(this);">Удалить</a>
+		  <a href="#" class="fnc delete" onclick="if( confirm('Вы уверены?') ) comm_del(this); return false;">Удалить</a>
 [comm_line_fs]
   <div class="comment foursquare forign" rel="{id}">
     <div class="bullet">
@@ -190,8 +198,9 @@
 		<div class="text">
 		  {text}
 		</div>
+		
 		<div class="foot">
-		  <a href="#" class="fnc" onclick="return comm_ans(this);">Ответить</a>
+		  {ans_button}
 		</div>
 		{answer_{id}}
   </div>
@@ -209,7 +218,7 @@
 		  {text}
 		</div>
 		<div class="foot">
-		  <a href="#" class="fnc" onclick="return comm_ans(this);">Ответить</a>
+		  {ans_button}
 		</div>
 		{answer_{id}}
   </div>

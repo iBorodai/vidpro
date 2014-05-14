@@ -12,6 +12,28 @@
 	z-index:10;
 }
 
+#line_nav{
+	text-align:center;
+}
+#line_nav a{
+	font-size:18px;
+	padding:20px 20px 10px;
+	text-decoration:none;
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	*display: inline;
+
+	color:#000;
+	border-bottom:4px solid #fff;
+}
+
+#line_nav a.active{
+	font-weight:bold;
+	border-bottom:4px solid #00C6FF;
+}
+
 #point_container{
 	padding:0 10px;
 }
@@ -212,6 +234,10 @@
 	width:20px; height:20px;
 	background-position:-80px -17px;
 }
+.point_list .foot .rss.subscribed i{
+	background-position:-80px -38px;
+}
+
 .point_list .foot .geo i{
 	width:14px; height:20px;
 	background-position:-65px -17px;

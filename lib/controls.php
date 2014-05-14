@@ -430,7 +430,7 @@ function myscandir( $dn ){	// служебная для функции editmsgs(
 }
 
 function editmsgs(){	// в админке выводит для редактирования список мессаг из sys_msg и sys_err
-	if(empty($_SESSION['Jlib_auth']['u_grp'])||$_SESSION['Jlib_auth']['u_grp']!='admin') return 'Err: admin access is required';
+	if(empty($_SESSION['Jlib_auth']['u_grp'])||$_SESSION['Jlib_auth']['u_grp']!='adm') return 'Err: admin access is required';
 
 	// взять из базы
 	$ma=array();
@@ -753,7 +753,8 @@ function point_edit_before_save($form){
 }
 
 function point_edit_after_save($form){
-	redirect( str_replace('/edit','', $GLOBALS['Jlib_target']) ); exit();
+	//redirect( str_replace('/edit','', $GLOBALS['Jlib_target']) ); exit();
+	//$form->pg=$form->tpl['success'];
 }
 
 class list_viewer_noucl extends list_viewer{

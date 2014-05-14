@@ -237,6 +237,9 @@ function send_profile(form){
 			    display_error(req.responseJS.error);
 				}else{
 				  $('#dialog_block .profile_dialog').html( req.responseJS.content );
+				  $('#user_inf').html( $('#changed_profile').html() );
+				  $('#user_profile img').attr('src',$('#user_inf i.uinf_img').html()+'?id='+Math.random() );
+				  $('#user_subnav .title').html($('#user_inf i.uinf_name').html() );
 				  setTimeout( function(){dialog_hide();}, DIALOG_HIDE_TIMEOUT );
 				}
 			}

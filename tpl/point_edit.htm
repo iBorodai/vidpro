@@ -50,4 +50,22 @@
 		<input type="submit" value="Сохранить">
 	</form>
 [success]
-	<script>alert('OK');</script>
+	<style>
+		body{
+		  background:#fff;
+		}
+	  h2{
+			font-size:20px;display:block;
+			margin:50px 0 20px;
+		}
+		.w{padding:50px; text-align:center;}
+	</style>
+	<div class="w">
+		<h2>Данные сохранены.</h2>
+		<a href="#" onclick="parent.$.fancybox.close(); return false;">Закрыть диалог</a>
+	</div>
+	<script>
+	  setTimeout(function(){
+	    parent.$.fancybox.close();
+		},2000);
+	</script>

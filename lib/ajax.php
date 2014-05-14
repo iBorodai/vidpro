@@ -7,95 +7,23 @@ class ajax extends icontrol{
 					$this->pg=show_geo();
 					//Вывожу
        		$t=new list_viewer(array('dir_name'=>'comms_list_last'));
-       		/*
-       		$ucl='sql:point LEFT JOIN (
-										SELECT	com_key_obj last_obj, max(com_id) max_com_id, com_key_u last_com_uid
-								    FROM		comment
-								    WHERE		com_type=\'pnt\'
-								    GROUP BY com_key_obj
-								)cm ON (last_obj=p_id) LEFT JOIN
-								comment ON ( com_id=max_com_id ) LEFT JOIN
-								user ON ( com_key_u = u_id ) LEFT JOIN
-								likes ON ( l_key_obj = p_id AND l_type = \'pnt\' ) ,
-								region,
-								point2theme,
-								theme
-							#p_id, p_url, p_fsid, p_name, p_img, p_dscr, p_key_reg, p_addr, p_lat, p_lng,
-								p_createdate,
-								com_id, com_type, com_date, com_short, com_cachelikes, com_cahecomms,
-								u_id, u_grp, u_url, u_name, u_img, u_gender, u_createdate, u_lastlogin,
-								r_id, r_name, r_url, r_lat, r_lng,
-							 	COUNT( com_id ) p_comms, SUM( l_weight ) p_weight, COUNT( l_weight ) p_votes,
-								(
-									SELECT COUNT( l1.l_key_obj ) FROM likes l1 WHERE l1.l_key_obj = p_id AND l1.l_type = \'pnt\' AND l_weight >0
-								)p_plus_cnt
-							?p_key_reg=r_id AND
-							 p2t_key_p=p_id AND t_id=p2t_key_t {themes_place} {city_place} {exclude}
-							$group=p_id order=com_date direction=desc ';
-					$ucl_limit=' limit='.intval($_REQUEST['page']).',10 ';
-					*/
 							
 					$queries=array();
 					
 			    if( !empty($_SESSION['geolocation']['city']) ){
 			      if(!isset($queries[0])) $queries[0]=array();
 			      $queries[0][]=str_replace('{city}',("'".$_SESSION['geolocation']['city']."','".$_SESSION['geolocation']['reg']."'"),$t->params['ucl_city']);
-			      /*
-			      $repl=array(
-			        'city_place'=>$this->params['ucl_city'],
-				      'city'=>"'".$_SESSION['geolocation']['city']."','".$_SESSION['geolocation']['reg']."'",
-						);
-						*/
-					}/*else{
-					  $repl=array(
-					    'city_place'=>'',
-					  );
 					}
-					*/
+					
 					if( !empty($_SESSION['Jlib_auth']['u_themes']) ){
 					  if(!isset($queries[0])) $queries[0]=array();
 					  $queries[0][]=str_replace('{themes}',$_SESSION['Jlib_auth']['u_themes'],$t->params['ucl_themes']);
-					  /*
-					  $repl['themes_place']=$t->params['ucl_themes'];
-					  $repl['themes']=$_SESSION['Jlib_auth']['u_themes'];
-					  */
-					} /*else $repl['themes_place']='';*/
-					
-					//subscribes
-					if(!empty($queries['subscribes'])){
-					  if(!isset($queries[1])) $queries[1]=array();
-						$queries[1][]=$queries['subscribes'];
 					}
 					
-					//({themes_place} {city_place} {exclude}) {subscribes}
-					
-
-     
 					if(!empty($queries[0])) $queries[0]=implode(' AND ', $queries[0]);
 					if(!empty($queries[1])) $queries[1]=implode(' AND ', $queries[1]);
 					$repl['queries']=' AND ('.implode(') OR (', $queries).')';
 					
-					//$GLOBALS[CM]->run('sql:user2point#u2p_key_p?u2p_key_u='.$_SESSION['Jlib_auth']['u_id']);
-					
-					//if(!empty($_REQUEST['exclude'])) $repl['exclude']=' AND p_id NOT IN('.$_REQUEST['exclude'].') ';
-					
-					
-					/*
-			    $ucl = strjtr($ucl, $repl);
-			    $data=$GLOBALS[CM]->run($ucl.$ucl_limit);
-			    $t=new list_viewer_noucl(array('dir_name'=>'comms_list_last'));
-			    $ttl=$GLOBALS[CM]->run($ucl.' debug=yes','count');
-			    $t->set_data(array(
-						'data'=>$data,
-						'meta'=>array(
-							'count'=>count($data),
-				      'total'=>$ttl,
-				      'page'=>intval($_REQUEST['page'])
-						)
-					));
-					unset($data);
-					*/
-			    
 			    $t->params['ucl'] = strjtr($t->params['ucl'], $repl);
 			    $t->params['page_ctrl']='t_pg';
 			    $t->params['vars'].='&t_pg='. intval($_REQUEST['page']);
@@ -106,17 +34,46 @@ class ajax extends icontrol{
         		$title=$t->tpl['title_def'];
 			    else
 			      $title=$GLOBALS[CM]->run('sql:theme#t_name?t_url=\''. mysql_real_escape_string($t->ctrl['theme']) .'\'$shrink=yes');
-			    $this->pg= str_replace('{title}',$title,$t->pg) ;
+			    $this->pg = str_replace('{title}',$title,$t->pg);
+			    
+			    //Рекомендовать в списке только для авторизированных
+			    if(!empty($_SESSION['Jlib_auth']))$rec_func=$t->tpl['rec_func'];
+			    else $rec_func='';
+			    $this->pg = str_replace('{rec_func}',$rec_func,$this->pg);
+			    
 			    unset($t);
 
 			    break;
 				}
+				case 'points_user_subscribed':{
+       		$t=new list_viewer(array('dir_name'=>'comms_user_subscribed'));
+			    $t->get_maked();
+			    $this->pg = str_replace('{title}', $t->tpl['title_users'] ,$t->pg);
+			    
+					//Рекомендовать в списке только для авторизированных
+			    if(!empty($_SESSION['Jlib_auth']))$rec_func=$t->tpl['rec_func'];
+			    else $rec_func='';
+			    $this->pg = str_replace('{rec_func}',$rec_func,$this->pg);
+			    unset($t);
+				  break;
+				}
+				case 'points_subscribed':{
+       		$t=new list_viewer(array('dir_name'=>'comms_points_subscribed'));
+			    $t->get_maked();
+			    $this->pg = str_replace('{title}', $t->tpl['title_points'] ,$t->pg);
+
+					//Рекомендовать в списке только для авторизированных
+			    if(!empty($_SESSION['Jlib_auth']))$rec_func=$t->tpl['rec_func'];
+			    else $rec_func='';
+			    $this->pg = str_replace('{rec_func}',$rec_func,$this->pg);
+			    unset($t);
+				  break;
+				}
 				case 'points_group':{
 				  $this->pg=show_geo();
-				  
+					break;
 				}
 				case 'send_review':{
-				  
 					if(empty($_REQUEST['point']) || empty($_REQUEST['text'])){
 						$GLOBALS['result']['error']='не переданы данные';
 						return false;
@@ -245,6 +202,31 @@ class ajax extends icontrol{
 					  'u_gender'=>'',
 					  'u_bdate'=>'',
 					);
+
+					if(!empty($_FILES['avatar']['name']) && empty($_FILES['avatar']['error'])){
+					  $fname=date('ymdhis').uniqid('');
+					  $tmim=j_make_image(
+							$_FILES['avatar']['tmp_name'] ,
+							$fname ,
+							array(
+								'tmb_x' => '-1',
+								'tmb_y' => '-1',
+								'pic_px' => '180',
+								'pic_py' => '180',
+								'pic_lx' => '180',
+								'pic_ly' => '180',
+								'pic_fix' => 2,
+								'no_pic' => 'nophoto',
+								'path' => 'img/users',
+							),
+							false
+						);
+						if($tmim){
+						  $data['u_img']='/img/users/'.$fname.'.jpg';
+						  $_SESSION['Jlib_auth']['u_img_path']=$data['u_img'];
+						  $_SESSION['Jlib_auth']['u_img']=$data['u_img'];
+						}
+					}
 					if(!empty($_REQUEST['pro_gender'])){
 					  $data['u_gender']=($_REQUEST['pro_gender']=='f')?'f':'m';
 					}
@@ -258,10 +240,11 @@ class ajax extends icontrol{
           	$this->pg=$this->tpl['profile_store_success'];
           	$_SESSION['Jlib_auth']=array_merge($_SESSION['Jlib_auth'], $data);
           }
+          
+          $this->pg=strjtr($this->pg,$_SESSION['Jlib_auth']);
 				  break;
 				}
 				case 'search_points':{
-				  
 				  if(!empty($_REQUEST['val']['reg_new'])) {
 				    $this->pg='';
 				    return true;
@@ -415,7 +398,7 @@ class ajax extends icontrol{
 						return false;
 					}
 
-          $GLOBALS[CM]->run('sql:comment?com_id='.intval($_REQUEST['com_id']).' AND com_key_u='.$_SESSION['Jlib_auth']['u_id'].'$limit=0,1 debug=yes','delete');
+          $GLOBALS[CM]->run('sql:comment?com_id='.intval($_REQUEST['com_id']).' AND (com_key_u='.$_SESSION['Jlib_auth']['u_id'].' OR \''.$_SESSION['Jlib_auth']['u_grp'].'\'=\'adm\')$limit=0,1 debug=yes','delete');
           if( mysql_affected_rows()<1 ){
             if( mysql_errno() )
             	$GLOBALS['result']['error']= mysql_error();
@@ -496,19 +479,22 @@ class ajax extends icontrol{
 						return false;
 					}
 					$o_id=intval($_REQUEST['obj']);
+					$tpl=load('point.htm');
 					switch($_REQUEST['type']){
 					  case 'point':
 					    $GLOBALS[CM]->run('sql:user2point','replace',array(
 		            'u2p_key_u'=>$_SESSION['Jlib_auth']['u_id'],
 		            'u2p_key_p'=>$o_id
 							));
-							$tpl=load('point.htm');
+							$tvar='subscribed';
 					  	break;
 					  case 'user':
-					    $GLOBALS[CM]->run('sql:user2point','replace',array(
+					    $GLOBALS[CM]->run('sql:user2user','replace',array(
 		            'u2u_sub'=>$_SESSION['Jlib_auth']['u_id'],
 		            'u2u_sig'=>$o_id
 							));
+							$tvar='unsubscribe_user';
+							break;
 					}
 					
           if( mysql_affected_rows()<1 && mysql_errno() ){
@@ -517,28 +503,33 @@ class ajax extends icontrol{
 						return false;
 					}
 
-					$this->pg=str_replace('{p_id}',$o_id, $tpl['subscribed']);
+					$this->pg=str_replace('{p_id}',$o_id, $tpl[ $tvar ]);
+					$this->pg=str_replace('{u_id}',$o_id, $this->pg);
 				  break;
 				}
 				case 'unsubscribe':{
+				  
 					if( empty($_REQUEST['type']) || empty($_REQUEST['obj']) ){
 						$GLOBALS['result']['error']='Data not send';
 						return false;
 					}
 					$o_id=intval($_REQUEST['obj']);
+					$tpl=load('point.htm');
 					switch($_REQUEST['type']){
 					  case 'point':
-					    $GLOBALS[CM]->run('sql:user2point','delete',array(
-		            'u2p_key_u'=>$_SESSION['Jlib_auth']['u_id'],
-		            'u2p_key_p'=>$o_id
-							));
-							$tpl=load('point.htm');
+					    $GLOBALS[CM]->run(
+								'sql:user2point?u2p_key_u='.$_SESSION['Jlib_auth']['u_id'].' AND u2p_key_p='.$o_id,
+								'delete'
+							);
+							$tvar='not_subscribed';
 					  	break;
 					  case 'user':
-					    $GLOBALS[CM]->run('sql:user2point','delete',array(
-		            'u2u_sub'=>$_SESSION['Jlib_auth']['u_id'],
-		            'u2u_sig'=>$o_id
-							));
+					    $GLOBALS[CM]->run(
+								'sql:user2user?u2u_sub='.$_SESSION['Jlib_auth']['u_id'].' AND u2u_sig='.$o_id.'$debug=yes',
+								'delete'
+							);
+							$tvar='subscribe_user';
+					  	break;
 					}
 
           if( mysql_affected_rows()<1 && mysql_errno() ){
@@ -547,7 +538,8 @@ class ajax extends icontrol{
 						return false;
 					}
 
-					$this->pg=str_replace('{p_id}',$o_id, $tpl['not_subscribed']);
+					$this->pg=str_replace('{p_id}',$o_id, $tpl[$tvar]);
+					$this->pg=str_replace('{u_id}',$o_id, $this->pg);
 				  break;
 				}
 			}

@@ -18,7 +18,7 @@ if( empty($_REQUEST['s']) || empty($_REQUEST['m']) || empty($_REQUEST['l']) || !
 
 //require('session.php');
 session_start($_REQUEST['s']);
-if(empty($_SESSION['Jlib_auth']['u_grp'])||$_SESSION['Jlib_auth']['u_grp']!='admin') err('no auth, admin access is required');
+if(empty($_SESSION['Jlib_auth']['u_grp'])||$_SESSION['Jlib_auth']['u_grp']!='adm') err('no auth, admin access is required');
 
 if( strpos($_REQUEST['m'],'err.')!==0 ){
 	$tab='sys_msg'; $fld='msg_id';

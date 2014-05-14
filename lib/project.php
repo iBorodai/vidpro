@@ -16,6 +16,7 @@ class point extends item_viewer{
 																	 (SELECT COUNT(l1.l_key_obj) FROM likes l1 WHERE l1.l_key_obj=p_id AND l1.l_type='pnt' AND l_weight>0) p_plus_cnt
 																	 ".$you_sql_add."
 																	?p_url='".$this->ctrl['p_url']."'\$auto_query=no group=p_id shrink=yes limit=0,1");
+																	
 		//Если нет foursquare идентификатора - ничего не выйдет
 	  if(empty($this->data['p_fsid'])){
 	    $this->data=array();
@@ -85,14 +86,22 @@ class point extends item_viewer{
 		if(!empty($t['comms']) && is_array($t['comms']))
 			$this->data['tips']=array_merge($this->data['tips'], $t['comms']);
 
+		$subs=array(
+		  'tbl'=>'',
+		  'fld'=>''
+		);
+		if(!empty($_SESSION['Jlib_auth']['u_id'])){
+			$subs['tbl']='LEFT JOIN user2user ON(u2u_sub=\''.$_SESSION['Jlib_auth']['u_id'].'\' AND u2u_sig=u_id)';
+			$subs['fld']=',u2u_sig';
+		}
 		//Выбрать каменты из БД
-		$t=$GLOBALS[CM]->run('sql:comment,user
+		$t=$GLOBALS[CM]->run('sql:comment, user '.$subs['tbl'].'
 													#com_id,com_id id,com_pid,com_type,com_key_obj,com_weight,com_key_u,com_text,com_short,com_cachelikes,com_cahecomms,
                            u_id,u_grp,u_url,u_email,u_name,u_img,u_gender,u_createdate,u_lastlogin,u_lock,
 													DATE_FORMAT( com_date ,\'%Y%m%d%H%i%s\') did,
-													DATE_FORMAT( com_date ,\'%d.%m.%Y %H:%i\') com_date
+													DATE_FORMAT( com_date ,\'%d.%m.%Y %H:%i\') com_date '.$subs['fld'].'
 													?(com_type=\'pnt\' OR com_type=\'ans\') AND com_key_obj='.$this->data['p_id'].' AND com_key_u=u_id
-													$id=did order=com_pid direction=asc');
+													$id=did order=com_pid direction=asc ');
 
 		//Раскидываю на коменты и ответы
 		$coms=array(); $this->data['tips_ans']=array(); 
@@ -167,10 +176,11 @@ class point extends item_viewer{
 			//echo '<pre class="debug">'.print_r ( $this->data['tips_ans'] ,true).'</pre>';exit();
 			//echo '<pre class="debug">'.print_r ( $this->data['tips'] ,true).'</pre>';exit();
 			$answers=array();
+			
 			if(!empty($this->data['tips'])){
 			  $index=array(); $ans=array();
 			  $this->data['tips']=array_merge($this->data['tips'],$this->data['tips_ans']);
-			  
+//echo '<pre class="debug">'.print_r ( $this->data['tips'] ,true).'</pre>';exit();
 				foreach($this->data['tips'] as $k=>$v){
 					if(!empty($v['com_id']))
 						$tpl=$this->tpl['comm_line'];
@@ -182,9 +192,8 @@ class point extends item_viewer{
 					$v['owner_func']='';
 					if(!empty( $v['vendor'] )) $v['id']=$this->data['tips'][$k]['id']=$this->data['p_id'].$v['time'];
 					else{
-					  //echo $_SESSION['Jlib_auth']['u_id'].'~'.$v['com_key_u'].'<br />';
 					  if(	!empty($_SESSION['Jlib_auth']) && (
-								$_SESSION['Jlib_auth']['u_grp']=='admin' ||
+								$_SESSION['Jlib_auth']['u_grp']=='adm' ||
 								$v['com_key_u']==$_SESSION['Jlib_auth']['u_id']
 							)
 						){
@@ -194,10 +203,22 @@ class point extends item_viewer{
 					
 					$index[$v['id']]=$k;
 					
+					if(	
+					  empty($_SESSION['Jlib_auth']['u_id']) ||
+					  empty($v['u_id']) ||
+					  $_SESSION['Jlib_auth']['u_id']==$v['u_id']
+					)
+						$v['subscribe_user']='';
+					elseif( empty($v['u2u_sig']) )
+						$v['subscribe_user']=str_replace('{u_id}',$v['u_id'],$this->tpl['subscribe_user']);
+					else
+					  $v['subscribe_user']=str_replace('{u_id}',$v['u_id'],$this->tpl['unsubscribe_user']);
+					
 					if($v['com_weight']>0)$v['com_weight']=$this->tpl['comm_weight_plus'];
 					elseif($v['com_weight']<0)$v['com_weight']=$this->tpl['comm_weight_minus'];
 					else $v['com_weight']='';
 
+					
 					if(!empty($v['com_pid'])){
 					  $v['ans_button']='';
 						if( !empty( $index[$v['com_pid']] )){
@@ -206,8 +227,10 @@ class point extends item_viewer{
 						}
 					}else{
 					  $v['ans_button']=$this->tpl['ans_button'];
+					  
 					  $vals[]=strjtr($tpl,$v);
 					}
+				
 				}
 				
 				$repl['comms']=str_replace('{body}',implode('',$vals),$this->tpl['comm_body']);
@@ -217,6 +240,15 @@ class point extends item_viewer{
 			unset($vals);
 			$repl['comm_p_fscat_prim']=$this->data['p_fscat_prim'];
 			$repl['comm_p_name']=$this->data['p_name'];
+			if(!empty($_SESSION['Jlib_auth']['u_id'])){
+			  $repl['ans_global_set']=$this->tpl['ans_global_set'];
+				$repl['alarm_global_set']=$this->tpl['alarm_global_set'];
+				$repl['subscribed_block']=(!empty($this->data['subscribed']))?$this->tpl['subscribed']:$this->tpl['not_subscribed'];
+			}else{
+			  $repl['ans_global_set']='';
+				$repl['alarm_global_set']='';
+				$repl['subscribed_block']='';
+			}
 			
 			//.... подстановка
 			$this->pg=strjtr($this->pg,$repl);
@@ -577,17 +609,57 @@ class proj_get_meta extends get_meta{
 }
 
 class nav_cats extends list_viewer{
-	function init(){
+	function get_data(){
 	  if(empty($_SESSION['Jlib_auth']))
-			$this->params['ucl']='sql:theme';
-		else
-		  $this->params['ucl']='sql:theme,user2theme?u2t_key_t=t_id AND u2t_key_u='.$_SESSION['Jlib_auth']['u_id'];
-
-		if(!empty($this->ctrl['theme'])){
-		  $this->pg=str_replace('{body}', $this->tpl['link_all'].'{body}', $this->pg);
+	    $this->data=array();
+		else{
+		  $this->data_sub=array();
+		  $ucl='sql:theme,user2theme?u2t_key_t=t_id AND u2t_key_u='.$_SESSION['Jlib_auth']['u_id'];
+		  if(!empty($this->ctrl['theme'])) $ucl.=' AND t_url!=\''.mysql_real_escape_string($this->ctrl['theme']).'\'';
+		  
+		  $this->data=$GLOBALS[CM]->run( $ucl );
+		  $this->data_sub['points']=$GLOBALS[CM]->run('sql:user2point?u2p_key_u='.$_SESSION['Jlib_auth']['u_id']);
+		  $this->data_sub['users']=$GLOBALS[CM]->run('sql:user2user?u2u_sub='.$_SESSION['Jlib_auth']['u_id']);
 		}
-		parent::init();
 	}
+	
+	function before_join_lines(&$lines){
+		$repl=array('themes'=>'', 'users'=>'','points'=>'', 'link_all'=>'');
+		$line_nav=array();
+		
+		if(!empty($this->data)){
+		  $line_nav[]=$this->tpl['themes'];
+		}
+		if(!empty($this->data_sub['users'])){
+		  if(empty($this->ctrl['users'])) $repl['users']=$this->tpl['users'];
+		  $line_nav[]=$this->tpl['users'];
+		}
+		if(!empty($this->data_sub['points'])){
+		  if(empty($this->ctrl['points'])) $repl['points']=$this->tpl['points'];
+		  $line_nav[]=$this->tpl['points'];
+		}
+		if(!empty($this->ctrl['theme'])){
+      $repl['link_all']=$this->tpl['link_all'];
+		}
+		$repl['themes']=$this->pg;
+		
+		// SET active marker
+		$act='theme';
+		if(!empty($this->ctrl['theme'])) $act='theme';
+		elseif(!empty($this->ctrl['users'])) $act='users';
+		elseif(!empty($this->ctrl['points'])) $act='points';
+		
+		if(count($line_nav)>2) $repl['line_nav']=implode('',$line_nav);
+		else $repl['line_nav']='';
+		$repl['active']=$act;
+		
+		$this->pg=strjtr( $this->tpl['wrapper'],$repl );
+		unset($repl);
+	}
+}
+
+function from_nav_cats($prm){
+
 }
 
 function point_stat($prm){
