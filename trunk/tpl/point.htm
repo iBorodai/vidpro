@@ -166,7 +166,7 @@
 		  {ans_button}
 		  {alarm_global_set}
 		  {owner_func}
-		  <a href="#" class="likes likes_{com_cachelikes}"><i></i>{com_cachelikes}</a>
+		  {com_likes_{com_id}}
 		</div>
 		{answer_{com_id}}
   </div>
@@ -201,6 +201,7 @@
 		
 		<div class="foot">
 		  {ans_button}
+		  {com_likes_{id}}
 		</div>
 		{answer_{id}}
   </div>
@@ -219,6 +220,7 @@
 		</div>
 		<div class="foot">
 		  {ans_button}
+		  {com_likes_{id}}
 		</div>
 		{answer_{id}}
   </div>
@@ -262,6 +264,8 @@
 		  </div>
 		</div>
 	</div>
+[com_likes]
+	<a href="#" class="likes likes_{likes_cnt}" onclick="like_com(this); return false;" title="отметить коментарий как понравившийся"><i></i><span>{likes_cnt}</span></a>
 [DELmany]
 	Большинство
 [DELmany_all]
