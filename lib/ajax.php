@@ -323,68 +323,88 @@ class ajax extends icontrol{
 				  $this->pg='';
 				  $data=$GLOBALS[CM]->run('sql:theme LEFT JOIN user2theme ON(u2t_key_t=t_id AND u2t_key_u='.$_SESSION['Jlib_auth']['u_id'].')');
 				  
-				  $rs='';
-				  foreach($data as $v){
-				    $l=strjtr($this->tpl['interest_category'],$v);
-				    if( $v['u2t_key_u'] ) $l=str_replace('{checked}','checked',$l);
-				    $rs.=$l;
-					}
-					$GLOBALS['result']['interests']=str_replace('{body}',$rs,$this->tpl['interest_category_wrapper']);
+				  if(!empty($data)){
+					  $rs='';
+					  foreach($data as $v){
+					    $l=strjtr($this->tpl['interest_category'],$v);
+					    if( $v['u2t_key_u'] ) $l=str_replace('{checked}','checked',$l);
+					    $rs.=$l;
+						}
+						$GLOBALS['result']['interests']=str_replace('{body}',$rs,$this->tpl['interest_category_wrapper']);
+					}else
+					  $GLOBALS['result']['interests']='';
 					
 					
 					$data=$GLOBALS[CM]->run('sql:user2user, user
 																		#u_id,u_grp,u_url,u_name,u_sname,u_img,u_gender,u_bdate
 																		? u2u_sig=u_id AND u2u_sub='.$_SESSION['Jlib_auth']['u_id']
+
 																	);
-				  $rs='';
-				  foreach($data as $v){
-				    $l=strjtr($this->tpl['interest_users'],$v);
-				    $rs.=$l;
+					if(!empty($data)){
+					  $rs='';
+					  foreach($data as $v){
+					    $l=strjtr($this->tpl['interest_users'],$v);
+					    $rs.=$l;
+						}
+						$rs=str_replace('{checked}','checked',$rs);
+						$GLOBALS['result']['users']=str_replace('{body}',$rs,$this->tpl['interest_users_wrapper']);
+					}else{
+					  $GLOBALS['result']['users']='';
 					}
-					$rs=str_replace('{checked}','checked',$rs);
-					$GLOBALS['result']['users']=str_replace('{body}',$rs,$this->tpl['interest_users_wrapper']);
 					
 					$data=$GLOBALS[CM]->run('sql:user2point, point
 																		#p_id,p_url,p_fsid,p_name,p_img,p_dscr,p_key_reg,p_addr
 																		? u2p_key_p=p_id AND u2p_key_u='.$_SESSION['Jlib_auth']['u_id']
 																	);
-					$rs='';
-				  foreach($data as $v){
-				    $l=strjtr($this->tpl['interest_points'],$v);
-				    $rs.=$l;
+					if(!empty($data)){
+						$rs='';
+					  foreach($data as $v){
+					    $l=strjtr($this->tpl['interest_points'],$v);
+					    $rs.=$l;
+						}
+						$rs=str_replace('{checked}','checked',$rs);
+						$GLOBALS['result']['points']=str_replace('{body}',$rs,$this->tpl['interest_points_wrapper']);
+					}else{
+					  $GLOBALS['result']['points']='';
 					}
-					$rs=str_replace('{checked}','checked',$rs);
-					$GLOBALS['result']['points']=str_replace('{body}',$rs,$this->tpl['interest_points_wrapper']);
 				  break;
 				}
 				case 'send_interest':{
 					//if(empty($_REQUEST['themes'])){ $GLOBALS['result']['error']='Data not send'; return false; }
 
-					$GLOBALS[CM]->run('sql:user2theme?u2t_key_u='.$_SESSION['Jlib_auth']['u_id'].' AND u2t_key_t NOT IN('.implode(',', $_REQUEST['themes'] ).')','delete');
-					$sql="REPLACE into user2theme values "; $vals=array();
-					foreach($_REQUEST['themes'] as $v){
-					  $vals[]='('.$_SESSION['Jlib_auth']['u_id'].', '.$v.' )';
+					$GLOBALS[CM]->run('sql:user2theme?u2t_key_u='.$_SESSION['Jlib_auth']['u_id'].' ','delete');
+					if(!empty($_REQUEST['themes'])){
+						$sql="REPLACE into user2theme values "; $vals=array();
+						foreach($_REQUEST['themes'] as $v){
+						  $vals[]='('.$_SESSION['Jlib_auth']['u_id'].', '.$v.' )';
+						}
+						$sql.=implode(',', $vals);
+						$db=init_db();
+						if(!$db->query($sql)){ $GLOBALS['result']['error']='Mysql_error1: '.mysql_error(); return false;}
 					}
-					$sql.=implode(',', $vals);
-					$db=init_db();
-					if(!$db->query($sql)){ $GLOBALS['result']['error']='Mysql_error: '.mysql_error(); return false;}
-
-          $GLOBALS[CM]->run('sql:user2user?u2u_sub='.$_SESSION['Jlib_auth']['u_id'].' AND u2u_sig NOT IN('.implode(',', $_REQUEST['users'] ).')','delete');
-					$sql="REPLACE into user2user values "; $vals=array();
-					foreach($_REQUEST['users'] as $v){
-					  $vals[]='('.$_SESSION['Jlib_auth']['u_id'].', '.$v.' )';
-					}
-					$sql.=implode(',', $vals);
-					if(!$db->query($sql)){ $GLOBALS['result']['error']='Mysql_error: '.mysql_error(); return false;}
 					
-					$GLOBALS[CM]->run('sql:user2point?u2p_key_u='.$_SESSION['Jlib_auth']['u_id'].' AND u2p_key_p NOT IN('.implode(',', $_REQUEST['points'] ).')','delete');
-					$sql="REPLACE into user2point values "; $vals=array();
-					foreach($_REQUEST['points'] as $v){
-					  $vals[]='('.$_SESSION['Jlib_auth']['u_id'].', '.$v.' )';
-					}
-					$sql.=implode(',', $vals);
-					if(!$db->query($sql)){ $GLOBALS['result']['error']='Mysql_error: '.mysql_error(); return false;}
 
+          $GLOBALS[CM]->run('sql:user2user?u2u_sub='.$_SESSION['Jlib_auth']['u_id'].' ','delete');
+          if(!empty($_REQUEST['users'])){
+	          $sql="REPLACE into user2user values "; $vals=array();
+						foreach($_REQUEST['users'] as $v){
+						  $vals[]='('.$_SESSION['Jlib_auth']['u_id'].', '.$v.' )';
+						}
+						$sql.=implode(',', $vals);
+						if(!$db->query($sql)){ $GLOBALS['result']['error']='Mysql_error2: '.mysql_error(); return false;}
+					}
+					
+					if(!empty($_REQUEST['points'])){
+						$GLOBALS[CM]->run('sql:user2point?u2p_key_u='.$_SESSION['Jlib_auth']['u_id'].' ','delete');
+						$sql="REPLACE into user2point values "; $vals=array();
+						foreach($_REQUEST['points'] as $v){
+						  $vals[]='('.$_SESSION['Jlib_auth']['u_id'].', '.$v.' )';
+						}
+						$sql.=implode(',', $vals);
+						if(!$db->query($sql)){ $GLOBALS['result']['error']='Mysql_error3: '.mysql_error(); return false;}
+
+					}
+					
 					$this->pg=$this->tpl['send_interest_success'];
 				  break;
 				}
