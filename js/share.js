@@ -141,7 +141,9 @@ function interest_dialog(){
 				  if( req.responseJS.error ){
 				    display_error(req.responseJS.error);
 					}else{
-						$('#dialog_block .catigiries').html( req.responseJS.content );
+						$('#dialog_block .catigiries').html( req.responseJS.interests );
+						$('#dialog_block .users').html( req.responseJS.users );
+						$('#dialog_block .points').html( req.responseJS.points );
 						set_act_radio();
 					}
 				}

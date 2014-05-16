@@ -414,6 +414,7 @@ body {
 	background:#fff;
 	display:none;
 	box-shadow:0 5px 5px #777;
+	padding-top:20px;
 }
 
 .relative{
@@ -581,7 +582,7 @@ font-weight:bold
 #dialog_block .close{
 	position:absolute;
 	right:0;
-	top:0;
+	top:-20px;
 }
 
 .profile_dialog .fline{
@@ -695,6 +696,20 @@ button.submit{
 .check_block.active{
   background:#00C6FF;
 }
+.check_block img{
+		-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+		filter:	alpha(opacity=50);
+		-moz-opacity: .5;
+		-khtml-opacity: .5;
+		opacity: .5;
+}
+.check_block.active img{
+		-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+		filter:	alpha(opacity=100);
+		-moz-opacity: 1;
+		-khtml-opacity: 1;
+		opacity: 1;
+}
 
 .check_block .bubble{
 	position:absolute;
@@ -743,6 +758,7 @@ button.submit{
 	width:100%;
 	height:100%;
 	position:absolute;
+	z-index:10;
 	top:0; left:0;
 		-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
 		filter:	alpha(opacity=0);
@@ -820,4 +836,25 @@ line-height: 24px;
 	right:5px;
 	font-size:10px;
 	color:#fff;
+}
+
+.interest_dialog{
+	margin: 0 auto;
+	position: relative;
+	width: 72%;
+}
+
+.interest_dialog h3{
+	margin-top:10px;
+}
+
+.interest_dialog .points .check_block{
+	overflow:hidden;
+}
+.interest_dialog .points .check_block img{
+	max-width:120%;
+	max-height:120%;
+	min-height:100%;
+	min-width:100%;
+
 }

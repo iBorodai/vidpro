@@ -168,6 +168,7 @@
 .comment .text{color:#687184; font-size:13px; line-height:18px; margin-top: 38px;}
 .comment.forign .text{
   margin-top: 0;
+  min-height:26px;
 }
 .comment.forign img{
 	vertical-align:middle;
@@ -182,6 +183,7 @@
 }
 .comment .foot{
 	margin-top:20px;
+	position:relative;
 }
 .comment .foot a.fnc{
 	border-left:1px solid #b1b2b4;
@@ -206,17 +208,35 @@
 }
 
 .comment .likes{
-		background:#fff;
-    
     display: block;
     height: 15px;
-    left: -50px;
-    top: 40px;
+    left: -70px;
+    top: -5px;
     position: absolute;
-    text-align: center;
-    width: 15px;
+    text-align: right;
+    width: 55px;
+    text-decoration:none;
+    color:#777a7f;
+    font-size:11px;
 }
-.comment .likes.likes_0{display:none;}
+.comment .likes i{
+	display:block;
+	float:left;
+  width:20px;
+  height:17px;
+  background:url(/img/sprite.png) no-repeat -44px -39px;
+  margin-top:-3px;
+}
+.comment .likes span{
+	display:block;
+	float:left;
+	margin-left:3px;
+}
+
+.comment .likes.likes_0 span{display:none;}
+.comment .likes.likes_0 i{
+	background-position:-44px -18px;
+}
 
 .stat_block .stat_info{
 	display: -moz-inline-stack;

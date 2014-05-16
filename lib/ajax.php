@@ -320,20 +320,45 @@ class ajax extends icontrol{
 					break;
 				}
 				case 'show_interest':{
-				  $data=$GLOBALS[CM]->run('sql:theme LEFT JOIN user2theme ON(u2t_key_t=t_id AND u2t_key_u='.$_SESSION['Jlib_auth']['u_id'].')');
 				  $this->pg='';
+				  $data=$GLOBALS[CM]->run('sql:theme LEFT JOIN user2theme ON(u2t_key_t=t_id AND u2t_key_u='.$_SESSION['Jlib_auth']['u_id'].')');
+				  
+				  $rs='';
 				  foreach($data as $v){
 				    $l=strjtr($this->tpl['interest_category'],$v);
 				    if( $v['u2t_key_u'] ) $l=str_replace('{checked}','checked',$l);
-				    $this->pg.=$l;
+				    $rs.=$l;
 					}
+					$GLOBALS['result']['interests']=str_replace('{body}',$rs,$this->tpl['interest_category_wrapper']);
+					
+					
+					$data=$GLOBALS[CM]->run('sql:user2user, user
+																		#u_id,u_grp,u_url,u_name,u_sname,u_img,u_gender,u_bdate
+																		? u2u_sig=u_id AND u2u_sub='.$_SESSION['Jlib_auth']['u_id']
+																	);
+				  $rs='';
+				  foreach($data as $v){
+				    $l=strjtr($this->tpl['interest_users'],$v);
+				    $rs.=$l;
+					}
+					$rs=str_replace('{checked}','checked',$rs);
+					$GLOBALS['result']['users']=str_replace('{body}',$rs,$this->tpl['interest_users_wrapper']);
+					
+					$data=$GLOBALS[CM]->run('sql:user2point, point
+																		#p_id,p_url,p_fsid,p_name,p_img,p_dscr,p_key_reg,p_addr
+																		? u2p_key_p=p_id AND u2p_key_u='.$_SESSION['Jlib_auth']['u_id']
+																	);
+					$rs='';
+				  foreach($data as $v){
+				    $l=strjtr($this->tpl['interest_points'],$v);
+				    $rs.=$l;
+					}
+					$rs=str_replace('{checked}','checked',$rs);
+					$GLOBALS['result']['points']=str_replace('{body}',$rs,$this->tpl['interest_points_wrapper']);
 				  break;
 				}
 				case 'send_interest':{
-					if(empty($_REQUEST['themes'])){
-						$GLOBALS['result']['error']='Data not send';
-						return false;
-					}
+					//if(empty($_REQUEST['themes'])){ $GLOBALS['result']['error']='Data not send'; return false; }
 
 					$GLOBALS[CM]->run('sql:user2theme?u2t_key_u='.$_SESSION['Jlib_auth']['u_id'].' AND u2t_key_t NOT IN('.implode(',', $_REQUEST['themes'] ).')','delete');
 					$sql="REPLACE into user2theme values "; $vals=array();
@@ -342,12 +367,25 @@ class ajax extends icontrol{
 					}
 					$sql.=implode(',', $vals);
 					$db=init_db();
-					$db->query($sql);
+					if(!$db->query($sql)){ $GLOBALS['result']['error']='Mysql_error: '.mysql_error(); return false;}
 
-					if( mysql_error() ){
-					  $GLOBALS['result']['error']='Данные не сохранены';
-					}else
-					  $this->pg=$this->tpl['send_interest_success'];
+          $GLOBALS[CM]->run('sql:user2user?u2u_sub='.$_SESSION['Jlib_auth']['u_id'].' AND u2u_sig NOT IN('.implode(',', $_REQUEST['users'] ).')','delete');
+					$sql="REPLACE into user2user values "; $vals=array();
+					foreach($_REQUEST['users'] as $v){
+					  $vals[]='('.$_SESSION['Jlib_auth']['u_id'].', '.$v.' )';
+					}
+					$sql.=implode(',', $vals);
+					if(!$db->query($sql)){ $GLOBALS['result']['error']='Mysql_error: '.mysql_error(); return false;}
+					
+					$GLOBALS[CM]->run('sql:user2point?u2p_key_u='.$_SESSION['Jlib_auth']['u_id'].' AND u2p_key_p NOT IN('.implode(',', $_REQUEST['points'] ).')','delete');
+					$sql="REPLACE into user2point values "; $vals=array();
+					foreach($_REQUEST['points'] as $v){
+					  $vals[]='('.$_SESSION['Jlib_auth']['u_id'].', '.$v.' )';
+					}
+					$sql.=implode(',', $vals);
+					if(!$db->query($sql)){ $GLOBALS['result']['error']='Mysql_error: '.mysql_error(); return false;}
+
+					$this->pg=$this->tpl['send_interest_success'];
 				  break;
 				}
 				case 'com_alarm':{
@@ -540,6 +578,28 @@ class ajax extends icontrol{
 
 					$this->pg=str_replace('{p_id}',$o_id, $tpl[$tvar]);
 					$this->pg=str_replace('{u_id}',$o_id, $this->pg);
+				  break;
+				}
+				case 'like_com':{
+				  if( empty($_REQUEST['obj']) ){
+						$GLOBALS['result']['error']='Data not send';
+						return false;
+					}
+					if(!is_numeric($_REQUEST['obj'])){
+					  $GLOBALS['result']['error']='Data fail';
+						return false;
+					}
+					$GLOBALS[CM]->run('sql:likes$debug=yes','replace',array(
+					  'l_weight'=>1,
+						'l_type'=>'com',
+						'l_key_obj'=>$_REQUEST['obj'],
+						'l_key_u'=>$_SESSION['Jlib_auth']['u_id'],
+						'l_date'=>date('Y-m-d H:i:s'),
+					));
+					if( mysql_errno() ){
+					  $GLOBALS['result']['error']='Mysql error:'.mysql_error();
+					}
+					$this->pg='ok';
 				  break;
 				}
 			}

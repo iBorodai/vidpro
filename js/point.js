@@ -342,3 +342,35 @@ function gotoEdit(){
 			'type'			: 'iframe',
 		});
 }
+
+function like_com(domObj){
+	var id=$(domObj).parents('.comment').attr('rel');
+	var req = new JsHttpRequest("utf-8");
+	
+	req.onreadystatechange = function(){
+		if (req.readyState == 4){
+			if(req.responseJS){
+			  if( req.responseJS.error ){
+			    display_error(req.responseJS.error);
+				}else{
+				  display_message( 'Ваш лайк учтен, спасибо за участие в проекте.' );
+				  if( $(domObj).hasClass('likes_0') ){
+				    $(domObj).removeClass('likes_0').addClass('likes_1');
+				    $('span',domObj).html('1');
+					}else{
+					  var res=parseInt($('span',domObj).html())+1;
+					  $('span',domObj).html( res );
+					}
+				}
+			}
+			if(req.responseText!='') console.log(req.responseText);
+		}
+	}
+
+	req.open(null,'/ajax', true);
+	req.send({
+		'mode':'like_com',
+		fields:['block'],
+		obj:id
+	});
+}

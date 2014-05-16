@@ -26,9 +26,7 @@ class point extends item_viewer{
 		//Обращение к foursquare (там есть кэш)
 		$GLOBALS['FS']=init_fs();
 		$dt=$GLOBALS['FS']->venue( $this->data['p_fsid'] );
-//echo '<pre class="debug">'.print_r ( $dt ,true).'</pre>';exit();
 		if(!$dt){
-			//echo '<pre class="debug">'.print_r ( $GLOBALS['FS']->errors ,true).'</pre>'; exit();
 		  $this->data=array(); return true;
 		}
 		
@@ -180,18 +178,26 @@ class point extends item_viewer{
 			if(!empty($this->data['tips'])){
 			  $index=array(); $ans=array();
 			  $this->data['tips']=array_merge($this->data['tips'],$this->data['tips_ans']);
-//echo '<pre class="debug">'.print_r ( $this->data['tips'] ,true).'</pre>';exit();
+			  //echo '<pre class="debug">'.print_r ( $this->data['tips'] ,true).'</pre>'; exit();
+			  $com_ids=array();
 				foreach($this->data['tips'] as $k=>$v){
-					if(!empty($v['com_id']))
+					if(!empty($v['com_id'])){
 						$tpl=$this->tpl['comm_line'];
-					elseif( !empty($v['vendor']) && !empty($this->tpl['comm_line_'.$v['vendor']]) )
-					  $tpl=$this->tpl['comm_line_'.$v['vendor']];
-					else
-						$tpl=$this->tpl['comm_line_fs'];
-						
+						$com_ids[]=$v['com_id'];
+					}else{
+					  $v['id']=$this->data['tips'][$k]['id']=$this->data['p_id'].$v['time'];
+					  $com_ids[]=$v['id'];
+					  
+					  if( !empty($v['vendor']) && !empty($this->tpl['comm_line_'.$v['vendor']]) ){
+						  $tpl=$this->tpl['comm_line_'.$v['vendor']];
+
+						}else{
+							$tpl=$this->tpl['comm_line_fs'];
+						}
+					}
+					
 					$v['owner_func']='';
-					if(!empty( $v['vendor'] )) $v['id']=$this->data['tips'][$k]['id']=$this->data['p_id'].$v['time'];
-					else{
+					if(empty( $v['vendor'] )){
 					  if(	!empty($_SESSION['Jlib_auth']) && (
 								$_SESSION['Jlib_auth']['u_grp']=='adm' ||
 								$v['com_key_u']==$_SESSION['Jlib_auth']['u_id']
@@ -235,6 +241,15 @@ class point extends item_viewer{
 				
 				$repl['comms']=str_replace('{body}',implode('',$vals),$this->tpl['comm_body']);
 				foreach($ans as $k=>$v){  $repl['answer_'.$k]=str_replace('{body}',implode('', $v), $this->tpl['comm_answer_body']); }
+				
+				//Получить и подставить лайки
+				$comdt=$GLOBALS[CM]->run('sql:likes#l_key_obj, count(l_key_obj) cnt?l_key_obj IN('. implode(',',$com_ids) .') AND l_type=\'com\' $group=l_key_obj');
+				if(!empty($comdt)){
+				  $com_repl=array();
+				  foreach($comdt as $k=>$v){
+						$com_repl[ 'com_likes_'.$v['l_key_obj'] ]=str_replace('{likes_cnt}', $v['cnt'], $this->tpl['com_likes']);
+					}
+				}
 			}else
 			  $repl['comms']='';
 			unset($vals);
@@ -255,6 +270,10 @@ class point extends item_viewer{
 			//Убираю плейсходлеры ответов
 			$rega='~\{answer_\d+\}~';
     	$this->pg=preg_replace($rega, '', $this->pg);
+    	//echo '<pre class="debug">'.print_r ( $com_repl ,true).'</pre>'; exit();
+    	if(!empty($com_repl))$this->pg=strjtr( $this->pg, $com_repl );
+			$this->pg=preg_replace('~\{com_likes_\d+\}~', str_replace('{likes_cnt}', 0, $this->tpl['com_likes']), $this->pg);
+
 			
 		/*****************
 		 *  Голосовалка / рекоммендовалка
