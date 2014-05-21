@@ -85,10 +85,10 @@
 	right:0;
 	width:165px;
 }
-#point_info{margin-right: 20px; width:460px;}
-#point_info li span{width:385px;}
-#point_info2{width:310px;}
-#point_info2 li span{width:200px; }
+#point_info{margin-right: 20px; width:380px;}
+#point_info li span{width:300px;}
+#point_info2{width:400px;}
+#point_info2 li span{width:290px; }
 
 .point_info{
 	list-style:none;
@@ -225,7 +225,7 @@
   width:20px;
   height:17px;
   background:url(/img/sprite.png) no-repeat -44px -39px;
-  margin-top:-3px;
+ 
 }
 .comment .likes span{
 	display:block;
@@ -237,7 +237,9 @@
 .comment .likes.likes_0 i{
 	background-position:-44px -18px;
 }
-
+.comment .likes.likes_0 i:hover{
+background-position: -44px -39px;
+}
 .stat_block .stat_info{
 	display: -moz-inline-stack;
 	display: inline-block;
@@ -319,8 +321,8 @@
 
 #point_control{
 	display:block;
-  float: left;
-  width: 180px;
+  float: right;
+  width: 160px;
   margin-top:20px;
 }
 #point_control a{
@@ -329,6 +331,9 @@
 	text-decoration:none;
 	display:block;
 }
+#point_control a:hover{
+	color:#000;
+}
 #point_control a i{
 	width:10px; height:15px;
 	display:block; float:left;
@@ -336,8 +341,8 @@
 	margin-right:5px;
 }
 p.dscr{
-	font-size:11px;
-	color:#777a7f;
+	font-size:13px;
+	color:#687184;
 	margin-left: 20px;
 	width: 800px;
 }
