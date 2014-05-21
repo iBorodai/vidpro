@@ -1,4 +1,4 @@
-.trace,.debug{
+﻿.trace,.debug{
 	position:relative;
 	z-index:200;
 	background:#fff;
@@ -783,11 +783,11 @@ line-height: 24px;
 	margin:0 20px 0 10px;
 }
 #footer .copy,#footer .socials,#footer .nav{
-	margin-top:10px;
+	margin-top:12px;
 	float:left;
 	display:block;
 	color:#8b8e92;
-	font-size:14px;
+	font-size:12px;
 }
 #footer .nav{
 	float:right;
